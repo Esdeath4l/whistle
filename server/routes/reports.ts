@@ -83,6 +83,31 @@ export const getReports: RequestHandler = (req, res) => {
   }
 };
 
+export const getReportStatus: RequestHandler = (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const report = reports.find((report) => report.id === id);
+    if (!report) {
+      return res.status(404).json({ error: "Report not found" });
+    }
+
+    // Return limited information for anonymous status check
+    const statusInfo = {
+      id: report.id,
+      status: report.status,
+      created_at: report.created_at,
+      admin_response: report.admin_response || null,
+      admin_response_at: report.admin_response_at || null,
+    };
+
+    res.json(statusInfo);
+  } catch (error) {
+    console.error("Error fetching report status:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 export const updateReport: RequestHandler = (req, res) => {
   try {
     // Simple admin check

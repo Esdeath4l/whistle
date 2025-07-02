@@ -33,11 +33,18 @@ export default function Index() {
               </p>
             </div>
           </div>
-          <Link to="/admin">
-            <Button variant="outline" size="sm">
-              Admin Access
-            </Button>
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link to="/check-status">
+              <Button variant="ghost" size="sm">
+                Check Status
+              </Button>
+            </Link>
+            <Link to="/admin">
+              <Button variant="outline" size="sm">
+                Admin Access
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 

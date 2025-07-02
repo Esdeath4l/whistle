@@ -6,6 +6,7 @@ import {
   getReports,
   updateReport,
   adminLogin,
+  getReportStatus,
 } from "./routes/reports";
 
 export function createServer() {
@@ -25,6 +26,7 @@ export function createServer() {
   // Whistle API routes
   app.post("/api/reports", createReport);
   app.get("/api/reports", getReports);
+  app.get("/api/reports/:id/status", getReportStatus); // Anonymous status check
   app.put("/api/reports/:id", updateReport);
   app.post("/api/admin/login", adminLogin);
 

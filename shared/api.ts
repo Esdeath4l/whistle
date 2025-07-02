@@ -30,6 +30,14 @@ export interface GetReportsResponse {
   total: number;
 }
 
+export interface ReportStatusResponse {
+  id: string;
+  status: ReportStatus;
+  created_at: string;
+  admin_response?: string;
+  admin_response_at?: string;
+}
+
 export interface UpdateReportRequest {
   status?: ReportStatus;
   admin_response?: string;

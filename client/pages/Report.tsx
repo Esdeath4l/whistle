@@ -166,11 +166,17 @@ export default function Report() {
               </AlertDescription>
             </Alert>
 
-            <div className="flex gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to={`/check-status`}>
+                <Button className="whistle-gradient hover:opacity-90">
+                  Check Status Later
+                </Button>
+              </Link>
               <Link to="/">
                 <Button variant="outline">Return Home</Button>
               </Link>
               <Button
+                variant="secondary"
                 onClick={() => {
                   setSubmitted(false);
                   setMessage("");
