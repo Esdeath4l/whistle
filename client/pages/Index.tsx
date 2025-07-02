@@ -52,8 +52,13 @@ export default function Index() {
           <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
             Report Safely,
             <br />
-            <span className="whistle-gradient bg-clip-text text-transparent">
-              Stay Anonymous
+            <span className="font-bold flex-grow-0 mr-auto">
+              <p style={{ textIndent: "1em" }}>
+                <strong>
+                  <span className="ql-cursor">﻿</span>
+                </strong>
+                Stay Anonymous
+              </p>
             </span>
           </h2>
 
