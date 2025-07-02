@@ -52,13 +52,8 @@ export default function Index() {
           <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
             Report Safely,
             <br />
-            <span className="font-bold flex-grow-0 mr-auto">
-              <p style={{ textIndent: "1em" }}>
-                <strong>
-                  <span className="ql-cursor">﻿</span>
-                </strong>
-                Stay Anonymous
-              </p>
+            <span className="text-2xl font-bold block mt-2">
+              Stay Anonymous
             </span>
           </h2>
 
@@ -77,10 +72,12 @@ export default function Index() {
                 Submit Anonymous Report
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="px-8 py-6 text-lg">
-              <Shield className="w-5 h-5 mr-2" />
-              Learn How It Works
-            </Button>
+            <Link to="/how-it-works">
+              <Button variant="outline" size="lg" className="px-8 py-6 text-lg">
+                <Shield className="w-5 h-5 mr-2" />
+                Learn How It Works
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
