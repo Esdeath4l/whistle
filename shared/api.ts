@@ -1,11 +1,51 @@
 /**
- * Shared code between client and server
- * Useful to share types between client and server
- * and/or small pure JS functions that can be used on both client and server
+ * Shared types between client and server for Whistle app
  */
 
+export interface Report {
+  id: string;
+  message: string;
+  photo_url?: string;
+  created_at: string;
+  status: ReportStatus;
+  admin_response?: string;
+  admin_response_at?: string;
+}
+
+export type ReportStatus = "pending" | "reviewed" | "flagged" | "resolved";
+
+export interface CreateReportRequest {
+  message: string;
+  photo_url?: string;
+}
+
+export interface CreateReportResponse {
+  id: string;
+  message: string;
+  created_at: string;
+}
+
+export interface GetReportsResponse {
+  reports: Report[];
+  total: number;
+}
+
+export interface UpdateReportRequest {
+  status?: ReportStatus;
+  admin_response?: string;
+}
+
+export interface AdminAuthRequest {
+  password: string;
+}
+
+export interface AdminAuthResponse {
+  success: boolean;
+  token?: string;
+}
+
 /**
- * Example response type for /api/demo
+ * Legacy demo interface (keeping for compatibility)
  */
 export interface DemoResponse {
   message: string;
