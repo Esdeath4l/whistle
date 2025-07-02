@@ -12,8 +12,9 @@ import {
 let reports: Report[] = [];
 let reportIdCounter = 1;
 
-// Simple admin authentication (replace with proper auth in production)
-const ADMIN_PASSWORD = "admin123"; // In production, use environment variables
+// Admin authentication for harassment reporting system
+const ADMIN_USERNAME = "ritika";
+const ADMIN_PASSWORD = "satoru 2624";
 
 export const createReport: RequestHandler = (req, res) => {
   try {
@@ -50,7 +51,10 @@ export const getReports: RequestHandler = (req, res) => {
   try {
     // Simple admin check (in production, use proper JWT validation)
     const authHeader = req.headers.authorization;
-    if (!authHeader || authHeader !== `Bearer ${ADMIN_PASSWORD}`) {
+    if (
+      !authHeader ||
+      authHeader !== `Bearer ${ADMIN_USERNAME}:${ADMIN_PASSWORD}`
+    ) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
@@ -83,7 +87,10 @@ export const updateReport: RequestHandler = (req, res) => {
   try {
     // Simple admin check
     const authHeader = req.headers.authorization;
-    if (!authHeader || authHeader !== `Bearer ${ADMIN_PASSWORD}`) {
+    if (
+      !authHeader ||
+      authHeader !== `Bearer ${ADMIN_USERNAME}:${ADMIN_PASSWORD}`
+    ) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
@@ -113,15 +120,17 @@ export const updateReport: RequestHandler = (req, res) => {
 
 export const adminLogin: RequestHandler = (req, res) => {
   try {
-    const { password } = req.body;
+    const { username, password } = req.body;
 
-    if (password === ADMIN_PASSWORD) {
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
       res.json({
         success: true,
-        token: ADMIN_PASSWORD, // In production, generate proper JWT
+        token: `${ADMIN_USERNAME}:${ADMIN_PASSWORD}`, // In production, generate proper JWT
       });
     } else {
-      res.status(401).json({ success: false, error: "Invalid password" });
+      res
+        .status(401)
+        .json({ success: false, error: "Invalid username or password" });
     }
   } catch (error) {
     console.error("Error in admin login:", error);

@@ -50,6 +50,7 @@ import {
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [reports, setReports] = useState<Report[]>([]);
@@ -58,7 +59,7 @@ export default function Admin() {
   const [adminResponse, setAdminResponse] = useState("");
   const [statusFilter, setStatusFilter] = useState<ReportStatus | "all">("all");
 
-  const authToken = "admin123"; // In production, this would be stored securely
+  const authToken = "ritika:satoru 2624"; // In production, this would be stored securely
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,7 +71,7 @@ export default function Admin() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await response.json();
@@ -79,7 +80,7 @@ export default function Admin() {
         setIsAuthenticated(true);
         fetchReports();
       } else {
-        setLoginError("Invalid password");
+        setLoginError("Invalid username or password");
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -217,13 +218,25 @@ export default function Admin() {
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Lock className="w-8 h-8 text-primary" />
                 </div>
-                <CardTitle>Admin Access</CardTitle>
+                <CardTitle>Admin Access - Harassment Report System</CardTitle>
                 <CardDescription>
-                  Enter your admin password to access the dashboard
+                  Enter your admin credentials to access the harassment
+                  reporting dashboard
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="username">Username</Label>
+                    <Input
+                      id="username"
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="Enter admin username"
+                      required
+                    />
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="password">Password</Label>
                     <Input
@@ -287,9 +300,14 @@ export default function Admin() {
           {/* Stats and Filters */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Reports Dashboard</h2>
+              <h2 className="text-2xl font-bold mb-2">
+                Harassment Reports Dashboard
+              </h2>
               <p className="text-muted-foreground">
-                {reports.length} total reports
+                {reports.length} total harassment complaints received
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                All reports are forwarded here for admin review and response
               </p>
             </div>
 

@@ -36,6 +36,7 @@ export interface UpdateReportRequest {
 }
 
 export interface AdminAuthRequest {
+  username: string;
   password: string;
 }
 
