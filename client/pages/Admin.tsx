@@ -317,7 +317,9 @@ export default function Admin() {
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Lock className="w-8 h-8 text-primary" />
                 </div>
-                <CardTitle>Admin Access - Harassment Report System</CardTitle>
+                <CardTitle>
+                  <p>Admin Access</p>
+                </CardTitle>
                 <CardDescription>
                   Enter your admin credentials to access the harassment
                   reporting dashboard
