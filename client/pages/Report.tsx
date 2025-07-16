@@ -334,6 +334,7 @@ export default function Report() {
                       onValueChange={(value) =>
                         setCategory(value as ReportCategory)
                       }
+                      required
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select category" />
@@ -368,6 +369,7 @@ export default function Report() {
                       onValueChange={(value) =>
                         setSeverity(value as ReportSeverity)
                       }
+                      required
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select priority" />
