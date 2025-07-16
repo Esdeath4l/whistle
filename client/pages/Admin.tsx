@@ -52,6 +52,7 @@ import {
   UpdateReportRequest,
 } from "@shared/api";
 import { decryptReportData } from "@/lib/encryption";
+import { notificationService } from "@/lib/notifications";
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -94,6 +95,14 @@ export default function Admin() {
       if (data.success) {
         setIsAuthenticated(true);
         fetchReports();
+
+        // Setup real-time notifications
+        notificationService.setupRealtimeNotifications(authToken);
+
+        // Request notification permission
+        if ("Notification" in window && Notification.permission === "default") {
+          await Notification.requestPermission();
+        }
       } else {
         setLoginError(data.error || "Invalid username or password");
       }
@@ -376,7 +385,10 @@ export default function Admin() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsAuthenticated(false)}
+              onClick={() => {
+                setIsAuthenticated(false);
+                notificationService.disconnect();
+              }}
             >
               Sign Out
             </Button>

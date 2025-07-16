@@ -7,6 +7,7 @@ import {
   UpdateReportRequest,
   ReportStatus,
 } from "@shared/api";
+import { notifyNewReport } from "./notifications";
 
 // In-memory storage for demo (replace with actual database in production)
 let reports: Report[] = [];
@@ -87,6 +88,9 @@ export const createReport: RequestHandler = (req, res) => {
 
     reports.push(newReport);
     console.log("Report created successfully:", newReport.id); // Debug log
+
+    // Send real-time notification to admins
+    notifyNewReport(newReport);
 
     const response: CreateReportResponse = {
       id: newReport.id,
