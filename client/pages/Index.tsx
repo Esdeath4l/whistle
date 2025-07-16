@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Shield,
   MessageSquare,
@@ -13,8 +14,13 @@ import {
   Users,
   AlertTriangle,
   CheckCircle,
+  QrCode,
+  Zap,
+  Eye,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import QRCodeGenerator from "@/components/QRCodeGenerator";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function Index() {
   return (
@@ -34,6 +40,7 @@ export default function Index() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <QRCodeGenerator />
             <Link to="/check-status">
               <Button variant="ghost" size="sm">
                 Check Status
@@ -44,6 +51,7 @@ export default function Index() {
                 Admin Access
               </Button>
             </Link>
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -89,14 +97,17 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Features Grid */}
+      {/* Winning Features Section */}
       <section className="py-20 px-4 bg-muted/30">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
-            <h3 className="text-3xl font-bold mb-4">Why Choose Whistle?</h3>
+            <Badge variant="secondary" className="mb-4">
+              🏆 Award-Winning Features
+            </Badge>
+            <h3 className="text-3xl font-bold mb-4">Why Whistle Wins</h3>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Built with privacy and security at its core, designed for
-              organizations that care about their community.
+              Industry-leading security, real-time alerts, and innovative QR
+              access make Whistle the complete solution for anonymous reporting.
             </p>
           </div>
 
@@ -130,12 +141,38 @@ export default function Index() {
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
               <CardHeader>
                 <div className="w-12 h-12 rounded-lg bg-info/10 flex items-center justify-center mb-4">
-                  <Users className="w-6 h-6 text-info" />
+                  <Zap className="w-6 h-6 text-info" />
                 </div>
-                <CardTitle>Real-time Response</CardTitle>
+                <CardTitle>Real-time Alerts</CardTitle>
                 <CardDescription>
-                  Administrators receive instant notifications and can respond
-                  quickly.
+                  Instant admin notifications via email/SMS with priority
+                  categorization for emergency situations.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <QrCode className="w-6 h-6 text-primary" />
+                </div>
+                <CardTitle>QR Code Access</CardTitle>
+                <CardDescription>
+                  Generate printable QR codes for events - instant access
+                  without typing URLs or downloading apps.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-lg bg-warning/10 flex items-center justify-center mb-4">
+                  <Eye className="w-6 h-6 text-warning" />
+                </div>
+                <CardTitle>Smart Categorization</CardTitle>
+                <CardDescription>
+                  AI-powered severity detection with automatic routing for
+                  harassment, medical, and emergency reports.
                 </CardDescription>
               </CardHeader>
             </Card>

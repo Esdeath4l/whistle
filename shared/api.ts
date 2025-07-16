@@ -5,18 +5,29 @@
 export interface Report {
   id: string;
   message: string;
+  category: ReportCategory;
   photo_url?: string;
   created_at: string;
   status: ReportStatus;
   admin_response?: string;
   admin_response_at?: string;
+  severity?: ReportSeverity;
 }
 
 export type ReportStatus = "pending" | "reviewed" | "flagged" | "resolved";
+export type ReportCategory =
+  | "harassment"
+  | "medical"
+  | "emergency"
+  | "feedback"
+  | "safety";
+export type ReportSeverity = "low" | "medium" | "high" | "urgent";
 
 export interface CreateReportRequest {
   message: string;
+  category: ReportCategory;
   photo_url?: string;
+  severity?: ReportSeverity;
 }
 
 export interface CreateReportResponse {
