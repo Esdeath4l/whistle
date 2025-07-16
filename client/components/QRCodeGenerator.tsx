@@ -16,7 +16,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { QrCode, Download, Printer } from "lucide-react";
-import QRCode from "qrcode.react";
+import { QRCodeSVG } from "qrcode.react";
 
 interface QRCodeGeneratorProps {
   reportUrl?: string;
@@ -27,19 +27,33 @@ export default function QRCodeGenerator({ reportUrl }: QRCodeGeneratorProps) {
   const currentUrl = reportUrl || `${window.location.origin}/report`;
 
   const downloadQR = () => {
-    const canvas = document.getElementById("qr-code") as HTMLCanvasElement;
-    if (canvas) {
-      const url = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.download = "whistle-report-qr.png";
-      link.href = url;
-      link.click();
+    const svg = document.getElementById("qr-code") as SVGElement;
+    if (svg) {
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+
+      canvas.width = 200;
+      canvas.height = 200;
+
+      img.onload = () => {
+        ctx?.drawImage(img, 0, 0);
+        const url = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.download = "whistle-report-qr.png";
+        link.href = url;
+        link.click();
+      };
+
+      img.src = "data:image/svg+xml;base64," + btoa(svgData);
     }
   };
 
   const printQR = () => {
-    const canvas = document.getElementById("qr-code") as HTMLCanvasElement;
-    if (canvas) {
+    const svg = document.getElementById("qr-code") as SVGElement;
+    if (svg) {
+      const svgData = new XMLSerializer().serializeToString(svg);
       const printWindow = window.open("", "_blank");
       if (printWindow) {
         printWindow.document.write(`
@@ -47,11 +61,11 @@ export default function QRCodeGenerator({ reportUrl }: QRCodeGeneratorProps) {
             <head>
               <title>Whistle QR Code</title>
               <style>
-                body { 
-                  display: flex; 
-                  flex-direction: column; 
-                  align-items: center; 
-                  font-family: Arial, sans-serif; 
+                body {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  font-family: Arial, sans-serif;
                   padding: 20px;
                 }
                 .header { text-align: center; margin-bottom: 20px; }
@@ -66,7 +80,7 @@ export default function QRCodeGenerator({ reportUrl }: QRCodeGeneratorProps) {
                 <p><strong>Speak up safely. Stay anonymous.</strong></p>
               </div>
               <div class="qr-container">
-                <img src="${canvas.toDataURL("image/png")}" alt="QR Code" />
+                ${svgData}
               </div>
               <div class="instructions">
                 <h3>How to Report:</h3>
@@ -106,7 +120,7 @@ export default function QRCodeGenerator({ reportUrl }: QRCodeGeneratorProps) {
         <Card className="border-0">
           <CardContent className="pt-6 text-center">
             <div className="bg-white p-4 rounded-lg inline-block mb-4">
-              <QRCode
+              <QRCodeSVG
                 id="qr-code"
                 value={currentUrl}
                 size={200}
@@ -136,7 +150,7 @@ export default function QRCodeGenerator({ reportUrl }: QRCodeGeneratorProps) {
                   🔒 <strong>100% Anonymous</strong>
                 </p>
                 <p>
-                  �� <strong>Mobile Optimized</strong>
+                  📱 <strong>Mobile Optimized</strong>
                 </p>
                 <p>
                   ⚡ <strong>Real-time Admin Alerts</strong>
