@@ -13,6 +13,13 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   MessageSquare,
   Lock,
   Upload,
@@ -22,17 +29,69 @@ import {
   AlertCircle,
   Camera,
   Shield,
+  AlertTriangle,
+  Heart,
+  MessageCircle,
+  Flag,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { CreateReportRequest, CreateReportResponse } from "@shared/api";
+import {
+  CreateReportRequest,
+  CreateReportResponse,
+  ReportCategory,
+  ReportSeverity,
+} from "@shared/api";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function Report() {
   const [message, setMessage] = useState("");
+  const [category, setCategory] = useState<ReportCategory>("harassment");
+  const [severity, setSeverity] = useState<ReportSeverity>("medium");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [reportId, setReportId] = useState<string>("");
   const [error, setError] = useState<string>("");
+
+  const categoryOptions = [
+    {
+      value: "harassment",
+      label: "Harassment",
+      icon: Flag,
+      description: "Inappropriate behavior, bullying, or discrimination",
+    },
+    {
+      value: "medical",
+      label: "Medical Emergency",
+      icon: Heart,
+      description: "Health-related emergencies or medical assistance needed",
+    },
+    {
+      value: "emergency",
+      label: "Safety Emergency",
+      icon: AlertTriangle,
+      description: "Immediate safety threats or dangerous situations",
+    },
+    {
+      value: "safety",
+      label: "Safety Concern",
+      icon: Shield,
+      description: "General safety issues or security concerns",
+    },
+    {
+      value: "feedback",
+      label: "Feedback",
+      icon: MessageCircle,
+      description: "General feedback or non-urgent concerns",
+    },
+  ] as const;
+
+  const severityOptions = [
+    { value: "low", label: "Low Priority", color: "text-muted-foreground" },
+    { value: "medium", label: "Medium Priority", color: "text-yellow-600" },
+    { value: "high", label: "High Priority", color: "text-orange-600" },
+    { value: "urgent", label: "Urgent", color: "text-red-600" },
+  ] as const;
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -80,6 +139,8 @@ export default function Report() {
 
       const reportData: CreateReportRequest = {
         message: message.trim(),
+        category,
+        severity,
         photo_url: photo_url || undefined,
       };
 
@@ -209,12 +270,15 @@ export default function Report() {
               </p>
             </div>
           </Link>
-          <Link to="/">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link to="/">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+            </Link>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
@@ -243,6 +307,63 @@ export default function Report() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="category">Report Category *</Label>
+                    <Select
+                      value={category}
+                      onValueChange={(value) =>
+                        setCategory(value as ReportCategory)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categoryOptions.map((option) => {
+                          const Icon = option.icon;
+                          return (
+                            <SelectItem key={option.value} value={option.value}>
+                              <div className="flex items-center gap-2">
+                                <Icon className="w-4 h-4" />
+                                <div>
+                                  <div className="font-medium">
+                                    {option.label}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    {option.description}
+                                  </div>
+                                </div>
+                              </div>
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="severity">Priority Level *</Label>
+                    <Select
+                      value={severity}
+                      onValueChange={(value) =>
+                        setSeverity(value as ReportSeverity)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {severityOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            <span className={option.color}>{option.label}</span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="message">Your Report *</Label>
                   <Textarea

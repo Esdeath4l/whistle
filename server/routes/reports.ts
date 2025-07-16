@@ -18,19 +18,31 @@ const ADMIN_PASSWORD = "satoru 2624";
 
 export const createReport: RequestHandler = (req, res) => {
   try {
-    const { message, photo_url }: CreateReportRequest = req.body;
+    const { message, category, severity, photo_url }: CreateReportRequest =
+      req.body;
 
     if (!message || message.trim().length === 0) {
       return res.status(400).json({ error: "Message is required" });
     }
 
+    if (!category) {
+      return res.status(400).json({ error: "Category is required" });
+    }
+
     const newReport: Report = {
       id: `report_${reportIdCounter++}`,
       message: message.trim(),
+      category,
+      severity: severity || "medium",
       photo_url,
       created_at: new Date().toISOString(),
       status: "pending" as ReportStatus,
     };
+
+    // Auto-flag urgent reports
+    if (severity === "urgent" || category === "emergency") {
+      newReport.status = "flagged";
+    }
 
     reports.push(newReport);
 
