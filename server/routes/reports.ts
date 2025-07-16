@@ -18,15 +18,36 @@ const ADMIN_PASSWORD = "satoru 2624";
 
 export const createReport: RequestHandler = (req, res) => {
   try {
+    console.log("Received report data:", req.body); // Debug log
     const { message, category, severity, photo_url }: CreateReportRequest =
       req.body;
 
     if (!message || message.trim().length === 0) {
+      console.log("Error: Message is required");
       return res.status(400).json({ error: "Message is required" });
     }
 
     if (!category) {
+      console.log("Error: Category is required");
       return res.status(400).json({ error: "Category is required" });
+    }
+
+    const validCategories = [
+      "harassment",
+      "medical",
+      "emergency",
+      "safety",
+      "feedback",
+    ];
+    if (!validCategories.includes(category)) {
+      console.log("Error: Invalid category:", category);
+      return res.status(400).json({ error: "Invalid category" });
+    }
+
+    const validSeverities = ["low", "medium", "high", "urgent"];
+    if (severity && !validSeverities.includes(severity)) {
+      console.log("Error: Invalid severity:", severity);
+      return res.status(400).json({ error: "Invalid severity level" });
     }
 
     const newReport: Report = {
@@ -45,6 +66,7 @@ export const createReport: RequestHandler = (req, res) => {
     }
 
     reports.push(newReport);
+    console.log("Report created successfully:", newReport.id); // Debug log
 
     const response: CreateReportResponse = {
       id: newReport.id,

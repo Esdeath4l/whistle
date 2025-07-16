@@ -121,6 +121,16 @@ export default function Report() {
       return;
     }
 
+    if (!category) {
+      setError("Please select a category");
+      return;
+    }
+
+    if (!severity) {
+      setError("Please select a priority level");
+      return;
+    }
+
     setIsSubmitting(true);
     setError("");
 
@@ -144,6 +154,8 @@ export default function Report() {
         photo_url: photo_url || undefined,
       };
 
+      console.log("Submitting report data:", reportData); // Debug log
+
       const response = await fetch("/api/reports", {
         method: "POST",
         headers: {
@@ -152,16 +164,23 @@ export default function Report() {
         body: JSON.stringify(reportData),
       });
 
+      console.log("Response status:", response.status); // Debug log
+
       if (!response.ok) {
-        throw new Error("Failed to submit report");
+        const errorData = await response.json().catch(() => ({}));
+        console.error("API Error:", errorData);
+        throw new Error(errorData.error || "Failed to submit report");
       }
 
       const result: CreateReportResponse = await response.json();
+      console.log("Success:", result); // Debug log
       setReportId(result.id);
       setSubmitted(true);
     } catch (err) {
       console.error("Error submitting report:", err);
-      setError("Failed to submit report. Please try again.");
+      setError(
+        `Failed to submit report: ${err instanceof Error ? err.message : "Unknown error"}`,
+      );
     } finally {
       setIsSubmitting(false);
     }
