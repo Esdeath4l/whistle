@@ -51,6 +51,7 @@ import {
   GetReportsResponse,
   UpdateReportRequest,
 } from "@shared/api";
+import { decryptReportData } from "@/lib/encryption";
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -255,6 +256,26 @@ export default function Admin() {
     });
   };
 
+  const getDecryptedReport = (report: Report) => {
+    if (report.is_encrypted && report.encrypted_data) {
+      try {
+        return decryptReportData(report.encrypted_data);
+      } catch (error) {
+        console.error("Failed to decrypt report:", error);
+        return {
+          message: "[DECRYPTION ERROR]",
+          category: "encrypted",
+          photo_url: undefined,
+        };
+      }
+    }
+    return {
+      message: report.message,
+      category: report.category,
+      photo_url: report.photo_url,
+    };
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-background">
@@ -438,9 +459,24 @@ export default function Admin() {
                           <Calendar className="w-4 h-4" />
                           {formatDate(report.created_at)}
                         </div>
-                        {getCategoryBadge(report.category)}
+                        {getCategoryBadge(
+                          report.is_encrypted
+                            ? getDecryptedReport(report).category
+                            : report.category,
+                        )}
                         {getSeverityBadge(report.severity)}
-                        {report.photo_url && (
+                        {report.is_encrypted && (
+                          <Badge
+                            variant="secondary"
+                            className="bg-green-100 text-green-800"
+                          >
+                            <Lock className="w-3 h-3 mr-1" />
+                            E2E Encrypted
+                          </Badge>
+                        )}
+                        {(report.photo_url ||
+                          (report.is_encrypted &&
+                            getDecryptedReport(report).photo_url)) && (
                           <Badge variant="outline">
                             <ImageIcon className="w-3 h-3 mr-1" />
                             Photo
@@ -451,7 +487,14 @@ export default function Admin() {
                     </div>
 
                     <p className="text-foreground mb-4 line-clamp-3">
-                      {report.message}
+                      {report.is_encrypted ? (
+                        <span className="flex items-center gap-2">
+                          <Lock className="w-4 h-4 text-primary" />
+                          {getDecryptedReport(report).message}
+                        </span>
+                      ) : (
+                        report.message
+                      )}
                     </p>
 
                     <div className="flex items-center justify-between">
@@ -501,10 +544,19 @@ export default function Admin() {
                               <div>
                                 <Label className="text-sm font-medium">
                                   Message
+                                  {selectedReport.is_encrypted && (
+                                    <Badge variant="outline" className="ml-2">
+                                      <Lock className="w-3 h-3 mr-1" />
+                                      Encrypted
+                                    </Badge>
+                                  )}
                                 </Label>
                                 <div className="mt-2 p-4 bg-muted rounded-lg">
                                   <p className="whitespace-pre-wrap">
-                                    {selectedReport.message}
+                                    {selectedReport.is_encrypted
+                                      ? getDecryptedReport(selectedReport)
+                                          .message
+                                      : selectedReport.message}
                                   </p>
                                 </div>
                               </div>
