@@ -29,8 +29,9 @@ export const createReport: RequestHandler = (req, res) => {
       is_encrypted,
     }: CreateReportRequest = req.body;
 
-    // Handle encrypted reports
+    // Handle both encrypted and plain text reports
     if (is_encrypted && encrypted_data) {
+      // Encrypted report validation
       if (
         !encrypted_data.encryptedMessage ||
         !encrypted_data.encryptedCategory
@@ -38,8 +39,9 @@ export const createReport: RequestHandler = (req, res) => {
         console.log("Error: Encrypted data is incomplete");
         return res.status(400).json({ error: "Invalid encrypted data" });
       }
+      console.log("Processing encrypted report");
     } else {
-      // Legacy validation for non-encrypted reports
+      // Plain text report validation
       if (!message || message.trim().length === 0) {
         console.log("Error: Message is required");
         return res.status(400).json({ error: "Message is required" });
@@ -61,6 +63,7 @@ export const createReport: RequestHandler = (req, res) => {
         console.log("Error: Invalid category:", category);
         return res.status(400).json({ error: "Invalid category" });
       }
+      console.log("Processing plain text report");
     }
 
     const validSeverities = ["low", "medium", "high", "urgent"];
@@ -71,8 +74,10 @@ export const createReport: RequestHandler = (req, res) => {
 
     const newReport: Report = {
       id: `report_${reportIdCounter++}`,
-      message: is_encrypted ? "[ENCRYPTED]" : message.trim(),
-      category: is_encrypted ? ("encrypted" as ReportCategory) : category,
+      message: is_encrypted ? "[ENCRYPTED]" : (message || "").trim(),
+      category: is_encrypted
+        ? ("harassment" as ReportCategory)
+        : category || "feedback",
       severity: severity || "medium",
       photo_url: is_encrypted ? undefined : photo_url,
       created_at: new Date().toISOString(),

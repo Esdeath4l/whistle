@@ -148,22 +148,42 @@ export default function Report() {
         });
       }
 
-      // Encrypt sensitive data before submission
-      const encryptedData = encryptReportData({
-        message: message.trim(),
-        category,
-        photo_url: photo_url || undefined,
-      });
+      let reportData: CreateReportRequest;
 
-      const reportData: CreateReportRequest = {
-        message: "", // Clear text removed for security
-        category: "feedback", // Dummy category for obfuscation
-        severity,
-        encrypted_data: encryptedData,
-        is_encrypted: true,
-      };
+      try {
+        // Try to encrypt data
+        const encryptedData = encryptReportData({
+          message: message.trim(),
+          category,
+          photo_url: photo_url || undefined,
+        });
 
-      console.log("Submitting encrypted report data"); // Debug log (no sensitive data)
+        reportData = {
+          message: "", // Clear text removed for security
+          category: "feedback", // Dummy category for obfuscation
+          severity,
+          encrypted_data: encryptedData,
+          is_encrypted: true,
+        };
+
+        console.log("Submitting encrypted report data"); // Debug log (no sensitive data)
+      } catch (encryptionError) {
+        console.warn(
+          "Encryption failed, submitting as plain text:",
+          encryptionError,
+        );
+
+        // Fallback to plain text submission if encryption fails
+        reportData = {
+          message: message.trim(),
+          category,
+          severity,
+          photo_url: photo_url || undefined,
+          is_encrypted: false,
+        };
+
+        console.log("Submitting plain text report data (encryption failed)");
+      }
 
       const response = await fetch("/api/reports", {
         method: "POST",
@@ -176,9 +196,15 @@ export default function Report() {
       console.log("Response status:", response.status); // Debug log
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error("API Error:", errorData);
-        throw new Error(errorData.error || "Failed to submit report");
+        let errorMessage = "Failed to submit report";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          console.warn("Could not parse error response");
+        }
+        console.error("API Error:", errorMessage);
+        throw new Error(errorMessage);
       }
 
       const result: CreateReportResponse = await response.json();

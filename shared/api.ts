@@ -31,7 +31,8 @@ export type ReportCategory =
   | "medical"
   | "emergency"
   | "feedback"
-  | "safety";
+  | "safety"
+  | "encrypted";
 export type ReportSeverity = "low" | "medium" | "high" | "urgent";
 
 export interface CreateReportRequest {
