@@ -156,30 +156,14 @@ export default function Report() {
 
       let reportData: CreateReportRequest;
 
-      try {
-        // Try to encrypt data
-        const encryptedData = encryptReportData({
-          message: message.trim(),
-          category,
-          photo_url: photo_url || undefined,
-        });
-
-        reportData = {
-          message: "", // Clear text removed for security
-          category: "feedback", // Dummy category for obfuscation
-          severity,
-          encrypted_data: encryptedData,
-          is_encrypted: true,
-        };
-
-        console.log("Submitting encrypted report data"); // Debug log (no sensitive data)
-      } catch (encryptionError) {
-        console.warn(
-          "Encryption failed, submitting as plain text:",
-          encryptionError,
+      // Check if we're on mobile (QR code scan) for better compatibility
+      const isMobile =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent,
         );
 
-        // Fallback to plain text submission if encryption fails
+      if (isMobile) {
+        // Use plain text for mobile devices to ensure compatibility
         reportData = {
           message: message.trim(),
           category,
@@ -187,8 +171,42 @@ export default function Report() {
           photo_url: photo_url || undefined,
           is_encrypted: false,
         };
+        console.log("Submitting plain text report (mobile device detected)");
+      } else {
+        try {
+          // Try to encrypt data on desktop
+          const encryptedData = encryptReportData({
+            message: message.trim(),
+            category,
+            photo_url: photo_url || undefined,
+          });
 
-        console.log("Submitting plain text report data (encryption failed)");
+          reportData = {
+            message: "", // Clear text removed for security
+            category: "feedback", // Dummy category for obfuscation
+            severity,
+            encrypted_data: encryptedData,
+            is_encrypted: true,
+          };
+
+          console.log("Submitting encrypted report data"); // Debug log (no sensitive data)
+        } catch (encryptionError) {
+          console.warn(
+            "Encryption failed, submitting as plain text:",
+            encryptionError,
+          );
+
+          // Fallback to plain text submission if encryption fails
+          reportData = {
+            message: message.trim(),
+            category,
+            severity,
+            photo_url: photo_url || undefined,
+            is_encrypted: false,
+          };
+
+          console.log("Submitting plain text report data (encryption failed)");
+        }
       }
 
       const response = await fetch("/api/reports", {
