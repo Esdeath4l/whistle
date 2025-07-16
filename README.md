@@ -29,42 +29,10 @@ npm run build
 npm start
 ```
 
-### 🌐 Deploy to Render
 
-1. **Fork this repository** to your GitHub account
-
-2. **Connect to Render:**
-
-   - Go to [Render Dashboard](https://dashboard.render.com)
-   - Click "New +" → "Web Service"
-   - Connect your GitHub repository
-
-3. **Configure Service:**
-
-   - **Name:** `whistle-app`
-   - **Build Command:** `npm install && npm run build`
    - **Start Command:** `npm start`
    - **Instance Type:** Free (or upgrade for production)
 
-4. **Set Environment Variables:**
-
-   ```
-   NODE_ENV=production
-   PORT=10000
-   ADMIN_USERNAME=ritika
-   ADMIN_PASSWORD=your_secure_password
-   ```
-
-5. **Deploy:** Click "Create Web Service"
-
-Your app will be live at: `https://whistle-app.onrender.com`
-
-## 🔧 Configuration
-
-### Admin Access
-
-- **Username:** `ritika` (configurable via `ADMIN_USERNAME`)
-- **Password:** `satoru 2624` (configurable via `ADMIN_PASSWORD`)
 
 ### Security Features
 
@@ -178,16 +146,6 @@ npm install twilio
 ## 📄 License
 
 MIT License - Perfect for hackathons and production use.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
-
----
 
 **Built with ❤️ for safer communities**
 
