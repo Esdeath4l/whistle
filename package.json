@@ -19,7 +19,8 @@
     "test": "vitest --run",
     "format.fix": "prettier --write .",
     "typecheck": "tsc",
-    "render-postbuild": "npm run build"
+    "render-build": "npx vite build && npx vite build --config vite.config.server.ts"
+
   },
   "engines": {
     "node": ">=18.0.0",
