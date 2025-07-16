@@ -18,30 +18,48 @@ const ADMIN_PASSWORD = "satoru 2624";
 
 export const createReport: RequestHandler = (req, res) => {
   try {
-    console.log("Received report data:", req.body); // Debug log
-    const { message, category, severity, photo_url }: CreateReportRequest =
-      req.body;
+    console.log("Received encrypted report submission"); // Debug log (no sensitive data)
+    const {
+      message,
+      category,
+      severity,
+      photo_url,
+      encrypted_data,
+      is_encrypted,
+    }: CreateReportRequest = req.body;
 
-    if (!message || message.trim().length === 0) {
-      console.log("Error: Message is required");
-      return res.status(400).json({ error: "Message is required" });
-    }
+    // Handle encrypted reports
+    if (is_encrypted && encrypted_data) {
+      if (
+        !encrypted_data.encryptedMessage ||
+        !encrypted_data.encryptedCategory
+      ) {
+        console.log("Error: Encrypted data is incomplete");
+        return res.status(400).json({ error: "Invalid encrypted data" });
+      }
+    } else {
+      // Legacy validation for non-encrypted reports
+      if (!message || message.trim().length === 0) {
+        console.log("Error: Message is required");
+        return res.status(400).json({ error: "Message is required" });
+      }
 
-    if (!category) {
-      console.log("Error: Category is required");
-      return res.status(400).json({ error: "Category is required" });
-    }
+      if (!category) {
+        console.log("Error: Category is required");
+        return res.status(400).json({ error: "Category is required" });
+      }
 
-    const validCategories = [
-      "harassment",
-      "medical",
-      "emergency",
-      "safety",
-      "feedback",
-    ];
-    if (!validCategories.includes(category)) {
-      console.log("Error: Invalid category:", category);
-      return res.status(400).json({ error: "Invalid category" });
+      const validCategories = [
+        "harassment",
+        "medical",
+        "emergency",
+        "safety",
+        "feedback",
+      ];
+      if (!validCategories.includes(category)) {
+        console.log("Error: Invalid category:", category);
+        return res.status(400).json({ error: "Invalid category" });
+      }
     }
 
     const validSeverities = ["low", "medium", "high", "urgent"];
@@ -52,16 +70,18 @@ export const createReport: RequestHandler = (req, res) => {
 
     const newReport: Report = {
       id: `report_${reportIdCounter++}`,
-      message: message.trim(),
-      category,
+      message: is_encrypted ? "[ENCRYPTED]" : message.trim(),
+      category: is_encrypted ? ("encrypted" as ReportCategory) : category,
       severity: severity || "medium",
-      photo_url,
+      photo_url: is_encrypted ? undefined : photo_url,
       created_at: new Date().toISOString(),
       status: "pending" as ReportStatus,
+      encrypted_data: encrypted_data,
+      is_encrypted: is_encrypted || false,
     };
 
-    // Auto-flag urgent reports
-    if (severity === "urgent" || category === "emergency") {
+    // Auto-flag urgent reports (check severity since category might be encrypted)
+    if (severity === "urgent") {
       newReport.status = "flagged";
     }
 

@@ -12,6 +12,17 @@ export interface Report {
   admin_response?: string;
   admin_response_at?: string;
   severity?: ReportSeverity;
+  // Encrypted data fields
+  encrypted_data?: EncryptedReportData;
+  is_encrypted?: boolean;
+}
+
+export interface EncryptedReportData {
+  encryptedMessage: string;
+  encryptedCategory: string;
+  encryptedPhotoUrl?: string;
+  iv: string;
+  timestamp: string;
 }
 
 export type ReportStatus = "pending" | "reviewed" | "flagged" | "resolved";
@@ -28,6 +39,9 @@ export interface CreateReportRequest {
   category: ReportCategory;
   photo_url?: string;
   severity?: ReportSeverity;
+  // For encrypted submissions
+  encrypted_data?: EncryptedReportData;
+  is_encrypted?: boolean;
 }
 
 export interface CreateReportResponse {

@@ -42,6 +42,7 @@ import {
   ReportSeverity,
 } from "@shared/api";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { encryptReportData } from "@/lib/encryption";
 
 export default function Report() {
   const [message, setMessage] = useState("");
@@ -147,14 +148,22 @@ export default function Report() {
         });
       }
 
-      const reportData: CreateReportRequest = {
+      // Encrypt sensitive data before submission
+      const encryptedData = encryptReportData({
         message: message.trim(),
         category,
-        severity,
         photo_url: photo_url || undefined,
+      });
+
+      const reportData: CreateReportRequest = {
+        message: "", // Clear text removed for security
+        category: "feedback", // Dummy category for obfuscation
+        severity,
+        encrypted_data: encryptedData,
+        is_encrypted: true,
       };
 
-      console.log("Submitting report data:", reportData); // Debug log
+      console.log("Submitting encrypted report data"); // Debug log (no sensitive data)
 
       const response = await fetch("/api/reports", {
         method: "POST",
@@ -452,9 +461,11 @@ export default function Report() {
                 <Alert>
                   <Shield className="h-4 w-4" />
                   <AlertDescription>
-                    Your report will be submitted completely anonymously. No
-                    personal information, IP addresses, or identifying data will
-                    be stored.
+                    🔒 <strong>End-to-End Encrypted:</strong> Your report is
+                    encrypted with military-grade AES-256 encryption before
+                    transmission. Only authorized admins can decrypt and view
+                    your submission. No personal information, IP addresses, or
+                    identifying data is stored.
                   </AlertDescription>
                 </Alert>
 
