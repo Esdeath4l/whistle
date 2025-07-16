@@ -78,13 +78,23 @@ export default function Admin() {
         body: JSON.stringify({ username, password }),
       });
 
+      if (!response.ok) {
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Network error" }));
+        setLoginError(
+          errorData.error || "Login failed. Please check your credentials.",
+        );
+        return;
+      }
+
       const data = await response.json();
 
       if (data.success) {
         setIsAuthenticated(true);
         fetchReports();
       } else {
-        setLoginError("Invalid username or password");
+        setLoginError(data.error || "Invalid username or password");
       }
     } catch (error) {
       console.error("Login error:", error);
