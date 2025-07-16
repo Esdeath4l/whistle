@@ -21,6 +21,7 @@ import {
 import { Link } from "react-router-dom";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import WinningFeatures from "@/components/WinningFeatures";
 
 export default function Index() {
   return (
@@ -217,6 +218,9 @@ export default function Index() {
           </div>
         </div>
       </section>
+
+      {/* Winning Features */}
+      <WinningFeatures />
 
       {/* CTA Section */}
       <section className="py-20 px-4">

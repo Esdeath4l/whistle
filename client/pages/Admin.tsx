@@ -39,6 +39,10 @@ import {
   Image as ImageIcon,
   Calendar,
   Filter,
+  Heart,
+  AlertTriangle,
+  Shield,
+  MessageCircle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -149,6 +153,40 @@ export default function Admin() {
     }
   }, [statusFilter, isAuthenticated]);
 
+  const getCategoryBadge = (category: string) => {
+    const categoryConfig = {
+      harassment: {
+        variant: "destructive" as const,
+        icon: Flag,
+        text: "Harassment",
+      },
+      medical: { variant: "default" as const, icon: Heart, text: "Medical" },
+      emergency: {
+        variant: "destructive" as const,
+        icon: AlertTriangle,
+        text: "Emergency",
+      },
+      safety: { variant: "secondary" as const, icon: Shield, text: "Safety" },
+      feedback: {
+        variant: "outline" as const,
+        icon: MessageCircle,
+        text: "Feedback",
+      },
+    };
+
+    const config =
+      categoryConfig[category as keyof typeof categoryConfig] ||
+      categoryConfig.feedback;
+    const Icon = config.icon;
+
+    return (
+      <Badge variant={config.variant} className="text-xs">
+        <Icon className="w-3 h-3 mr-1" />
+        {config.text}
+      </Badge>
+    );
+  };
+
   const getStatusBadge = (status: ReportStatus) => {
     const statusConfig = {
       pending: { variant: "secondary" as const, icon: Clock, text: "Pending" },
@@ -173,6 +211,27 @@ export default function Admin() {
         <Icon className="w-3 h-3 mr-1" />
         {config.text}
       </Badge>
+    );
+  };
+
+  const getSeverityBadge = (severity: string) => {
+    const severityConfig = {
+      low: { color: "text-muted-foreground", bg: "bg-muted" },
+      medium: { color: "text-yellow-700", bg: "bg-yellow-100" },
+      high: { color: "text-orange-700", bg: "bg-orange-100" },
+      urgent: { color: "text-red-700", bg: "bg-red-100" },
+    };
+
+    const config =
+      severityConfig[severity as keyof typeof severityConfig] ||
+      severityConfig.medium;
+
+    return (
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium ${config.color} ${config.bg}`}
+      >
+        {severity?.toUpperCase() || "MEDIUM"}
+      </span>
     );
   };
 
@@ -364,11 +423,13 @@ export default function Admin() {
                 >
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Calendar className="w-4 h-4" />
                           {formatDate(report.created_at)}
                         </div>
+                        {getCategoryBadge(report.category)}
+                        {getSeverityBadge(report.severity)}
                         {report.photo_url && (
                           <Badge variant="outline">
                             <ImageIcon className="w-3 h-3 mr-1" />
