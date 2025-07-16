@@ -132,6 +132,12 @@ export default function Report() {
       return;
     }
 
+    console.log("Form validation passed", {
+      message: message.length,
+      category,
+      severity,
+    });
+
     setIsSubmitting(true);
     setError("");
 
