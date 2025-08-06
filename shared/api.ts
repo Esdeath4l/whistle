@@ -67,8 +67,9 @@ export interface ReportStatusResponse {
   id: string;
   status: ReportStatus;
   created_at: string;
-  admin_response?: string;
-  admin_response_at?: string;
+  admin_response?: string; // Keep for backward compatibility
+  admin_response_at?: string; // Keep for backward compatibility
+  admin_responses?: AdminResponse[]; // New field for multiple responses
 }
 
 export interface UpdateReportRequest {
