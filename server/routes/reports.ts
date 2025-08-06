@@ -169,20 +169,29 @@ export const createReport: RequestHandler = (req, res) => {
 
 export const getReports: RequestHandler = (req, res) => {
   try {
+    console.log("getReports called, total reports in memory:", reports.length);
+
     // Simple admin check (in production, use proper JWT validation)
     const authHeader = req.headers.authorization;
     if (
       !authHeader ||
       authHeader !== `Bearer ${ADMIN_USERNAME}:${ADMIN_PASSWORD}`
     ) {
+      console.log("Unauthorized access attempt to getReports");
       return res.status(401).json({ error: "Unauthorized" });
     }
 
     const { status } = req.query;
+    console.log("Status filter:", status);
+
+    // Refresh reports from file in case they were updated elsewhere
+    reports = loadReports();
+    console.log("Reloaded reports from file, total:", reports.length);
 
     let filteredReports = reports;
     if (status && typeof status === "string") {
       filteredReports = reports.filter((report) => report.status === status);
+      console.log(`Filtered to ${filteredReports.length} reports with status: ${status}`);
     }
 
     // Sort by newest first
@@ -196,6 +205,7 @@ export const getReports: RequestHandler = (req, res) => {
       total: filteredReports.length,
     };
 
+    console.log("Sending response with", response.total, "reports");
     res.json(response);
   } catch (error) {
     console.error("Error fetching reports:", error);
