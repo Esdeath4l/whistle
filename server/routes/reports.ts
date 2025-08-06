@@ -136,9 +136,9 @@ export const getReports: RequestHandler = (req, res) => {
     const { status } = req.query;
     console.log("Status filter:", status);
 
-    // Refresh reports from file in case they were updated elsewhere
-    reports = loadReports();
-    console.log("Reloaded reports from file, total:", reports.length);
+    // Refresh reports from storage in case they were updated elsewhere
+    reports = storage.loadReports();
+    console.log("Reloaded reports from storage, total:", reports.length);
 
     let filteredReports = reports;
     if (status && typeof status === "string") {
