@@ -575,20 +575,39 @@ export default function Admin() {
                                 </div>
                               </div>
 
-                              {selectedReport.photo_url && (
-                                <div>
-                                  <Label className="text-sm font-medium">
-                                    Photo Evidence
-                                  </Label>
-                                  <div className="mt-2">
-                                    <img
-                                      src={selectedReport.photo_url}
-                                      alt="Report evidence"
-                                      className="max-w-full h-auto rounded-lg border"
-                                    />
+                              {(() => {
+                                const photoUrl = selectedReport.photo_url ||
+                                  (selectedReport.is_encrypted ? getDecryptedReport(selectedReport).photo_url : undefined);
+
+                                return photoUrl ? (
+                                  <div>
+                                    <Label className="text-sm font-medium">
+                                      Photo Evidence
+                                      {selectedReport.is_encrypted && (
+                                        <Badge variant="outline" className="ml-2">
+                                          <Lock className="w-3 h-3 mr-1" />
+                                          Encrypted
+                                        </Badge>
+                                      )}
+                                    </Label>
+                                    <div className="mt-2">
+                                      <img
+                                        src={photoUrl}
+                                        alt="Report evidence"
+                                        className="max-w-full h-auto rounded-lg border"
+                                        onError={(e) => {
+                                          const target = e.target as HTMLImageElement;
+                                          target.style.display = 'none';
+                                          const errorDiv = document.createElement('div');
+                                          errorDiv.className = 'p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-center';
+                                          errorDiv.innerHTML = '<p class="text-sm text-destructive">Unable to load image</p>';
+                                          target.parentNode?.appendChild(errorDiv);
+                                        }}
+                                      />
+                                    </div>
                                   </div>
-                                </div>
-                              )}
+                                ) : null;
+                              })()}
 
                               {selectedReport.admin_response && (
                                 <div>
