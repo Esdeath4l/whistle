@@ -130,6 +130,7 @@ export const createReport: RequestHandler = (req, res) => {
     }
 
     reports.push(newReport);
+    saveReports(reports); // Persist to file
     console.log("Report created successfully:", newReport.id); // Debug log
 
     // Send real-time notification to admins
