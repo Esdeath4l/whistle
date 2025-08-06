@@ -31,9 +31,14 @@ if (!fs.existsSync(DATA_DIR)) {
 // Load reports from file
 function loadReports(): Report[] {
   try {
+    console.log("Loading reports from:", REPORTS_FILE);
     if (fs.existsSync(REPORTS_FILE)) {
       const data = fs.readFileSync(REPORTS_FILE, "utf8");
-      return JSON.parse(data);
+      const loadedReports = JSON.parse(data);
+      console.log(`Loaded ${loadedReports.length} reports from file`);
+      return loadedReports;
+    } else {
+      console.log("Reports file does not exist, starting with empty array");
     }
   } catch (error) {
     console.error("Error loading reports from file:", error);
@@ -44,9 +49,13 @@ function loadReports(): Report[] {
 // Save reports to file
 function saveReports(reports: Report[]): void {
   try {
+    console.log(`Saving ${reports.length} reports to:`, REPORTS_FILE);
     fs.writeFileSync(REPORTS_FILE, JSON.stringify(reports, null, 2));
+    console.log("Reports saved successfully");
   } catch (error) {
     console.error("Error saving reports to file:", error);
+    console.error("File path:", REPORTS_FILE);
+    console.error("Directory exists:", fs.existsSync(DATA_DIR));
   }
 }
 
