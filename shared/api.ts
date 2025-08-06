@@ -2,6 +2,12 @@
  * Shared types between client and server for Whistle app
  */
 
+export interface AdminResponse {
+  message: string;
+  timestamp: string;
+  status_at_time: ReportStatus;
+}
+
 export interface Report {
   id: string;
   message: string;
@@ -9,8 +15,9 @@ export interface Report {
   photo_url?: string;
   created_at: string;
   status: ReportStatus;
-  admin_response?: string;
-  admin_response_at?: string;
+  admin_response?: string; // Keep for backward compatibility
+  admin_response_at?: string; // Keep for backward compatibility
+  admin_responses?: AdminResponse[]; // New field for multiple responses
   severity?: ReportSeverity;
   // Encrypted data fields
   encrypted_data?: EncryptedReportData;
