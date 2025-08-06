@@ -83,6 +83,7 @@ export const createReport: RequestHandler = (req, res) => {
       photo_url: is_encrypted ? undefined : photo_url,
       created_at: new Date().toISOString(),
       status: "pending" as ReportStatus,
+      admin_responses: [], // Initialize empty admin responses array
       encrypted_data: encrypted_data,
       is_encrypted: is_encrypted || false,
     };
