@@ -198,8 +198,20 @@ export const updateReport: RequestHandler = (req, res) => {
     }
 
     if (admin_response !== undefined) {
+      // Update current admin response for backward compatibility
       reports[reportIndex].admin_response = admin_response;
       reports[reportIndex].admin_response_at = new Date().toISOString();
+
+      // Add to admin responses history
+      if (!reports[reportIndex].admin_responses) {
+        reports[reportIndex].admin_responses = [];
+      }
+
+      reports[reportIndex].admin_responses!.push({
+        message: admin_response,
+        timestamp: new Date().toISOString(),
+        status_at_time: reports[reportIndex].status,
+      });
     }
 
     res.json(reports[reportIndex]);
