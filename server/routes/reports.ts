@@ -6,6 +6,7 @@ import {
   GetReportsResponse,
   UpdateReportRequest,
   ReportStatus,
+  AdminResponse,
 } from "@shared/api";
 import { notifyNewReport } from "./notifications";
 
