@@ -577,15 +577,22 @@ export default function Admin() {
                               </div>
 
                               {(() => {
-                                const photoUrl = selectedReport.photo_url ||
-                                  (selectedReport.is_encrypted ? getDecryptedReport(selectedReport).photo_url : undefined);
+                                const photoUrl =
+                                  selectedReport.photo_url ||
+                                  (selectedReport.is_encrypted
+                                    ? getDecryptedReport(selectedReport)
+                                        .photo_url
+                                    : undefined);
 
                                 return photoUrl ? (
                                   <div>
                                     <Label className="text-sm font-medium">
                                       Photo Evidence
                                       {selectedReport.is_encrypted && (
-                                        <Badge variant="outline" className="ml-2">
+                                        <Badge
+                                          variant="outline"
+                                          className="ml-2"
+                                        >
                                           <Lock className="w-3 h-3 mr-1" />
                                           Encrypted
                                         </Badge>
@@ -597,12 +604,18 @@ export default function Admin() {
                                         alt="Report evidence"
                                         className="max-w-full h-auto rounded-lg border"
                                         onError={(e) => {
-                                          const target = e.target as HTMLImageElement;
-                                          target.style.display = 'none';
-                                          const errorDiv = document.createElement('div');
-                                          errorDiv.className = 'p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-center';
-                                          errorDiv.innerHTML = '<p class="text-sm text-destructive">Unable to load image</p>';
-                                          target.parentNode?.appendChild(errorDiv);
+                                          const target =
+                                            e.target as HTMLImageElement;
+                                          target.style.display = "none";
+                                          const errorDiv =
+                                            document.createElement("div");
+                                          errorDiv.className =
+                                            "p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-center";
+                                          errorDiv.innerHTML =
+                                            '<p class="text-sm text-destructive">Unable to load image</p>';
+                                          target.parentNode?.appendChild(
+                                            errorDiv,
+                                          );
                                         }}
                                       />
                                     </div>
@@ -610,48 +623,81 @@ export default function Admin() {
                                 ) : null;
                               })()}
 
-                              {(selectedReport.admin_responses?.length > 0 || selectedReport.admin_response) && (
+                              {(selectedReport.admin_responses?.length > 0 ||
+                                selectedReport.admin_response) && (
                                 <div>
                                   <Label className="text-sm font-medium">
                                     Admin Response History
                                     <span className="ml-2 text-xs font-normal text-muted-foreground">
-                                      ({(selectedReport.admin_responses?.length || 0) + (selectedReport.admin_response && !selectedReport.admin_responses?.length ? 1 : 0)} response{((selectedReport.admin_responses?.length || 0) + (selectedReport.admin_response && !selectedReport.admin_responses?.length ? 1 : 0)) !== 1 ? 's' : ''})
+                                      (
+                                      {(selectedReport.admin_responses
+                                        ?.length || 0) +
+                                        (selectedReport.admin_response &&
+                                        !selectedReport.admin_responses?.length
+                                          ? 1
+                                          : 0)}{" "}
+                                      response
+                                      {(selectedReport.admin_responses
+                                        ?.length || 0) +
+                                        (selectedReport.admin_response &&
+                                        !selectedReport.admin_responses?.length
+                                          ? 1
+                                          : 0) !==
+                                      1
+                                        ? "s"
+                                        : ""}
+                                      )
                                     </span>
                                   </Label>
                                   <div className="mt-2 space-y-3 max-h-60 overflow-y-auto">
                                     {/* Show new admin responses array if available */}
-                                    {selectedReport.admin_responses?.map((response: AdminResponse, index: number) => (
-                                      <div key={index} className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                                        <div className="flex items-start justify-between gap-3 mb-2">
-                                          <div className="flex-1">
-                                            <p className="whitespace-pre-wrap text-sm">
-                                              {response.message}
-                                            </p>
+                                    {selectedReport.admin_responses?.map(
+                                      (
+                                        response: AdminResponse,
+                                        index: number,
+                                      ) => (
+                                        <div
+                                          key={index}
+                                          className="p-4 bg-primary/5 border border-primary/20 rounded-lg"
+                                        >
+                                          <div className="flex items-start justify-between gap-3 mb-2">
+                                            <div className="flex-1">
+                                              <p className="whitespace-pre-wrap text-sm">
+                                                {response.message}
+                                              </p>
+                                            </div>
+                                            <Badge
+                                              variant="outline"
+                                              className="text-xs shrink-0"
+                                            >
+                                              {response.status_at_time}
+                                            </Badge>
                                           </div>
-                                          <Badge variant="outline" className="text-xs shrink-0">
-                                            {response.status_at_time}
-                                          </Badge>
+                                          <p className="text-xs text-muted-foreground">
+                                            Responded on{" "}
+                                            {formatDate(response.timestamp)}
+                                          </p>
                                         </div>
-                                        <p className="text-xs text-muted-foreground">
-                                          Responded on {formatDate(response.timestamp)}
-                                        </p>
-                                      </div>
-                                    ))}
+                                      ),
+                                    )}
 
                                     {/* Fallback to legacy single response if no admin_responses array */}
-                                    {!selectedReport.admin_responses?.length && selectedReport.admin_response && (
-                                      <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                                        <p className="whitespace-pre-wrap text-sm">
-                                          {selectedReport.admin_response}
-                                        </p>
-                                        {selectedReport.admin_response_at && (
-                                          <p className="text-xs text-muted-foreground mt-2">
-                                            Responded on{" "}
-                                            {formatDate(selectedReport.admin_response_at)}
+                                    {!selectedReport.admin_responses?.length &&
+                                      selectedReport.admin_response && (
+                                        <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                                          <p className="whitespace-pre-wrap text-sm">
+                                            {selectedReport.admin_response}
                                           </p>
-                                        )}
-                                      </div>
-                                    )}
+                                          {selectedReport.admin_response_at && (
+                                            <p className="text-xs text-muted-foreground mt-2">
+                                              Responded on{" "}
+                                              {formatDate(
+                                                selectedReport.admin_response_at,
+                                              )}
+                                            </p>
+                                          )}
+                                        </div>
+                                      )}
                                   </div>
                                 </div>
                               )}

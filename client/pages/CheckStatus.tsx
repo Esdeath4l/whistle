@@ -252,48 +252,73 @@ export default function CheckStatus() {
                 </div>
 
                 {/* Admin Responses */}
-                {(reportStatus.admin_responses?.length > 0 || reportStatus.admin_response) && (
+                {(reportStatus.admin_responses?.length > 0 ||
+                  reportStatus.admin_response) && (
                   <div>
                     <Label className="text-sm font-medium mb-3 block">
                       Admin Responses
                       <span className="ml-2 text-xs font-normal text-muted-foreground">
-                        ({(reportStatus.admin_responses?.length || 0) + (reportStatus.admin_response && !reportStatus.admin_responses?.length ? 1 : 0)} response{((reportStatus.admin_responses?.length || 0) + (reportStatus.admin_response && !reportStatus.admin_responses?.length ? 1 : 0)) !== 1 ? 's' : ''})
+                        (
+                        {(reportStatus.admin_responses?.length || 0) +
+                          (reportStatus.admin_response &&
+                          !reportStatus.admin_responses?.length
+                            ? 1
+                            : 0)}{" "}
+                        response
+                        {(reportStatus.admin_responses?.length || 0) +
+                          (reportStatus.admin_response &&
+                          !reportStatus.admin_responses?.length
+                            ? 1
+                            : 0) !==
+                        1
+                          ? "s"
+                          : ""}
+                        )
                       </span>
                     </Label>
                     <div className="space-y-3">
                       {/* Show new admin responses array if available */}
-                      {reportStatus.admin_responses?.map((response: AdminResponse, index: number) => (
-                        <div key={index} className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-                          <div className="flex items-start justify-between gap-3 mb-2">
-                            <div className="flex-1">
-                              <p className="text-sm whitespace-pre-wrap">
-                                {response.message}
-                              </p>
+                      {reportStatus.admin_responses?.map(
+                        (response: AdminResponse, index: number) => (
+                          <div
+                            key={index}
+                            className="bg-primary/5 border border-primary/20 rounded-lg p-4"
+                          >
+                            <div className="flex items-start justify-between gap-3 mb-2">
+                              <div className="flex-1">
+                                <p className="text-sm whitespace-pre-wrap">
+                                  {response.message}
+                                </p>
+                              </div>
+                              <Badge
+                                variant="outline"
+                                className="text-xs shrink-0"
+                              >
+                                {response.status_at_time}
+                              </Badge>
                             </div>
-                            <Badge variant="outline" className="text-xs shrink-0">
-                              {response.status_at_time}
-                            </Badge>
+                            <p className="text-xs text-muted-foreground">
+                              Responded on {formatDate(response.timestamp)}
+                            </p>
                           </div>
-                          <p className="text-xs text-muted-foreground">
-                            Responded on {formatDate(response.timestamp)}
-                          </p>
-                        </div>
-                      ))}
+                        ),
+                      )}
 
                       {/* Fallback to legacy single response if no admin_responses array */}
-                      {!reportStatus.admin_responses?.length && reportStatus.admin_response && (
-                        <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-                          <p className="text-sm whitespace-pre-wrap mb-2">
-                            {reportStatus.admin_response}
-                          </p>
-                          {reportStatus.admin_response_at && (
-                            <p className="text-xs text-muted-foreground">
-                              Responded on{" "}
-                              {formatDate(reportStatus.admin_response_at)}
+                      {!reportStatus.admin_responses?.length &&
+                        reportStatus.admin_response && (
+                          <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+                            <p className="text-sm whitespace-pre-wrap mb-2">
+                              {reportStatus.admin_response}
                             </p>
-                          )}
-                        </div>
-                      )}
+                            {reportStatus.admin_response_at && (
+                              <p className="text-xs text-muted-foreground">
+                                Responded on{" "}
+                                {formatDate(reportStatus.admin_response_at)}
+                              </p>
+                            )}
+                          </div>
+                        )}
                     </div>
                   </div>
                 )}
