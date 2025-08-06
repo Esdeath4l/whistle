@@ -66,6 +66,8 @@ let reportIdCounter = Math.max(
   ...reports.map((r) => parseInt(r.id.replace("report_", "")) || 0)
 ) + 1;
 
+console.log(`Initialized with ${reports.length} reports, next ID will be: report_${reportIdCounter}`);
+
 // Admin authentication for harassment reporting system
 const ADMIN_USERNAME = "ritika";
 const ADMIN_PASSWORD = "satoru 2624";
