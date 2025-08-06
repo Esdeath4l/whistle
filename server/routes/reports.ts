@@ -162,8 +162,9 @@ export const getReportStatus: RequestHandler = (req, res) => {
       id: report.id,
       status: report.status,
       created_at: report.created_at,
-      admin_response: report.admin_response || null,
-      admin_response_at: report.admin_response_at || null,
+      admin_response: report.admin_response || null, // Keep for backward compatibility
+      admin_response_at: report.admin_response_at || null, // Keep for backward compatibility
+      admin_responses: report.admin_responses || [], // Include all admin responses
     };
 
     res.json(statusInfo);
