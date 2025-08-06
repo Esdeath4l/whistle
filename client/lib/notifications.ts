@@ -97,6 +97,9 @@ export class NotificationService {
    * Setup real-time notifications via Server-Sent Events
    */
   setupRealtimeNotifications(adminToken: string) {
+    // Reset reconnection attempts when explicitly setting up
+    this.reconnectAttempts = 0;
+
     if (this.eventSource) {
       this.eventSource.close();
     }
