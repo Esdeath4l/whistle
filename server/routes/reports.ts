@@ -9,10 +9,46 @@ import {
   AdminResponse,
 } from "@shared/api";
 import { notifyNewReport } from "./notifications";
+import fs from "fs";
+import path from "path";
 
-// In-memory storage for demo (replace with actual database in production)
-let reports: Report[] = [];
-let reportIdCounter = 1;
+// File-based persistent storage
+const DATA_DIR = path.join(process.cwd(), "server", "data");
+const REPORTS_FILE = path.join(DATA_DIR, "reports.json");
+
+// Ensure data directory exists
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+// Load reports from file
+function loadReports(): Report[] {
+  try {
+    if (fs.existsSync(REPORTS_FILE)) {
+      const data = fs.readFileSync(REPORTS_FILE, "utf8");
+      return JSON.parse(data);
+    }
+  } catch (error) {
+    console.error("Error loading reports from file:", error);
+  }
+  return [];
+}
+
+// Save reports to file
+function saveReports(reports: Report[]): void {
+  try {
+    fs.writeFileSync(REPORTS_FILE, JSON.stringify(reports, null, 2));
+  } catch (error) {
+    console.error("Error saving reports to file:", error);
+  }
+}
+
+// Initialize reports from file
+let reports: Report[] = loadReports();
+let reportIdCounter = Math.max(
+  1,
+  ...reports.map((r) => parseInt(r.id.replace("report_", "")) || 0)
+) + 1;
 
 // Admin authentication for harassment reporting system
 const ADMIN_USERNAME = "ritika";
