@@ -50,6 +50,7 @@ import {
   ReportStatus,
   GetReportsResponse,
   UpdateReportRequest,
+  AdminResponse,
 } from "@shared/api";
 import { decryptReportData } from "@/lib/encryption";
 import { notificationService } from "@/lib/notifications";
