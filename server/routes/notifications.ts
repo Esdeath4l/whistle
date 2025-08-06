@@ -95,14 +95,25 @@ export const streamNotifications: RequestHandler = (req, res) => {
  */
 export function broadcastNotification(notification: any) {
   const data = `data: ${JSON.stringify(notification)}\n\n`;
+  const connectionsToRemove: any[] = [];
 
   sseConnections.forEach((connection) => {
     try {
-      connection.res.write(data);
+      // Check if response is still writable
+      if (!connection.res.destroyed && connection.res.writable) {
+        connection.res.write(data);
+      } else {
+        connectionsToRemove.push(connection);
+      }
     } catch (error) {
       console.error("Failed to send notification to connection:", error);
-      sseConnections.delete(connection);
+      connectionsToRemove.push(connection);
     }
+  });
+
+  // Clean up dead connections
+  connectionsToRemove.forEach((connection) => {
+    sseConnections.delete(connection);
   });
 
   console.log(
