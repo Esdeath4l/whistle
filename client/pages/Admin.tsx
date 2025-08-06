@@ -610,22 +610,47 @@ export default function Admin() {
                                 ) : null;
                               })()}
 
-                              {selectedReport.admin_response && (
+                              {(selectedReport.admin_responses?.length > 0 || selectedReport.admin_response) && (
                                 <div>
                                   <Label className="text-sm font-medium">
-                                    Admin Response
+                                    Admin Response History
+                                    <span className="ml-2 text-xs font-normal text-muted-foreground">
+                                      ({(selectedReport.admin_responses?.length || 0) + (selectedReport.admin_response && !selectedReport.admin_responses?.length ? 1 : 0)} response{((selectedReport.admin_responses?.length || 0) + (selectedReport.admin_response && !selectedReport.admin_responses?.length ? 1 : 0)) !== 1 ? 's' : ''})
+                                    </span>
                                   </Label>
-                                  <div className="mt-2 p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                                    <p className="whitespace-pre-wrap">
-                                      {selectedReport.admin_response}
-                                    </p>
-                                    {selectedReport.admin_response_at && (
-                                      <p className="text-xs text-muted-foreground mt-2">
-                                        Responded on{" "}
-                                        {formatDate(
-                                          selectedReport.admin_response_at,
+                                  <div className="mt-2 space-y-3 max-h-60 overflow-y-auto">
+                                    {/* Show new admin responses array if available */}
+                                    {selectedReport.admin_responses?.map((response: AdminResponse, index: number) => (
+                                      <div key={index} className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                                        <div className="flex items-start justify-between gap-3 mb-2">
+                                          <div className="flex-1">
+                                            <p className="whitespace-pre-wrap text-sm">
+                                              {response.message}
+                                            </p>
+                                          </div>
+                                          <Badge variant="outline" className="text-xs shrink-0">
+                                            {response.status_at_time}
+                                          </Badge>
+                                        </div>
+                                        <p className="text-xs text-muted-foreground">
+                                          Responded on {formatDate(response.timestamp)}
+                                        </p>
+                                      </div>
+                                    ))}
+
+                                    {/* Fallback to legacy single response if no admin_responses array */}
+                                    {!selectedReport.admin_responses?.length && selectedReport.admin_response && (
+                                      <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                                        <p className="whitespace-pre-wrap text-sm">
+                                          {selectedReport.admin_response}
+                                        </p>
+                                        {selectedReport.admin_response_at && (
+                                          <p className="text-xs text-muted-foreground mt-2">
+                                            Responded on{" "}
+                                            {formatDate(selectedReport.admin_response_at)}
+                                          </p>
                                         )}
-                                      </p>
+                                      </div>
                                     )}
                                   </div>
                                 </div>
