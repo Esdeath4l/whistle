@@ -251,6 +251,7 @@ export const updateReport: RequestHandler = (req, res) => {
       });
     }
 
+    saveReports(reports); // Persist to file
     res.json(reports[reportIndex]);
   } catch (error) {
     console.error("Error updating report:", error);
