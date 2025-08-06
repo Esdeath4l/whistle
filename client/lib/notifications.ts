@@ -125,8 +125,19 @@ export class NotificationService {
         }
       };
 
-      this.eventSource.onerror = () => {
-        console.error("Notification stream error");
+      this.eventSource.onerror = (error) => {
+        console.error("Notification stream error:", error);
+
+        // Show error toast only if we haven't shown one recently
+        if (this.reconnectAttempts === 0) {
+          this.showToast({
+            title: "⚠️ Notification Connection Issue",
+            description: "Attempting to reconnect to real-time notifications...",
+            type: "warning",
+            duration: 5000,
+          });
+        }
+
         this.eventSource?.close();
         this.attemptReconnect(adminToken);
       };
