@@ -24,7 +24,7 @@ import {
   Shield,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { ReportStatusResponse, ReportStatus } from "@shared/api";
+import { ReportStatusResponse, ReportStatus, AdminResponse } from "@shared/api";
 
 export default function CheckStatus() {
   const [reportId, setReportId] = useState("");
