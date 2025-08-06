@@ -9,58 +9,10 @@ import {
   AdminResponse,
 } from "@shared/api";
 import { notifyNewReport } from "./notifications";
-import fs from "fs";
-import path from "path";
+import { storage } from "../lib/storage";
 
-// File-based persistent storage with fallback for different environments
-const DATA_DIR = process.env.NODE_ENV === "production"
-  ? path.join("/tmp", "whistle-data")
-  : path.join(process.cwd(), "server", "data");
-const REPORTS_FILE = path.join(DATA_DIR, "reports.json");
-
-// Ensure data directory exists
-if (!fs.existsSync(DATA_DIR)) {
-  try {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-    console.log("Created data directory:", DATA_DIR);
-  } catch (error) {
-    console.error("Failed to create data directory:", error);
-  }
-}
-
-// Load reports from file
-function loadReports(): Report[] {
-  try {
-    console.log("Loading reports from:", REPORTS_FILE);
-    if (fs.existsSync(REPORTS_FILE)) {
-      const data = fs.readFileSync(REPORTS_FILE, "utf8");
-      const loadedReports = JSON.parse(data);
-      console.log(`Loaded ${loadedReports.length} reports from file`);
-      return loadedReports;
-    } else {
-      console.log("Reports file does not exist, starting with empty array");
-    }
-  } catch (error) {
-    console.error("Error loading reports from file:", error);
-  }
-  return [];
-}
-
-// Save reports to file
-function saveReports(reports: Report[]): void {
-  try {
-    console.log(`Saving ${reports.length} reports to:`, REPORTS_FILE);
-    fs.writeFileSync(REPORTS_FILE, JSON.stringify(reports, null, 2));
-    console.log("Reports saved successfully");
-  } catch (error) {
-    console.error("Error saving reports to file:", error);
-    console.error("File path:", REPORTS_FILE);
-    console.error("Directory exists:", fs.existsSync(DATA_DIR));
-  }
-}
-
-// Initialize reports from file
-let reports: Report[] = loadReports();
+// Initialize reports from storage
+let reports: Report[] = storage.loadReports();
 let reportIdCounter = Math.max(
   1,
   ...reports.map((r) => parseInt(r.id.replace("report_", "")) || 0)
