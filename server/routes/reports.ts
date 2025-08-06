@@ -12,13 +12,20 @@ import { notifyNewReport } from "./notifications";
 import fs from "fs";
 import path from "path";
 
-// File-based persistent storage
-const DATA_DIR = path.join(process.cwd(), "server", "data");
+// File-based persistent storage with fallback for different environments
+const DATA_DIR = process.env.NODE_ENV === "production"
+  ? path.join("/tmp", "whistle-data")
+  : path.join(process.cwd(), "server", "data");
 const REPORTS_FILE = path.join(DATA_DIR, "reports.json");
 
 // Ensure data directory exists
 if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+  try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    console.log("Created data directory:", DATA_DIR);
+  } catch (error) {
+    console.error("Failed to create data directory:", error);
+  }
 }
 
 // Load reports from file
