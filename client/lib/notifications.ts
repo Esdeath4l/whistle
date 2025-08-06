@@ -109,7 +109,17 @@ export class NotificationService {
         `/api/notifications/stream?token=${encodeURIComponent(adminToken)}`,
       );
 
+      // Set up connection timeout
+      const connectionTimeout = setTimeout(() => {
+        if (this.eventSource && this.eventSource.readyState === EventSource.CONNECTING) {
+          console.warn("SSE connection timeout");
+          this.eventSource.close();
+          this.attemptReconnect(adminToken);
+        }
+      }, 10000); // 10 second timeout
+
       this.eventSource.onopen = () => {
+        clearTimeout(connectionTimeout);
         console.log("Real-time notifications connected");
         this.reconnectAttempts = 0;
         this.showToast({
