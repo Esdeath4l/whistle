@@ -19,46 +19,75 @@ export const streamNotifications: RequestHandler = (req, res) => {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  // Set SSE headers
-  res.writeHead(200, {
-    "Content-Type": "text/event-stream",
-    "Cache-Control": "no-cache",
-    Connection: "keep-alive",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Cache-Control",
-  });
+  try {
+    // Set SSE headers
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "Cache-Control",
+    });
 
-  // Create connection object
-  const connection = {
-    id: Date.now(),
-    res,
-    lastPing: Date.now(),
-  };
+    // Create connection object
+    const connection = {
+      id: Date.now(),
+      res,
+      lastPing: Date.now(),
+    };
 
-  // Add to active connections
-  sseConnections.add(connection);
+    // Add to active connections
+    sseConnections.add(connection);
 
-  // Send initial connection message
-  res.write(
-    `data: ${JSON.stringify({ type: "connected", message: "Notifications active" })}\n\n`,
-  );
-
-  // Setup heartbeat
-  const heartbeat = setInterval(() => {
+    // Send initial connection message
     res.write(
-      `data: ${JSON.stringify({ type: "heartbeat", timestamp: Date.now() })}\n\n`,
+      `data: ${JSON.stringify({ type: "connected", message: "Notifications active" })}\n\n`,
     );
-    connection.lastPing = Date.now();
-  }, 30000);
 
-  // Handle client disconnect
-  req.on("close", () => {
-    clearInterval(heartbeat);
-    sseConnections.delete(connection);
-    console.log(`SSE connection ${connection.id} closed`);
-  });
+    // Setup heartbeat
+    const heartbeat = setInterval(() => {
+      try {
+        if (!res.destroyed) {
+          res.write(
+            `data: ${JSON.stringify({ type: "heartbeat", timestamp: Date.now() })}\n\n`,
+          );
+          connection.lastPing = Date.now();
+        } else {
+          clearInterval(heartbeat);
+          sseConnections.delete(connection);
+        }
+      } catch (error) {
+        console.error("Heartbeat error:", error);
+        clearInterval(heartbeat);
+        sseConnections.delete(connection);
+      }
+    }, 30000);
 
-  console.log(`SSE connection ${connection.id} established`);
+    // Handle client disconnect
+    req.on("close", () => {
+      clearInterval(heartbeat);
+      sseConnections.delete(connection);
+      console.log(`SSE connection ${connection.id} closed`);
+    });
+
+    // Handle server-side errors
+    req.on("error", (error) => {
+      console.error(`SSE connection ${connection.id} error:`, error);
+      clearInterval(heartbeat);
+      sseConnections.delete(connection);
+    });
+
+    res.on("error", (error) => {
+      console.error(`SSE response ${connection.id} error:`, error);
+      clearInterval(heartbeat);
+      sseConnections.delete(connection);
+    });
+
+    console.log(`SSE connection ${connection.id} established`);
+  } catch (error) {
+    console.error("Failed to establish SSE connection:", error);
+    res.status(500).json({ error: "Failed to setup notification stream" });
+  }
 };
 
 /**
