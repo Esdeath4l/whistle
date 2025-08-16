@@ -7,6 +7,8 @@ export interface Report {
   message: string;
   category: ReportCategory;
   photo_url?: string;
+  video_url?: string;
+  video_metadata?: VideoMetadata;
   created_at: string;
   status: ReportStatus;
   admin_response?: string;
@@ -17,10 +19,22 @@ export interface Report {
   is_encrypted?: boolean;
 }
 
+export interface VideoMetadata {
+  duration: number; // in seconds
+  size: number; // in bytes
+  format: string; // MIME type
+  width?: number;
+  height?: number;
+  isRecorded: boolean;
+  uploadMethod: 'direct' | 'resumable';
+}
+
 export interface EncryptedReportData {
   encryptedMessage: string;
   encryptedCategory: string;
   encryptedPhotoUrl?: string;
+  encryptedVideoUrl?: string;
+  encryptedVideoMetadata?: string;
   iv: string;
   timestamp: string;
 }
@@ -39,6 +53,8 @@ export interface CreateReportRequest {
   message: string;
   category: ReportCategory;
   photo_url?: string;
+  video_url?: string;
+  video_metadata?: VideoMetadata;
   severity?: ReportSeverity;
   // For encrypted submissions
   encrypted_data?: EncryptedReportData;
