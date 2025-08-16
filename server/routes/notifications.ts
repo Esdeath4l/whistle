@@ -117,9 +117,14 @@ async function sendEmailAlert(report: Report) {
     const emailSent = await sendRealEmail(report);
 
     if (emailSent) {
-      console.log("✅ Email alert sent successfully for urgent report:", report.id);
+      console.log(
+        "✅ Email alert sent successfully for urgent report:",
+        report.id,
+      );
     } else {
-      console.log("⚠️ Email service not configured - logging notification instead");
+      console.log(
+        "⚠️ Email service not configured - logging notification instead",
+      );
 
       // Fallback: Log the email details
       const emailData = {
@@ -228,7 +233,9 @@ export const getNotificationSettings: RequestHandler = (req, res) => {
  */
 export const testEmailService: RequestHandler = async (req, res) => {
   try {
-    const { testEmailService: testService, sendTestEmail } = await import("../email-service");
+    const { testEmailService: testService, sendTestEmail } = await import(
+      "../email-service"
+    );
 
     // Test connection
     const isConfigured = await testService();
@@ -236,7 +243,7 @@ export const testEmailService: RequestHandler = async (req, res) => {
     if (!isConfigured) {
       return res.status(503).json({
         error: "Email service not configured",
-        message: "Set EMAIL_APP_PASSWORD environment variable"
+        message: "Set EMAIL_APP_PASSWORD environment variable",
       });
     }
 
@@ -246,19 +253,19 @@ export const testEmailService: RequestHandler = async (req, res) => {
     if (testSent) {
       res.json({
         success: true,
-        message: "Test email sent successfully to ritisulo@gmail.com"
+        message: "Test email sent successfully to ritisulo@gmail.com",
       });
     } else {
       res.status(500).json({
         error: "Failed to send test email",
-        message: "Check server logs for details"
+        message: "Check server logs for details",
       });
     }
   } catch (error) {
     console.error("Email test error:", error);
     res.status(500).json({
       error: "Email test failed",
-      message: error instanceof Error ? error.message : "Unknown error"
+      message: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };

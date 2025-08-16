@@ -30,7 +30,9 @@ export default function AdminSettings() {
     adminEmail: "ritisulo@gmail.com",
     fromEmail: "whistle.git@gmail.com",
   });
-  const [emailStatus, setEmailStatus] = useState<"unknown" | "configured" | "error">("unknown");
+  const [emailStatus, setEmailStatus] = useState<
+    "unknown" | "configured" | "error"
+  >("unknown");
   const [testingEmail, setTestingEmail] = useState(false);
   const [loading, setLoading] = useState(false);
   // Remove toast hook since we're using the direct import
@@ -202,15 +204,27 @@ export default function AdminSettings() {
               <Alert>
                 <Lock className="h-4 w-4" />
                 <AlertDescription>
-                  <strong>Email Service Configuration Required:</strong> To enable actual email 
-                  delivery, set the <code>EMAIL_APP_PASSWORD</code> environment variable with 
-                  a Gmail App Password. Without this, emails will only be logged to the console.
+                  <strong>Email Service Configuration Required:</strong> To
+                  enable actual email delivery, set the{" "}
+                  <code>EMAIL_APP_PASSWORD</code> environment variable with a
+                  Gmail App Password. Without this, emails will only be logged
+                  to the console.
                   <br />
                   <br />
                   <strong>Steps to configure:</strong>
                   <ol className="mt-2 ml-4 list-decimal">
                     <li>Enable 2FA on whistle.git@gmail.com</li>
-                    <li>Generate an App Password at <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener noreferrer" className="text-primary underline">Google Account Settings</a></li>
+                    <li>
+                      Generate an App Password at{" "}
+                      <a
+                        href="https://myaccount.google.com/apppasswords"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary underline"
+                      >
+                        Google Account Settings
+                      </a>
+                    </li>
                     <li>Set EMAIL_APP_PASSWORD environment variable</li>
                     <li>Test the configuration using the button below</li>
                   </ol>
@@ -252,7 +266,9 @@ export default function AdminSettings() {
                   <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <CheckCircle className="w-5 h-5 text-green-600" />
-                      <strong className="text-green-800">Desktop Browsers</strong>
+                      <strong className="text-green-800">
+                        Desktop Browsers
+                      </strong>
                     </div>
                     <p className="text-sm text-green-700">
                       Reports are encrypted with AES-256 before transmission
@@ -270,10 +286,12 @@ export default function AdminSettings() {
                 </div>
                 <Alert>
                   <AlertDescription>
-                    <strong>E2EE Indicator Behavior:</strong> The green "E2E Encrypted" badge 
-                    appears only for reports that were successfully encrypted client-side. 
-                    Reports without this badge used secure HTTPS but not client-side encryption.
-                    This is expected behavior due to browser compatibility limitations.
+                    <strong>E2EE Indicator Behavior:</strong> The green "E2E
+                    Encrypted" badge appears only for reports that were
+                    successfully encrypted client-side. Reports without this
+                    badge used secure HTTPS but not client-side encryption. This
+                    is expected behavior due to browser compatibility
+                    limitations.
                   </AlertDescription>
                 </Alert>
               </div>
@@ -291,15 +309,23 @@ export default function AdminSettings() {
             <CardContent>
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                  <span className="text-sm font-medium">Real-time Notifications</span>
-                  <Badge variant="secondary" className="bg-green-100 text-green-800">
+                  <span className="text-sm font-medium">
+                    Real-time Notifications
+                  </span>
+                  <Badge
+                    variant="secondary"
+                    className="bg-green-100 text-green-800"
+                  >
                     <CheckCircle className="w-3 h-3 mr-1" />
                     Active
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <span className="text-sm font-medium">Report Encryption</span>
-                  <Badge variant="secondary" className="bg-green-100 text-green-800">
+                  <Badge
+                    variant="secondary"
+                    className="bg-green-100 text-green-800"
+                  >
                     <CheckCircle className="w-3 h-3 mr-1" />
                     Enabled
                   </Badge>

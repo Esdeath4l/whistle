@@ -23,8 +23,13 @@ export async function sendEmailAlert(report: Report): Promise<boolean> {
   try {
     // Check if email is configured
     if (!EMAIL_CONFIG.auth.pass) {
-      console.warn("❌ Email service not configured - EMAIL_APP_PASSWORD missing");
-      console.log("📧 Would send email to: ritisulo@gmail.com for report:", report.id);
+      console.warn(
+        "❌ Email service not configured - EMAIL_APP_PASSWORD missing",
+      );
+      console.log(
+        "📧 Would send email to: ritisulo@gmail.com for report:",
+        report.id,
+      );
       return false;
     }
 
@@ -70,7 +75,7 @@ export async function sendEmailAlert(report: Report): Promise<boolean> {
                 <li><strong>Severity:</strong> ${report.severity?.toUpperCase()}</li>
                 <li><strong>Submitted:</strong> ${new Date(report.created_at).toLocaleString()}</li>
                 <li><strong>Status:</strong> ${report.status}</li>
-                ${report.is_encrypted ? '<li><strong>Security:</strong> 🔒 End-to-End Encrypted</li>' : ''}
+                ${report.is_encrypted ? "<li><strong>Security:</strong> 🔒 End-to-End Encrypted</li>" : ""}
               </ul>
             </div>
             
@@ -85,7 +90,7 @@ export async function sendEmailAlert(report: Report): Promise<boolean> {
             </div>
             
             <div style="text-align: center;">
-              <a href="${process.env.ADMIN_DASHBOARD_URL || 'http://localhost:8080/admin'}" class="button">
+              <a href="${process.env.ADMIN_DASHBOARD_URL || "http://localhost:8080/admin"}" class="button">
                 🔐 Access Admin Dashboard
               </a>
             </div>
@@ -110,7 +115,7 @@ Report Details:
 - Severity: ${report.severity?.toUpperCase()}
 - Submitted: ${new Date(report.created_at).toLocaleString()}
 - Status: ${report.status}
-${report.is_encrypted ? '- Security: 🔒 End-to-End Encrypted' : ''}
+${report.is_encrypted ? "- Security: 🔒 End-to-End Encrypted" : ""}
 
 Required Actions:
 1. Log into the admin dashboard immediately
@@ -118,7 +123,7 @@ Required Actions:
 3. Take appropriate administrative action
 4. Respond within your organization's SLA timeframe
 
-Admin Dashboard: ${process.env.ADMIN_DASHBOARD_URL || 'http://localhost:8080/admin'}
+Admin Dashboard: ${process.env.ADMIN_DASHBOARD_URL || "http://localhost:8080/admin"}
 
 This is an automated alert from the Whistle Harassment Reporting System.
 Report ID: ${report.id} | Timestamp: ${new Date().toISOString()}
@@ -127,24 +132,28 @@ Report ID: ${report.id} | Timestamp: ${new Date().toISOString()}
 
     // Send the email
     const info = await transporter.sendMail(emailOptions);
-    
+
     console.log("✅ Email sent successfully:", info.messageId);
     console.log("📧 Email sent to:", emailOptions.to);
     console.log("📬 Preview URL:", nodemailer.getTestMessageUrl(info));
-    
+
     return true;
   } catch (error) {
     console.error("❌ Failed to send email notification:", error);
-    
+
     // Log detailed error for debugging
     if (error instanceof Error) {
       console.error("Error details:", error.message);
       if (error.message.includes("Invalid login")) {
-        console.error("💡 Tip: Make sure to use an App Password for Gmail, not your regular password");
-        console.error("💡 Generate one at: https://myaccount.google.com/apppasswords");
+        console.error(
+          "💡 Tip: Make sure to use an App Password for Gmail, not your regular password",
+        );
+        console.error(
+          "💡 Generate one at: https://myaccount.google.com/apppasswords",
+        );
       }
     }
-    
+
     return false;
   }
 }
@@ -158,7 +167,7 @@ export async function testEmailService(): Promise<boolean> {
       console.log("❌ Email not configured - missing EMAIL_APP_PASSWORD");
       return false;
     }
-    
+
     await transporter.verify();
     console.log("✅ Email service is ready");
     return true;
@@ -181,6 +190,6 @@ export async function sendTestEmail(): Promise<boolean> {
     status: "pending",
     is_encrypted: false,
   };
-  
+
   return sendEmailAlert(testReport);
 }
