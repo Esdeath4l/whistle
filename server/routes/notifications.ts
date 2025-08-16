@@ -374,12 +374,18 @@ export const sendSMSNotification: RequestHandler = async (req, res) => {
  */
 export const getNotificationSettings: RequestHandler = (req, res) => {
   res.json({
-    emailEnabled: true,
-    smsEnabled: true,
+    emailEnabled: !!process.env.EMAIL_USER,
+    smsEnabled: false, // SMS service not configured yet
     pushEnabled: true,
     urgentAlerts: true,
-    categories: ["harassment", "medical", "emergency", "safety"],
-    adminEmail: "admin@whistle-app.com",
-    adminPhone: "+1234567890",
+    categories: ["harassment", "medical", "emergency", "safety", "feedback"],
+    adminEmail: "ritiofficial2006@gmail.com",
+    emailServiceConfigured: !!process.env.EMAIL_USER,
+    priorityRules: {
+      urgent: "Immediate email alert",
+      high: "High priority email alert",
+      medium: "Standard email alert (based on category)",
+      low: "Email alert for important categories only"
+    }
   });
 };
