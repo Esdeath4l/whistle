@@ -205,8 +205,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Winning Features */}
-      <WinningFeatures />
 
       {/* CTA Section */}
       <section className="py-20 px-4">
