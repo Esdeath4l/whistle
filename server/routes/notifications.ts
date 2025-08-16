@@ -147,7 +147,7 @@ export function notifyNewReport(report: Report) {
  * Priority-based email notification system
  */
 async function sendPriorityBasedEmailAlert(report: Report) {
-  const adminEmail = "ritisulo@gmail.com";
+  const adminEmail = "whistle.git@gmail.com";
 
   // Determine if email should be sent based on priority
   const shouldSendEmail = shouldSendEmailForPriority(report.severity, report.category);
