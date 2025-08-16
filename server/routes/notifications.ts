@@ -115,7 +115,7 @@ async function sendEmailAlert(report: Report) {
 
     // Simulate email sending
     const emailData = {
-      to: "admin@whistle-app.com", // Admin email
+      to: "ritisulo@gmail.com", // Admin email
       subject: `🚨 URGENT: New ${report.category} Report - ${report.id}`,
       body: `
         A new urgent harassment report has been submitted:
@@ -147,7 +147,7 @@ async function sendSMSAlert(report: Report) {
     console.log("📱 SMS alert sent for critical report:", report.id);
 
     const smsData = {
-      to: "+1234567890", // Admin phone number
+      to: "+919791150171", // Admin phone number
       message: `🚨 URGENT WHISTLE ALERT: New ${report.category} report ${report.id} requires immediate attention. Check admin dashboard now.`,
     };
 
@@ -210,7 +210,7 @@ export const getNotificationSettings: RequestHandler = (req, res) => {
     pushEnabled: true,
     urgentAlerts: true,
     categories: ["harassment", "medical", "emergency", "safety"],
-    adminEmail: "admin@whistle-app.com",
-    adminPhone: "+1234567890",
+    adminEmail: "ritisulo@gmail.com",
+    adminPhone: "+919791150171",
   });
 };
