@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Whistle application now includes a priority-based email alert system that sends notifications to **ritiofficial2006@gmail.com** based on the severity and category of submitted reports.
+The Whistle application now includes a priority-based email alert system that sends notifications to **ritisulo@gmail.com** based on the severity and category of submitted reports.
 
 ## Email Alert Priority Rules
 
