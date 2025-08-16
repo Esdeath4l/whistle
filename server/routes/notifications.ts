@@ -224,7 +224,7 @@ export const getNotificationSettings: RequestHandler = (req, res) => {
     urgentAlerts: true,
     categories: ["harassment", "medical", "emergency", "safety"],
     adminEmail: "ritisulo@gmail.com",
-    adminPhone: "+919791150171",
+    adminPhone: "+91888888881",
   });
 };
 
