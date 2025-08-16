@@ -38,7 +38,7 @@ export async function sendEmailAlert(report: Report): Promise<boolean> {
         name: "Whistle Security System",
         address: EMAIL_CONFIG.auth.user,
       },
-      to: "ritisulo@gmail.com",
+      to: process.env.EMAIL_TO,
       subject: `🚨 URGENT: New ${report.category} Report - ${report.id}`,
       html: `
         <!DOCTYPE html>
@@ -90,7 +90,7 @@ export async function sendEmailAlert(report: Report): Promise<boolean> {
             </div>
             
             <div style="text-align: center;">
-              <a href="${process.env.ADMIN_DASHBOARD_URL || "https://whistle-s3n8.onrender.com/"}" class="button">
+              <a href="${process.env.ADMIN_DASHBOARD_URL }" class="button">
                 🔐 Access Admin Dashboard
               </a>
             </div>
