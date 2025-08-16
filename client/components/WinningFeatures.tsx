@@ -25,12 +25,9 @@ export default function WinningFeatures() {
           <Badge
             variant="secondary"
             className="mb-4 bg-yellow-100 text-yellow-800"
-          >
-            <Trophy className="w-4 h-4 mr-1" />
-            🏆 Award-Winning Innovation
-          </Badge>
+          />
           <h3 className="text-3xl font-bold mb-4">
-            Why Whistle is Built to Win
+            &nbsp;Whistle is Built to Win
           </h3>
           <p className="text-muted-foreground text-lg max-w-3xl mx-auto">
             Combining cutting-edge security, real-time AI, and innovative UX
