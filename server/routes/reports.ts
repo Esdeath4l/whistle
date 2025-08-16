@@ -19,15 +19,52 @@ const ADMIN_PASSWORD = "satoru 2624";
 
 export const createReport: RequestHandler = (req, res) => {
   try {
-    console.log("Received encrypted report submission"); // Debug log (no sensitive data)
+    console.log("Received report submission with media"); // Debug log (no sensitive data)
     const {
       message,
       category,
       severity,
       photo_url,
+      video_url,
+      video_metadata,
       encrypted_data,
       is_encrypted,
     }: CreateReportRequest = req.body;
+
+    // Validate video metadata if video is provided
+    if (video_url && video_metadata) {
+      const maxSizeMB = 100;
+      const maxDurationMinutes = 5;
+      const allowedFormats = ['video/mp4', 'video/webm', 'video/quicktime'];
+
+      if (video_metadata.size > maxSizeMB * 1024 * 1024) {
+        console.log("Error: Video file too large");
+        return res.status(400).json({
+          error: `Video file too large. Maximum size is ${maxSizeMB}MB`
+        });
+      }
+
+      if (video_metadata.duration > maxDurationMinutes * 60) {
+        console.log("Error: Video duration too long");
+        return res.status(400).json({
+          error: `Video too long. Maximum duration is ${maxDurationMinutes} minutes`
+        });
+      }
+
+      if (!allowedFormats.includes(video_metadata.format)) {
+        console.log("Error: Invalid video format");
+        return res.status(400).json({
+          error: `Invalid video format. Allowed formats: ${allowedFormats.join(', ')}`
+        });
+      }
+
+      console.log("Video validation passed:", {
+        size: `${(video_metadata.size / 1024 / 1024).toFixed(2)}MB`,
+        duration: `${(video_metadata.duration / 60).toFixed(2)}min`,
+        format: video_metadata.format,
+        isRecorded: video_metadata.isRecorded
+      });
+    }
 
     // Handle both encrypted and plain text reports
     if (is_encrypted && encrypted_data) {
@@ -39,7 +76,7 @@ export const createReport: RequestHandler = (req, res) => {
         console.log("Error: Encrypted data is incomplete");
         return res.status(400).json({ error: "Invalid encrypted data" });
       }
-      console.log("Processing encrypted report");
+      console.log("Processing encrypted report with media");
     } else {
       // Plain text report validation
       if (!message || message.trim().length === 0) {
@@ -80,6 +117,8 @@ export const createReport: RequestHandler = (req, res) => {
         : category || "feedback",
       severity: severity || "medium",
       photo_url: is_encrypted ? undefined : photo_url,
+      video_url: is_encrypted ? undefined : video_url,
+      video_metadata: is_encrypted ? undefined : video_metadata,
       created_at: new Date().toISOString(),
       status: "pending" as ReportStatus,
       encrypted_data: encrypted_data,
