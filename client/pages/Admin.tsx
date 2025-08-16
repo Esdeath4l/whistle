@@ -603,16 +603,30 @@ export default function Admin() {
                                 </div>
                               </div>
 
-                              {selectedReport.photo_url && (
+                              {(selectedReport.photo_url ||
+                                (selectedReport.is_encrypted &&
+                                 getDecryptedReport(selectedReport).photo_url)) && (
                                 <div>
                                   <Label className="text-sm font-medium">
                                     Photo Evidence
+                                    {selectedReport.is_encrypted && (
+                                      <Badge variant="outline" className="ml-2">
+                                        <Lock className="w-3 h-3 mr-1" />
+                                        Encrypted
+                                      </Badge>
+                                    )}
                                   </Label>
                                   <div className="mt-2">
                                     <img
-                                      src={selectedReport.photo_url}
+                                      src={selectedReport.is_encrypted
+                                        ? getDecryptedReport(selectedReport).photo_url
+                                        : selectedReport.photo_url}
                                       alt="Report evidence"
                                       className="max-w-full h-auto rounded-lg border"
+                                      onError={(e) => {
+                                        console.error('Failed to load photo:', e);
+                                        (e.target as HTMLImageElement).style.display = 'none';
+                                      }}
                                     />
                                   </div>
                                 </div>
@@ -632,16 +646,46 @@ export default function Admin() {
                                     )}
                                   </Label>
                                   <div className="mt-2">
-                                    <video
-                                      src={selectedReport.is_encrypted
+                                    {(() => {
+                                      const videoUrl = selectedReport.is_encrypted
                                         ? getDecryptedReport(selectedReport).video_url
-                                        : selectedReport.video_url}
-                                      controls
-                                      className="max-w-full h-auto rounded-lg border bg-black"
-                                      style={{ maxHeight: '300px' }}
-                                    >
-                                      Your browser does not support video playback.
-                                    </video>
+                                        : selectedReport.video_url;
+
+                                      // Check if video URL is too large (base64 data URLs can be huge)
+                                      if (videoUrl && videoUrl.length > 50000000) { // ~50MB base64 limit
+                                        return (
+                                          <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                                            <div className="flex items-center gap-2 mb-2">
+                                              <AlertCircle className="w-5 h-5 text-amber-600" />
+                                              <span className="font-medium text-amber-800">Video Too Large for Preview</span>
+                                            </div>
+                                            <p className="text-sm text-amber-700">
+                                              Video file is too large to display in browser.
+                                              In production, this would be streamed from cloud storage.
+                                            </p>
+                                            <p className="text-xs text-amber-600 mt-2">
+                                              Size: {(selectedReport.video_metadata?.size || 0 / 1024 / 1024).toFixed(1)}MB
+                                            </p>
+                                          </div>
+                                        );
+                                      }
+
+                                      return (
+                                        <video
+                                          src={videoUrl}
+                                          controls
+                                          preload="metadata"
+                                          className="max-w-full h-auto rounded-lg border bg-black"
+                                          style={{ maxHeight: '300px' }}
+                                          onError={(e) => {
+                                            console.error('Failed to load video:', e);
+                                            (e.target as HTMLVideoElement).style.display = 'none';
+                                          }}
+                                        >
+                                          Your browser does not support video playback.
+                                        </video>
+                                      );
+                                    })()}
                                   </div>
                                 </div>
                               )}
