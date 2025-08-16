@@ -5,8 +5,8 @@ import { Report } from "@shared/api";
 const sseConnections = new Set<any>();
 
 // Admin authentication credentials
-const ADMIN_USERNAME = "ritika";
-const ADMIN_PASSWORD = "satoru 2624";
+const ADMIN_USERNAME = "process.env.ADMIN_USERNAME";
+const ADMIN_PASSWORD = "process.env.ADMIN_PASSWORD";
 
 /**
  * Server-Sent Events endpoint for real-time notifications
@@ -128,7 +128,7 @@ async function sendEmailAlert(report: Report) {
 
       // Fallback: Log the email details
       const emailData = {
-        to: "ritisulo@gmail.com",
+        to: process.env.EMAIL_TO,
         subject: `🚨 URGENT: New ${report.category} Report - ${report.id}`,
         body: `
           A new urgent harassment report has been submitted:
@@ -160,7 +160,7 @@ async function sendSMSAlert(report: Report) {
     console.log("📱 SMS alert sent for critical report:", report.id);
 
     const smsData = {
-      to: "+919791150171", // Admin phone number
+      to: "+9178885555", // Admin phone number
       message: `🚨 URGENT WHISTLE ALERT: New ${report.category} report ${report.id} requires immediate attention. Check admin dashboard now.`,
     };
 
@@ -223,7 +223,7 @@ export const getNotificationSettings: RequestHandler = (req, res) => {
     pushEnabled: true,
     urgentAlerts: true,
     categories: ["harassment", "medical", "emergency", "safety"],
-    adminEmail: "ritisulo@gmail.com",
+    adminEmail: process.env.EMAIL_TO,
     adminPhone: "+91888888881",
   });
 };
