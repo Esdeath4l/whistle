@@ -159,7 +159,7 @@ async function sendEmailAlert(report: Report) {
     const transporter = createEmailTransporter();
 
     // Get the base URL (you may want to configure this via environment variable)
-    const baseUrl = process.env.BASE_URL || 'http://localhost:8080';
+    const baseUrl = process.env.BASE_URL || "http://localhost:8080";
     const adminDashboardUrl = `${baseUrl}/admin`;
     const reportSubmissionUrl = `${baseUrl}/report`;
     const statusCheckUrl = `${baseUrl}/check-status`;
