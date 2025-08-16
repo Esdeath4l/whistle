@@ -66,7 +66,7 @@ export function createServer() {
       if (testResult) {
         // Send test email
         const success = await emailService.sendEmail({
-          to: "ritiofficial2006@gmail.com",
+          to: "ritisulo@gmail.com",
           subject: "🧪 Whistle Email Test - Configuration Successful",
           body: `Email service test successful!
 
@@ -75,7 +75,7 @@ This is a test email to confirm that the Whistle email alert system is working c
 Test Details:
 =============
 - Email service: Configured and working
-- Admin email: ritiofficial2006@gmail.com
+- Admin email: ritisulo@gmail.com
 - Test time: ${new Date().toLocaleString()}
 
 If you received this email, priority-based alerts are now active for:
