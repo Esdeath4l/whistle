@@ -41,7 +41,11 @@ export function encryptReportData(data: {
     ? CryptoJS.AES.encrypt(data.video_url, ENCRYPTION_KEY, { iv }).toString()
     : undefined;
   const encryptedVideoMetadata = data.video_metadata
-    ? CryptoJS.AES.encrypt(JSON.stringify(data.video_metadata), ENCRYPTION_KEY, { iv }).toString()
+    ? CryptoJS.AES.encrypt(
+        JSON.stringify(data.video_metadata),
+        ENCRYPTION_KEY,
+        { iv },
+      ).toString()
     : undefined;
 
   return {
@@ -92,9 +96,15 @@ export function decryptReportData(encryptedData: EncryptedData): {
     : undefined;
 
   const decryptedVideoMetadata = encryptedData.encryptedVideoMetadata
-    ? JSON.parse(CryptoJS.AES.decrypt(encryptedData.encryptedVideoMetadata, ENCRYPTION_KEY, {
-        iv,
-      }).toString(CryptoJS.enc.Utf8))
+    ? JSON.parse(
+        CryptoJS.AES.decrypt(
+          encryptedData.encryptedVideoMetadata,
+          ENCRYPTION_KEY,
+          {
+            iv,
+          },
+        ).toString(CryptoJS.enc.Utf8),
+      )
     : undefined;
 
   return {

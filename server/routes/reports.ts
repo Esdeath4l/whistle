@@ -35,26 +35,26 @@ export const createReport: RequestHandler = (req, res) => {
     if (video_url && video_metadata) {
       const maxSizeMB = 100;
       const maxDurationMinutes = 5;
-      const allowedFormats = ['video/mp4', 'video/webm', 'video/quicktime'];
+      const allowedFormats = ["video/mp4", "video/webm", "video/quicktime"];
 
       if (video_metadata.size > maxSizeMB * 1024 * 1024) {
         console.log("Error: Video file too large");
         return res.status(400).json({
-          error: `Video file too large. Maximum size is ${maxSizeMB}MB`
+          error: `Video file too large. Maximum size is ${maxSizeMB}MB`,
         });
       }
 
       if (video_metadata.duration > maxDurationMinutes * 60) {
         console.log("Error: Video duration too long");
         return res.status(400).json({
-          error: `Video too long. Maximum duration is ${maxDurationMinutes} minutes`
+          error: `Video too long. Maximum duration is ${maxDurationMinutes} minutes`,
         });
       }
 
       if (!allowedFormats.includes(video_metadata.format)) {
         console.log("Error: Invalid video format");
         return res.status(400).json({
-          error: `Invalid video format. Allowed formats: ${allowedFormats.join(', ')}`
+          error: `Invalid video format. Allowed formats: ${allowedFormats.join(", ")}`,
         });
       }
 
@@ -62,7 +62,7 @@ export const createReport: RequestHandler = (req, res) => {
         size: `${(video_metadata.size / 1024 / 1024).toFixed(2)}MB`,
         duration: `${(video_metadata.duration / 60).toFixed(2)}min`,
         format: video_metadata.format,
-        isRecorded: video_metadata.isRecorded
+        isRecorded: video_metadata.isRecorded,
       });
     }
 

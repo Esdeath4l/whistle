@@ -26,7 +26,7 @@ export interface VideoMetadata {
   width?: number;
   height?: number;
   isRecorded: boolean;
-  uploadMethod: 'direct' | 'resumable';
+  uploadMethod: "direct" | "resumable";
 }
 
 export interface EncryptedReportData {

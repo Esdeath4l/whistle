@@ -519,7 +519,10 @@ export default function Admin() {
                         {(report.video_url ||
                           (report.is_encrypted &&
                             getDecryptedReport(report).video_url)) && (
-                          <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300">
+                          <Badge
+                            variant="outline"
+                            className="bg-purple-50 text-purple-700 border-purple-300"
+                          >
                             <Video className="w-3 h-3 mr-1" />
                             Video
                           </Badge>
@@ -605,7 +608,8 @@ export default function Admin() {
 
                               {(selectedReport.photo_url ||
                                 (selectedReport.is_encrypted &&
-                                 getDecryptedReport(selectedReport).photo_url)) && (
+                                  getDecryptedReport(selectedReport)
+                                    .photo_url)) && (
                                 <div>
                                   <Label className="text-sm font-medium">
                                     Photo Evidence
@@ -618,14 +622,22 @@ export default function Admin() {
                                   </Label>
                                   <div className="mt-2">
                                     <img
-                                      src={selectedReport.is_encrypted
-                                        ? getDecryptedReport(selectedReport).photo_url
-                                        : selectedReport.photo_url}
+                                      src={
+                                        selectedReport.is_encrypted
+                                          ? getDecryptedReport(selectedReport)
+                                              .photo_url
+                                          : selectedReport.photo_url
+                                      }
                                       alt="Report evidence"
                                       className="max-w-full h-auto rounded-lg border"
                                       onError={(e) => {
-                                        console.error('Failed to load photo:', e);
-                                        (e.target as HTMLImageElement).style.display = 'none';
+                                        console.error(
+                                          "Failed to load photo:",
+                                          e,
+                                        );
+                                        (
+                                          e.target as HTMLImageElement
+                                        ).style.display = "none";
                                       }}
                                     />
                                   </div>
@@ -634,37 +646,72 @@ export default function Admin() {
 
                               {(selectedReport.video_url ||
                                 (selectedReport.is_encrypted &&
-                                 getDecryptedReport(selectedReport).video_url)) && (
+                                  getDecryptedReport(selectedReport)
+                                    .video_url)) && (
                                 <div>
                                   <Label className="text-sm font-medium">
                                     Video Evidence
                                     {selectedReport.video_metadata && (
                                       <Badge variant="outline" className="ml-2">
-                                        {(selectedReport.video_metadata.size / 1024 / 1024).toFixed(1)}MB • {Math.floor((selectedReport.video_metadata.duration || 0) / 60)}:{String(Math.floor((selectedReport.video_metadata.duration || 0) % 60)).padStart(2, '0')}
-                                        {selectedReport.video_metadata.isRecorded && ' • Recorded'}
+                                        {(
+                                          selectedReport.video_metadata.size /
+                                          1024 /
+                                          1024
+                                        ).toFixed(1)}
+                                        MB •{" "}
+                                        {Math.floor(
+                                          (selectedReport.video_metadata
+                                            .duration || 0) / 60,
+                                        )}
+                                        :
+                                        {String(
+                                          Math.floor(
+                                            (selectedReport.video_metadata
+                                              .duration || 0) % 60,
+                                          ),
+                                        ).padStart(2, "0")}
+                                        {selectedReport.video_metadata
+                                          .isRecorded && " • Recorded"}
                                       </Badge>
                                     )}
                                   </Label>
                                   <div className="mt-2">
                                     {(() => {
-                                      const videoUrl = selectedReport.is_encrypted
-                                        ? getDecryptedReport(selectedReport).video_url
-                                        : selectedReport.video_url;
+                                      const videoUrl =
+                                        selectedReport.is_encrypted
+                                          ? getDecryptedReport(selectedReport)
+                                              .video_url
+                                          : selectedReport.video_url;
 
                                       // Check if video URL is too large (base64 data URLs can be huge)
-                                      if (videoUrl && videoUrl.length > 50000000) { // ~50MB base64 limit
+                                      if (
+                                        videoUrl &&
+                                        videoUrl.length > 50000000
+                                      ) {
+                                        // ~50MB base64 limit
                                         return (
                                           <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
                                             <div className="flex items-center gap-2 mb-2">
                                               <AlertCircle className="w-5 h-5 text-amber-600" />
-                                              <span className="font-medium text-amber-800">Video Too Large for Preview</span>
+                                              <span className="font-medium text-amber-800">
+                                                Video Too Large for Preview
+                                              </span>
                                             </div>
                                             <p className="text-sm text-amber-700">
-                                              Video file is too large to display in browser.
-                                              In production, this would be streamed from cloud storage.
+                                              Video file is too large to display
+                                              in browser. In production, this
+                                              would be streamed from cloud
+                                              storage.
                                             </p>
                                             <p className="text-xs text-amber-600 mt-2">
-                                              Size: {((selectedReport.video_metadata?.size || 0) / 1024 / 1024).toFixed(1)}MB
+                                              Size:{" "}
+                                              {(
+                                                (selectedReport.video_metadata
+                                                  ?.size || 0) /
+                                                1024 /
+                                                1024
+                                              ).toFixed(1)}
+                                              MB
                                             </p>
                                           </div>
                                         );
@@ -676,13 +723,19 @@ export default function Admin() {
                                           controls
                                           preload="metadata"
                                           className="max-w-full h-auto rounded-lg border bg-black"
-                                          style={{ maxHeight: '300px' }}
+                                          style={{ maxHeight: "300px" }}
                                           onError={(e) => {
-                                            console.error('Failed to load video:', e);
-                                            (e.target as HTMLVideoElement).style.display = 'none';
+                                            console.error(
+                                              "Failed to load video:",
+                                              e,
+                                            );
+                                            (
+                                              e.target as HTMLVideoElement
+                                            ).style.display = "none";
                                           }}
                                         >
-                                          Your browser does not support video playback.
+                                          Your browser does not support video
+                                          playback.
                                         </video>
                                       );
                                     })()}

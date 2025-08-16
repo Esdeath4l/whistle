@@ -14,12 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Video,
   Upload,
@@ -62,7 +57,7 @@ interface VideoUploadRecorderProps {
 const DEFAULT_CONFIG: VideoUploadConfig = {
   maxSizeMB: 100,
   maxDurationMinutes: 5,
-  allowedFormats: ['video/mp4', 'video/webm', 'video/quicktime'],
+  allowedFormats: ["video/mp4", "video/webm", "video/quicktime"],
   chunkSizeMB: 10,
 };
 
@@ -79,8 +74,10 @@ export default function VideoUploadRecorder({
   const [error, setError] = useState("");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
-  const [cameraPermission, setCameraPermission] = useState<boolean | null>(null);
-  
+  const [cameraPermission, setCameraPermission] = useState<boolean | null>(
+    null,
+  );
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const videoStreamRef = useRef<MediaStream | null>(null);
   const videoPreviewRef = useRef<HTMLVideoElement>(null);
@@ -93,7 +90,7 @@ export default function VideoUploadRecorder({
   // Cleanup function
   const cleanup = useCallback(() => {
     if (videoStreamRef.current) {
-      videoStreamRef.current.getTracks().forEach(track => track.stop());
+      videoStreamRef.current.getTracks().forEach((track) => track.stop());
       videoStreamRef.current = null;
     }
     if (recordingTimerRef.current) {
@@ -109,14 +106,16 @@ export default function VideoUploadRecorder({
   // Check camera permission
   const checkCameraPermission = async () => {
     try {
-      const permission = await navigator.permissions.query({ name: 'camera' as PermissionName });
-      setCameraPermission(permission.state === 'granted');
-      
-      permission.addEventListener('change', () => {
-        setCameraPermission(permission.state === 'granted');
+      const permission = await navigator.permissions.query({
+        name: "camera" as PermissionName,
+      });
+      setCameraPermission(permission.state === "granted");
+
+      permission.addEventListener("change", () => {
+        setCameraPermission(permission.state === "granted");
       });
     } catch (error) {
-      console.warn('Permission API not supported');
+      console.warn("Permission API not supported");
     }
   };
 
@@ -128,7 +127,7 @@ export default function VideoUploadRecorder({
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   // Validate video file
@@ -141,20 +140,22 @@ export default function VideoUploadRecorder({
 
     // Check file type
     if (!fullConfig.allowedFormats.includes(file.type)) {
-      return `Unsupported format. Please use: ${fullConfig.allowedFormats.join(', ')}`;
+      return `Unsupported format. Please use: ${fullConfig.allowedFormats.join(", ")}`;
     }
 
     // Check duration (requires creating video element)
     return new Promise((resolve) => {
-      const video = document.createElement('video');
+      const video = document.createElement("video");
       video.src = URL.createObjectURL(file);
-      
+
       video.onloadedmetadata = () => {
         const durationMinutes = video.duration / 60;
         URL.revokeObjectURL(video.src);
-        
+
         if (durationMinutes > fullConfig.maxDurationMinutes) {
-          resolve(`Video must be shorter than ${fullConfig.maxDurationMinutes} minutes (current: ${durationMinutes.toFixed(1)} minutes)`);
+          resolve(
+            `Video must be shorter than ${fullConfig.maxDurationMinutes} minutes (current: ${durationMinutes.toFixed(1)} minutes)`,
+          );
         } else {
           resolve(null);
         }
@@ -162,7 +163,7 @@ export default function VideoUploadRecorder({
 
       video.onerror = () => {
         URL.revokeObjectURL(video.src);
-        resolve('Invalid video file');
+        resolve("Invalid video file");
       };
     });
   };
@@ -173,7 +174,7 @@ export default function VideoUploadRecorder({
     if (!file) return;
 
     setError("");
-    
+
     const validationError = await validateVideo(file);
     if (validationError) {
       setError(validationError);
@@ -181,9 +182,9 @@ export default function VideoUploadRecorder({
     }
 
     // Create video element to get metadata
-    const video = document.createElement('video');
+    const video = document.createElement("video");
     video.src = URL.createObjectURL(file);
-    
+
     video.onloadedmetadata = () => {
       const videoFile: VideoFile = {
         file,
@@ -193,7 +194,7 @@ export default function VideoUploadRecorder({
         format: file.type,
         isRecorded: false,
       };
-      
+
       setCurrentVideo(videoFile);
       onVideoChange(videoFile);
     };
@@ -203,25 +204,27 @@ export default function VideoUploadRecorder({
   const startCamera = async () => {
     try {
       setError("");
-      
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: { ideal: 1280 },
           height: { ideal: 720 },
-          facingMode: 'user'
+          facingMode: "user",
         },
-        audio: true
+        audio: true,
       });
-      
+
       videoStreamRef.current = stream;
       setCameraPermission(true);
-      
+
       if (videoPreviewRef.current) {
         videoPreviewRef.current.srcObject = stream;
       }
     } catch (error) {
       setCameraPermission(false);
-      setError('Camera access denied. Please allow camera permissions and try again.');
+      setError(
+        "Camera access denied. Please allow camera permissions and try again.",
+      );
     }
   };
 
@@ -235,32 +238,34 @@ export default function VideoUploadRecorder({
       if (!videoStreamRef.current) return;
 
       chunksRef.current = [];
-      
+
       const mediaRecorder = new MediaRecorder(videoStreamRef.current, {
-        mimeType: 'video/webm;codecs=vp9' // Fallback to vp8 if needed
+        mimeType: "video/webm;codecs=vp9", // Fallback to vp8 if needed
       });
-      
+
       mediaRecorderRef.current = mediaRecorder;
-      
+
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           chunksRef.current.push(event.data);
         }
       };
-      
+
       mediaRecorder.onstop = () => {
-        console.log('Recording stopped, processing video...');
+        console.log("Recording stopped, processing video...");
         setIsProcessing(true);
 
         // Small delay to show processing state
         setTimeout(() => {
-          const blob = new Blob(chunksRef.current, { type: 'video/webm' });
-          const file = new File([blob], `recording-${Date.now()}.webm`, { type: 'video/webm' });
+          const blob = new Blob(chunksRef.current, { type: "video/webm" });
+          const file = new File([blob], `recording-${Date.now()}.webm`, {
+            type: "video/webm",
+          });
 
-          console.log('Video recorded:', {
+          console.log("Video recorded:", {
             size: `${(blob.size / 1024 / 1024).toFixed(2)}MB`,
             duration: `${recordingTime}s`,
-            chunks: chunksRef.current.length
+            chunks: chunksRef.current.length,
           });
 
           const videoFile: VideoFile = {
@@ -268,7 +273,7 @@ export default function VideoUploadRecorder({
             url: URL.createObjectURL(blob),
             duration: recordingTime,
             size: blob.size,
-            format: 'video/webm',
+            format: "video/webm",
             isRecorded: true,
           };
 
@@ -277,37 +282,38 @@ export default function VideoUploadRecorder({
           setIsProcessing(false);
           cleanup();
 
-          console.log('Video file created and set, ready for form submission');
+          console.log("Video file created and set, ready for form submission");
         }, 500);
       };
-      
+
       mediaRecorder.start(1000); // Capture data every second
       setIsRecording(true);
       setRecordingTime(0);
-      
+
       // Start timer
       recordingTimerRef.current = setInterval(() => {
-        setRecordingTime(prev => {
+        setRecordingTime((prev) => {
           const newTime = prev + 1;
-          
+
           // Auto-stop at max duration
           if (newTime >= fullConfig.maxDurationMinutes * 60) {
             stopRecording();
           }
-          
+
           return newTime;
         });
       }, 1000);
-      
     } catch (error) {
-      setError('Failed to start recording. Please check your camera and microphone permissions.');
+      setError(
+        "Failed to start recording. Please check your camera and microphone permissions.",
+      );
     }
   };
 
   // Stop recording
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
-      console.log('Stopping recording...');
+      console.log("Stopping recording...");
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       setIsPaused(false);
@@ -335,30 +341,32 @@ export default function VideoUploadRecorder({
   const simulateResumableUpload = async (file: File) => {
     setIsUploading(true);
     setUploadProgress(0);
-    
+
     const chunkSize = fullConfig.chunkSizeMB * 1024 * 1024;
     const totalChunks = Math.ceil(file.size / chunkSize);
-    
+
     for (let i = 0; i < totalChunks; i++) {
       // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
       const progress = ((i + 1) / totalChunks) * 100;
       setUploadProgress(progress);
     }
-    
+
     setIsUploading(false);
   };
 
   // Start upload if video is large
   useEffect(() => {
-    if (currentVideo && currentVideo.size > 10 * 1024 * 1024) { // > 10MB
+    if (currentVideo && currentVideo.size > 10 * 1024 * 1024) {
+      // > 10MB
       simulateResumableUpload(currentVideo.file);
     }
   }, [currentVideo]);
 
   const isLargeFile = currentVideo && currentVideo.size > 10 * 1024 * 1024;
-  const maxDurationReached = recordingTime >= fullConfig.maxDurationMinutes * 60;
+  const maxDurationReached =
+    recordingTime >= fullConfig.maxDurationMinutes * 60;
 
   return (
     <div className="space-y-4">
@@ -384,15 +392,20 @@ export default function VideoUploadRecorder({
                 <div className="flex items-center gap-2">
                   <FileVideo className="w-5 h-5 text-primary" />
                   <div>
-                    <p className="text-sm font-medium">{currentVideo.file.name}</p>
+                    <p className="text-sm font-medium">
+                      {currentVideo.file.name}
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       {(currentVideo.size / 1024 / 1024).toFixed(2)} MB
-                      {currentVideo.duration && ` • ${formatTime(Math.floor(currentVideo.duration))}`}
-                      {currentVideo.isRecorded && ' • Recorded'}
+                      {currentVideo.duration &&
+                        ` • ${formatTime(Math.floor(currentVideo.duration))}`}
+                      {currentVideo.isRecorded && " • Recorded"}
                     </p>
                     <div className="flex items-center gap-1 mt-1">
                       <CheckCircle className="w-3 h-3 text-green-600" />
-                      <span className="text-xs text-green-600 font-medium">Ready for submission</span>
+                      <span className="text-xs text-green-600 font-medium">
+                        Ready for submission
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -417,7 +430,9 @@ export default function VideoUploadRecorder({
               {isLargeFile && (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Upload Progress</span>
+                    <span className="text-muted-foreground">
+                      Upload Progress
+                    </span>
                     <span>{Math.round(uploadProgress)}%</span>
                   </div>
                   <Progress value={uploadProgress} className="h-2" />
@@ -452,15 +467,18 @@ export default function VideoUploadRecorder({
                     <Video className="w-6 h-6 text-muted-foreground" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Click to upload a video</p>
+                    <p className="text-sm font-medium">
+                      Click to upload a video
+                    </p>
                     <p className="text-xs text-muted-foreground">
-                      MP4, WebM up to {fullConfig.maxSizeMB}MB, max {fullConfig.maxDurationMinutes} minutes
+                      MP4, WebM up to {fullConfig.maxSizeMB}MB, max{" "}
+                      {fullConfig.maxDurationMinutes} minutes
                     </p>
                   </div>
                   <Input
                     ref={fileInputRef}
                     type="file"
-                    accept={fullConfig.allowedFormats.join(',')}
+                    accept={fullConfig.allowedFormats.join(",")}
                     onChange={handleFileUpload}
                     disabled={disabled}
                     className="cursor-pointer"
@@ -476,7 +494,9 @@ export default function VideoUploadRecorder({
                         <AlertCircle className="w-6 h-6 text-destructive" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Camera Access Required</p>
+                        <p className="text-sm font-medium">
+                          Camera Access Required
+                        </p>
                         <p className="text-xs text-muted-foreground">
                           Please allow camera permissions to record video
                         </p>
@@ -499,7 +519,7 @@ export default function VideoUploadRecorder({
                           muted
                           className={cn(
                             "w-full max-h-48 rounded-lg bg-black",
-                            !videoStreamRef.current && "hidden"
+                            !videoStreamRef.current && "hidden",
                           )}
                         />
                         {!videoStreamRef.current && (
@@ -507,7 +527,7 @@ export default function VideoUploadRecorder({
                             <Camera className="w-12 h-12 text-muted-foreground" />
                           </div>
                         )}
-                        
+
                         {isRecording && (
                           <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
                             <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
@@ -547,12 +567,17 @@ export default function VideoUploadRecorder({
 
                       {isRecording && (
                         <div className="space-y-2">
-                          <Progress 
-                            value={(recordingTime / (fullConfig.maxDurationMinutes * 60)) * 100} 
+                          <Progress
+                            value={
+                              (recordingTime /
+                                (fullConfig.maxDurationMinutes * 60)) *
+                              100
+                            }
                             className="h-2"
                           />
                           <p className="text-xs text-muted-foreground">
-                            {formatTime(recordingTime)} / {formatTime(fullConfig.maxDurationMinutes * 60)}
+                            {formatTime(recordingTime)} /{" "}
+                            {formatTime(fullConfig.maxDurationMinutes * 60)}
                           </p>
                         </div>
                       )}

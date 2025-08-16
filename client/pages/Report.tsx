@@ -43,7 +43,9 @@ import {
 } from "@shared/api";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { encryptReportData } from "@/lib/encryption";
-import VideoUploadRecorder, { VideoFile } from "@/components/VideoUploadRecorder";
+import VideoUploadRecorder, {
+  VideoFile,
+} from "@/components/VideoUploadRecorder";
 
 export default function Report() {
   const [message, setMessage] = useState("");
@@ -161,8 +163,11 @@ export default function Report() {
       // In production, you'd upload to a file storage service with resumable uploads
       if (videoFile) {
         // Safety check: Don't process extremely large videos that could crash the browser
-        if (videoFile.size > 50 * 1024 * 1024) { // 50MB limit for base64 conversion
-          setError("Video file too large for demo. In production, this would use cloud storage.");
+        if (videoFile.size > 50 * 1024 * 1024) {
+          // 50MB limit for base64 conversion
+          setError(
+            "Video file too large for demo. In production, this would use cloud storage.",
+          );
           setIsSubmitting(false);
           return;
         }
@@ -171,14 +176,15 @@ export default function Report() {
           const reader = new FileReader();
           video_url = await new Promise<string>((resolve, reject) => {
             reader.onload = () => resolve(reader.result as string);
-            reader.onerror = () => reject(new Error("Failed to read video file"));
+            reader.onerror = () =>
+              reject(new Error("Failed to read video file"));
             reader.readAsDataURL(videoFile.file);
           });
 
           console.log("Video processed for submission:", {
             size: `${(videoFile.size / 1024 / 1024).toFixed(2)}MB`,
             duration: `${(videoFile.duration || 0 / 60).toFixed(1)}min`,
-            format: videoFile.format
+            format: videoFile.format,
           });
         } catch (error) {
           console.error("Failed to process video:", error);
@@ -204,13 +210,16 @@ export default function Report() {
           severity,
           photo_url: photo_url || undefined,
           video_url: video_url || undefined,
-          video_metadata: videoFile ? {
-            duration: videoFile.duration || 0,
-            size: videoFile.size,
-            format: videoFile.format,
-            isRecorded: videoFile.isRecorded,
-            uploadMethod: videoFile.size > 10 * 1024 * 1024 ? 'resumable' : 'direct'
-          } : undefined,
+          video_metadata: videoFile
+            ? {
+                duration: videoFile.duration || 0,
+                size: videoFile.size,
+                format: videoFile.format,
+                isRecorded: videoFile.isRecorded,
+                uploadMethod:
+                  videoFile.size > 10 * 1024 * 1024 ? "resumable" : "direct",
+              }
+            : undefined,
           is_encrypted: false,
         };
         console.log("Submitting plain text report (mobile device detected)");
@@ -222,13 +231,16 @@ export default function Report() {
             category,
             photo_url: photo_url || undefined,
             video_url: video_url || undefined,
-            video_metadata: videoFile ? {
-              duration: videoFile.duration || 0,
-              size: videoFile.size,
-              format: videoFile.format,
-              isRecorded: videoFile.isRecorded,
-              uploadMethod: videoFile.size > 10 * 1024 * 1024 ? 'resumable' : 'direct'
-            } : undefined,
+            video_metadata: videoFile
+              ? {
+                  duration: videoFile.duration || 0,
+                  size: videoFile.size,
+                  format: videoFile.format,
+                  isRecorded: videoFile.isRecorded,
+                  uploadMethod:
+                    videoFile.size > 10 * 1024 * 1024 ? "resumable" : "direct",
+                }
+              : undefined,
           });
 
           reportData = {
@@ -253,13 +265,16 @@ export default function Report() {
             severity,
             photo_url: photo_url || undefined,
             video_url: video_url || undefined,
-            video_metadata: videoFile ? {
-              duration: videoFile.duration || 0,
-              size: videoFile.size,
-              format: videoFile.format,
-              isRecorded: videoFile.isRecorded,
-              uploadMethod: videoFile.size > 10 * 1024 * 1024 ? 'resumable' : 'direct'
-            } : undefined,
+            video_metadata: videoFile
+              ? {
+                  duration: videoFile.duration || 0,
+                  size: videoFile.size,
+                  format: videoFile.format,
+                  isRecorded: videoFile.isRecorded,
+                  uploadMethod:
+                    videoFile.size > 10 * 1024 * 1024 ? "resumable" : "direct",
+                }
+              : undefined,
             is_encrypted: false,
           };
 
@@ -566,7 +581,11 @@ export default function Report() {
                   config={{
                     maxSizeMB: 100,
                     maxDurationMinutes: 5,
-                    allowedFormats: ['video/mp4', 'video/webm', 'video/quicktime'],
+                    allowedFormats: [
+                      "video/mp4",
+                      "video/webm",
+                      "video/quicktime",
+                    ],
                     chunkSizeMB: 10,
                   }}
                   disabled={isSubmitting}
