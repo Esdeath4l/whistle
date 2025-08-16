@@ -390,6 +390,10 @@ export default function VideoUploadRecorder({
                       {currentVideo.duration && ` • ${formatTime(Math.floor(currentVideo.duration))}`}
                       {currentVideo.isRecorded && ' • Recorded'}
                     </p>
+                    <div className="flex items-center gap-1 mt-1">
+                      <CheckCircle className="w-3 h-3 text-green-600" />
+                      <span className="text-xs text-green-600 font-medium">Ready for submission</span>
+                    </div>
                   </div>
                 </div>
                 <Button
