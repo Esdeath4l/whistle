@@ -144,36 +144,158 @@ export function notifyNewReport(report: Report) {
 }
 
 /**
- * Email notification for urgent reports
+ * Priority-based email notification system
  */
-async function sendEmailAlert(report: Report) {
-  try {
-    // In production, integrate with email service (SendGrid, AWS SES, etc.)
-    console.log("📧 Email alert sent for urgent report:", report.id);
+async function sendPriorityBasedEmailAlert(report: Report) {
+  const adminEmail = "ritiofficial2006@gmail.com";
 
-    // Simulate email sending
+  // Determine if email should be sent based on priority
+  const shouldSendEmail = shouldSendEmailForPriority(report.severity, report.category);
+
+  if (!shouldSendEmail) {
+    console.log(`📧 Skipping email for ${report.severity} priority report:`, report.id);
+    return;
+  }
+
+  try {
+    const priorityConfig = getEmailPriorityConfig(report.severity, report.category);
+
     const emailData = {
-      to: "admin@whistle-app.com", // Admin email
-      subject: `🚨 URGENT: New ${report.category} Report - ${report.id}`,
+      to: adminEmail,
+      subject: `${priorityConfig.emoji} ${priorityConfig.urgency}: New ${report.category} Report - ${report.id}`,
       body: `
-        A new urgent harassment report has been submitted:
-        
+        ${priorityConfig.alertText}
+
+        Report Details:
+        ================
         Report ID: ${report.id}
         Category: ${report.category}
         Severity: ${report.severity}
-        Submitted: ${report.created_at}
-        
-        Please log into the admin dashboard immediately to review and respond.
-        
+        Submitted: ${new Date(report.created_at).toLocaleString()}
+
+        ${report.is_encrypted ?
+          "⚠️  This report contains encrypted data that requires admin access to decrypt." :
+          `Message Preview: ${report.message.substring(0, 100)}${report.message.length > 100 ? '...' : ''}`
+        }
+
+        Action Required:
+        ================
+        ${priorityConfig.actionRequired}
+
+        Admin Dashboard: ${process.env.FRONTEND_URL || 'http://localhost:3000'}/admin
+
         - Whistle Security System
+        Automated Alert System
       `,
+      priority: priorityConfig.priority,
     };
 
-    // Log the email (in production, send actual email)
-    console.log("Email notification:", emailData);
+    // Log the email (integrate with real email service in production)
+    console.log(`📧 ${priorityConfig.urgency} email notification sent to ${adminEmail}:`, {
+      reportId: report.id,
+      severity: report.severity,
+      category: report.category,
+      subject: emailData.subject
+    });
+
+    // In production, replace this with actual email service
+    await sendActualEmail(emailData);
+
   } catch (error) {
-    console.error("Failed to send email notification:", error);
+    console.error("Failed to send priority-based email notification:", error);
   }
+}
+
+/**
+ * Determine if email should be sent based on priority rules
+ */
+function shouldSendEmailForPriority(severity?: string, category?: string): boolean {
+  // Always send for urgent and high priority
+  if (severity === "urgent" || severity === "high") return true;
+
+  // Always send for emergency and harassment categories
+  if (category === "emergency" || category === "harassment") return true;
+
+  // Send for medium priority medical and safety issues
+  if ((category === "medical" || category === "safety") && severity === "medium") return true;
+
+  // Don't send for low priority feedback
+  if (severity === "low" && category === "feedback") return false;
+
+  // Send for all other medium priority reports
+  if (severity === "medium") return true;
+
+  // Default: send email to be safe
+  return true;
+}
+
+/**
+ * Get email configuration based on priority
+ */
+function getEmailPriorityConfig(severity?: string, category?: string) {
+  if (severity === "urgent" || category === "emergency") {
+    return {
+      emoji: "🚨",
+      urgency: "CRITICAL ALERT",
+      priority: "high",
+      alertText: "🔴 IMMEDIATE ACTION REQUIRED - A critical incident has been reported that may require emergency response.",
+      actionRequired: "1. Review immediately (within 5 minutes)\n2. Contact relevant authorities if needed\n3. Respond to reporter ASAP\n4. Document all actions taken"
+    };
+  }
+
+  if (severity === "high" || category === "harassment") {
+    return {
+      emoji: "⚠️",
+      urgency: "HIGH PRIORITY",
+      priority: "high",
+      alertText: "🟠 HIGH PRIORITY REPORT - A serious incident requiring prompt attention has been reported.",
+      actionRequired: "1. Review within 30 minutes\n2. Investigate thoroughly\n3. Respond within 2 hours\n4. Consider escalation if needed"
+    };
+  }
+
+  if (severity === "medium") {
+    return {
+      emoji: "📋",
+      urgency: "STANDARD PRIORITY",
+      priority: "normal",
+      alertText: "🟡 STANDARD REPORT - A new incident report has been submitted for review.",
+      actionRequired: "1. Review within 4 hours\n2. Investigate as appropriate\n3. Respond within 24 hours"
+    };
+  }
+
+  // Low priority or default
+  return {
+    emoji: "📝",
+    urgency: "LOW PRIORITY",
+    priority: "low",
+    alertText: "🟢 ROUTINE REPORT - A new report has been submitted for your review.",
+    actionRequired: "1. Review within 24 hours\n2. Respond as appropriate"
+  };
+}
+
+/**
+ * Legacy email alert function (keeping for backward compatibility)
+ */
+async function sendEmailAlert(report: Report) {
+  return sendPriorityBasedEmailAlert(report);
+}
+
+/**
+ * Send actual email (placeholder for real email service integration)
+ */
+async function sendActualEmail(emailData: any) {
+  // This is where you would integrate with a real email service
+  // For now, just log the email data
+  console.log("📧 EMAIL CONTENT:", emailData);
+
+  // TODO: Integrate with email service like:
+  // - EmailJS (client-side)
+  // - Nodemailer with SMTP
+  // - SendGrid API
+  // - AWS SES
+  // - Mailgun
+
+  return Promise.resolve();
 }
 
 /**
