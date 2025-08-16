@@ -43,6 +43,7 @@ import {
   AlertTriangle,
   Shield,
   MessageCircle,
+  Settings,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -384,6 +385,12 @@ export default function Admin() {
             </div>
           </Link>
           <div className="flex items-center gap-4">
+            <Link to="/admin/settings">
+              <Button variant="ghost" size="sm">
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
+              </Button>
+            </Link>
             <Button
               variant="outline"
               size="sm"
