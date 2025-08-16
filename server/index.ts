@@ -27,30 +27,37 @@ export function createServer() {
   app.get("/api/ping", (_req, res) => {
     res.json({ message: "Hello from Whistle server!" });
   });
-  app.get("/api/debug", (_req, res) => {
-    const fs = require("fs");
-    const path = require("path");
+  app.get("/api/debug", async (_req, res) => {
+    try {
+      const fs = await import("fs");
+      const path = await import("path");
 
-    const dataDir =
-      process.env.NODE_ENV === "production"
-        ? path.join("/tmp", "whistle-data")
-        : path.join(process.cwd(), "server", "data");
-    const reportsFile = path.join(dataDir, "reports.json");
+      const dataDir =
+        process.env.NODE_ENV === "production"
+          ? path.join("/tmp", "whistle-data")
+          : path.join(process.cwd(), "server", "data");
+      const reportsFile = path.join(dataDir, "reports.json");
 
-    res.json({
-      message: "Debug info",
-      environment: process.env.NODE_ENV || "development",
-      dataDir,
-      reportsFile,
-      dataDirExists: fs.existsSync(dataDir),
-      reportsFileExists: fs.existsSync(reportsFile),
-      emailConfigured: !!process.env.EMAIL_USER,
-      emailUser: process.env.EMAIL_USER
-        ? `${process.env.EMAIL_USER.split("@")[0]}@***`
-        : "not configured",
-      cwd: process.cwd(),
-      timestamp: new Date().toISOString(),
-    });
+      res.json({
+        message: "Debug info",
+        environment: process.env.NODE_ENV || "development",
+        dataDir,
+        reportsFile,
+        dataDirExists: fs.existsSync(dataDir),
+        reportsFileExists: fs.existsSync(reportsFile),
+        emailConfigured: !!process.env.EMAIL_USER,
+        emailUser: process.env.EMAIL_USER
+          ? `${process.env.EMAIL_USER.split("@")[0]}@***`
+          : "not configured",
+        cwd: process.cwd(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      res.status(500).json({
+        error: "Debug endpoint error",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
   });
 
   // Email test endpoint (admin only)
