@@ -142,7 +142,7 @@ function createEmailTransporter() {
   }
 
   try {
-    const transporter = nodemailer.createTransporter(emailConfig);
+    const transporter = nodemailer.createTransport(emailConfig);
     console.log("📧 Email transporter created successfully");
     return transporter;
   } catch (error) {
