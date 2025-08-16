@@ -664,7 +664,7 @@ export default function Admin() {
                                               In production, this would be streamed from cloud storage.
                                             </p>
                                             <p className="text-xs text-amber-600 mt-2">
-                                              Size: {(selectedReport.video_metadata?.size || 0 / 1024 / 1024).toFixed(1)}MB
+                                              Size: {((selectedReport.video_metadata?.size || 0) / 1024 / 1024).toFixed(1)}MB
                                             </p>
                                           </div>
                                         );
