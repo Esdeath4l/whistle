@@ -14,7 +14,7 @@ const EMAIL_CONFIG = {
 };
 
 // Create transporter
-const transporter = nodemailer.createTransporter(EMAIL_CONFIG);
+const transporter = nodemailer.createTransport(EMAIL_CONFIG);
 
 /**
  * Send actual email notification for urgent reports
@@ -105,7 +105,7 @@ export async function sendEmailAlert(report: Report): Promise<boolean> {
         </html>
       `,
       text: `
-🚨 URGENT HARASSMENT REPORT - IMMEDIATE ACTION REQUIRED
+��� URGENT HARASSMENT REPORT - IMMEDIATE ACTION REQUIRED
 
 A new urgent harassment report has been submitted and requires immediate administrative review.
 
