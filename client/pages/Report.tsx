@@ -448,7 +448,7 @@ export default function Report() {
                   <Label htmlFor="message">Your Report *</Label>
                   <Textarea
                     id="message"
-                    placeholder="Please describe the incident, concern, or feedback you'd like to report. Include relevant details such as date, time, location, and people involved..."
+                    placeholder="Please describe what happened. Include details like:&#10;• What occurred?&#10;• When did it happen?&#10;• Where did it take place?&#10;• Who was involved?&#10;• Any other relevant information..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     className="min-h-[120px] resize-none"
