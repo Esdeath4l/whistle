@@ -285,3 +285,35 @@ export const getNotificationSettings: RequestHandler = (req, res) => {
     adminPhone: "+1234567890",
   });
 };
+
+/**
+ * Test email alert endpoint
+ */
+export const testEmailAlert: RequestHandler = async (req, res) => {
+  try {
+    const testReport: Report = {
+      id: `test_${Date.now()}`,
+      message: "This is a test urgent report to verify email notifications",
+      category: "harassment",
+      severity: "urgent",
+      created_at: new Date().toISOString(),
+      status: "pending",
+      is_encrypted: false
+    };
+
+    await sendEmailAlert(testReport);
+
+    res.json({
+      success: true,
+      message: "Test email sent to whistle.git@gmail.com",
+      reportId: testReport.id
+    });
+  } catch (error) {
+    console.error("Test email failed:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to send test email",
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+};
