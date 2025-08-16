@@ -248,9 +248,16 @@ export default function VideoUploadRecorder({
       };
       
       mediaRecorder.onstop = () => {
+        console.log('Recording stopped, processing video...');
         const blob = new Blob(chunksRef.current, { type: 'video/webm' });
         const file = new File([blob], `recording-${Date.now()}.webm`, { type: 'video/webm' });
-        
+
+        console.log('Video recorded:', {
+          size: `${(blob.size / 1024 / 1024).toFixed(2)}MB`,
+          duration: `${recordingTime}s`,
+          chunks: chunksRef.current.length
+        });
+
         const videoFile: VideoFile = {
           file,
           url: URL.createObjectURL(blob),
@@ -259,10 +266,12 @@ export default function VideoUploadRecorder({
           format: 'video/webm',
           isRecorded: true,
         };
-        
+
         setCurrentVideo(videoFile);
         onVideoChange(videoFile);
         cleanup();
+
+        console.log('Video file created and set, ready for form submission');
       };
       
       mediaRecorder.start(1000); // Capture data every second
