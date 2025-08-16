@@ -13,6 +13,7 @@ import {
   sendEmailNotification,
   sendSMSNotification,
   getNotificationSettings,
+  testEmailAlert,
 } from "./routes/notifications";
 
 export function createServer() {
