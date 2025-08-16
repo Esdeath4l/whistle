@@ -8,7 +8,7 @@ const EMAIL_CONFIG = {
   port: 587,
   secure: false,
   auth: {
-    user: process.env.EMAIL_USER || "whistle.git@gmail.com", // Your email
+    user: process.env.EMAIL_USER, // Your email
     pass: process.env.EMAIL_APP_PASSWORD, // App-specific password required
   },
 };
@@ -27,7 +27,7 @@ export async function sendEmailAlert(report: Report): Promise<boolean> {
         "❌ Email service not configured - EMAIL_APP_PASSWORD missing",
       );
       console.log(
-        "📧 Would send email to: ritisulo@gmail.com for report:",
+        "📧 Would send email for report:",
         report.id,
       );
       return false;
@@ -123,7 +123,7 @@ Required Actions:
 3. Take appropriate administrative action
 4. Respond within your organization's SLA timeframe
 
-Admin Dashboard: ${process.env.ADMIN_DASHBOARD_URL || "https://whistle-s3n8.onrender.com/"}
+Admin Dashboard: ${process.env.ADMIN_DASHBOARD_URL }
 
 This is an automated alert from the Whistle Harassment Reporting System.
 Report ID: ${report.id} | Timestamp: ${new Date().toISOString()}
