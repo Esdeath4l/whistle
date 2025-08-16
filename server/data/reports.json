@@ -5,8 +5,14 @@
     "category": "harassment",
     "severity": "medium",
     "created_at": "2025-08-16T06:14:01.280Z",
-    "status": "pending",
-    "admin_responses": [],
+    "status": "reviewed",
+    "admin_responses": [
+      {
+        "message": "okay ",
+        "timestamp": "2025-08-16T06:19:50.966Z",
+        "status_at_time": "reviewed"
+      }
+    ],
     "encrypted_data": {
       "encryptedMessage": "U2FsdGVkX1/6ysSJcnKyNmcMh5I5SdK67vWnpYHeZKc=",
       "encryptedCategory": "U2FsdGVkX1+IKw/0o7Adh3Yx/XDfPoJMi2T9HuYRuIw=",
@@ -14,6 +20,8 @@
       "iv": "dd967bb1f9834ac96b2c9056671a2d3a",
       "timestamp": "2025-08-16T06:13:53.520Z"
     },
-    "is_encrypted": true
+    "is_encrypted": true,
+    "admin_response": "okay ",
+    "admin_response_at": "2025-08-16T06:19:50.966Z"
   }
 ]
