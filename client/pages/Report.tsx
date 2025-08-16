@@ -182,6 +182,14 @@ export default function Report() {
           category,
           severity,
           photo_url: photo_url || undefined,
+          video_url: video_url || undefined,
+          video_metadata: videoFile ? {
+            duration: videoFile.duration || 0,
+            size: videoFile.size,
+            format: videoFile.format,
+            isRecorded: videoFile.isRecorded,
+            uploadMethod: videoFile.size > 10 * 1024 * 1024 ? 'resumable' : 'direct'
+          } : undefined,
           is_encrypted: false,
         };
         console.log("Submitting plain text report (mobile device detected)");
