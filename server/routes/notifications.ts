@@ -281,21 +281,30 @@ async function sendEmailAlert(report: Report) {
 }
 
 /**
- * Send actual email (placeholder for real email service integration)
+ * Send actual email using Nodemailer service
  */
 async function sendActualEmail(emailData: any) {
-  // This is where you would integrate with a real email service
-  // For now, just log the email data
-  console.log("📧 EMAIL CONTENT:", emailData);
+  const { emailService } = await import('../lib/email');
 
-  // TODO: Integrate with email service like:
-  // - EmailJS (client-side)
-  // - Nodemailer with SMTP
-  // - SendGrid API
-  // - AWS SES
-  // - Mailgun
+  try {
+    const success = await emailService.sendEmail({
+      to: emailData.to,
+      subject: emailData.subject,
+      body: emailData.body,
+      priority: emailData.priority,
+    });
 
-  return Promise.resolve();
+    if (success) {
+      console.log(`✅ Email alert successfully sent to ${emailData.to}`);
+    } else {
+      console.log(`⚠️  Email service not configured, but alert was logged`);
+    }
+
+    return success;
+  } catch (error) {
+    console.error('❌ Failed to send email alert:', error);
+    return false;
+  }
 }
 
 /**
