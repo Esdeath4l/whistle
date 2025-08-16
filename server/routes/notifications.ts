@@ -139,10 +139,8 @@ export function notifyNewReport(report: Report) {
 
   broadcastNotification(notification);
 
-  // Send email notification for urgent reports
-  if (notification.type === "urgent_report") {
-    sendEmailAlert(report);
-  }
+  // Send email notification based on priority
+  sendPriorityBasedEmailAlert(report);
 }
 
 /**
