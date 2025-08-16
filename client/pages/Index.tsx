@@ -168,19 +168,6 @@ export default function Index() {
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
               <CardHeader>
                 <div className="w-12 h-12 rounded-lg bg-warning/10 flex items-center justify-center mb-4">
-                  <Eye className="w-6 h-6 text-warning" />
-                </div>
-                <CardTitle>Smart Categorization</CardTitle>
-                <CardDescription>
-                  AI-powered severity detection with automatic routing for
-                  harassment, medical, and emergency reports.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-              <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-warning/10 flex items-center justify-center mb-4">
                   <AlertTriangle className="w-6 h-6 text-warning" />
                 </div>
                 <CardTitle>Photo Evidence</CardTitle>
