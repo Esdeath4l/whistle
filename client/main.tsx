@@ -10,6 +10,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Report from "./pages/Report";
 import Admin from "./pages/Admin";
+import AdminSettings from "./pages/AdminSettings";
 import HowItWorks from "./pages/HowItWorks";
 import CheckStatus from "./pages/CheckStatus";
 import NotFound from "./pages/NotFound";
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/report" element={<Report />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/check-status" element={<CheckStatus />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
