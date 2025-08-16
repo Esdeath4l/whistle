@@ -111,9 +111,12 @@ export function notifyNewReport(report: Report) {
  */
 function createEmailTransporter() {
   // Debug environment variables
-  console.log('🔧 Email Configuration Debug:');
-  console.log('  - EMAIL_USER:', process.env.EMAIL_USER || 'whistle.git@gmail.com');
-  console.log('  - EMAIL_PASSWORD set:', !!process.env.EMAIL_PASSWORD);
+  console.log("🔧 Email Configuration Debug:");
+  console.log(
+    "  - EMAIL_USER:",
+    process.env.EMAIL_USER || "whistle.git@gmail.com",
+  );
+  console.log("  - EMAIL_PASSWORD set:", !!process.env.EMAIL_PASSWORD);
 
   // For Gmail, you'll need to use App Password instead of regular password
   // Go to Google Account settings > Security > App passwords to generate one
@@ -130,20 +133,20 @@ function createEmailTransporter() {
     console.warn(
       "⚠️  No EMAIL_PASSWORD environment variable set. Email notifications will be logged to console only.",
     );
-    console.warn('⚠️  To fix this:');
-    console.warn('   1. Go to https://myaccount.google.com/security');
-    console.warn('   2. Enable 2-Step Verification');
-    console.warn('   3. Go to App passwords and generate one for Mail');
-    console.warn('   4. Set EMAIL_PASSWORD environment variable');
+    console.warn("⚠️  To fix this:");
+    console.warn("   1. Go to https://myaccount.google.com/security");
+    console.warn("   2. Enable 2-Step Verification");
+    console.warn("   3. Go to App passwords and generate one for Mail");
+    console.warn("   4. Set EMAIL_PASSWORD environment variable");
     return null;
   }
 
   try {
     const transporter = nodemailer.createTransporter(emailConfig);
-    console.log('📧 Email transporter created successfully');
+    console.log("📧 Email transporter created successfully");
     return transporter;
   } catch (error) {
-    console.error('❌ Failed to create email transporter:', error);
+    console.error("❌ Failed to create email transporter:", error);
     return null;
   }
 }
