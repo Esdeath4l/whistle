@@ -110,31 +110,39 @@ export function notifyNewReport(report: Report) {
  */
 async function sendEmailAlert(report: Report) {
   try {
-    // In production, integrate with email service (SendGrid, AWS SES, etc.)
-    console.log("📧 Email alert sent for urgent report:", report.id);
+    // Import the real email service
+    const { sendEmailAlert: sendRealEmail } = await import("../email-service");
 
-    // Simulate email sending
-    const emailData = {
-      to: "ritisulo@gmail.com", // Admin email
-      subject: `🚨 URGENT: New ${report.category} Report - ${report.id}`,
-      body: `
-        A new urgent harassment report has been submitted:
-        
-        Report ID: ${report.id}
-        Category: ${report.category}
-        Severity: ${report.severity}
-        Submitted: ${report.created_at}
-        
-        Please log into the admin dashboard immediately to review and respond.
-        
-        - Whistle Security System
-      `,
-    };
+    // Try to send real email first
+    const emailSent = await sendRealEmail(report);
 
-    // Log the email (in production, send actual email)
-    console.log("Email notification:", emailData);
+    if (emailSent) {
+      console.log("✅ Email alert sent successfully for urgent report:", report.id);
+    } else {
+      console.log("⚠️ Email service not configured - logging notification instead");
+
+      // Fallback: Log the email details
+      const emailData = {
+        to: "ritisulo@gmail.com",
+        subject: `🚨 URGENT: New ${report.category} Report - ${report.id}`,
+        body: `
+          A new urgent harassment report has been submitted:
+
+          Report ID: ${report.id}
+          Category: ${report.category}
+          Severity: ${report.severity}
+          Submitted: ${report.created_at}
+
+          Please log into the admin dashboard immediately to review and respond.
+
+          - Whistle Security System
+        `,
+      };
+
+      console.log("📧 Email notification (simulated):", emailData);
+    }
   } catch (error) {
-    console.error("Failed to send email notification:", error);
+    console.error("❌ Failed to send email notification:", error);
   }
 }
 
