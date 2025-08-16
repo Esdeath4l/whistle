@@ -22,7 +22,7 @@ import {
   Lock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "@/components/ui/use-toast";
 
 export default function AdminSettings() {
   const [emailSettings, setEmailSettings] = useState({
@@ -33,7 +33,7 @@ export default function AdminSettings() {
   const [emailStatus, setEmailStatus] = useState<"unknown" | "configured" | "error">("unknown");
   const [testingEmail, setTestingEmail] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+  // Remove toast hook since we're using the direct import
 
   useEffect(() => {
     fetchSettings();
