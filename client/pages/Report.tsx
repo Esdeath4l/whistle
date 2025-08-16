@@ -43,12 +43,14 @@ import {
 } from "@shared/api";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { encryptReportData } from "@/lib/encryption";
+import VideoUploadRecorder, { VideoFile } from "@/components/VideoUploadRecorder";
 
 export default function Report() {
   const [message, setMessage] = useState("");
   const [category, setCategory] = useState<ReportCategory>("harassment");
   const [severity, setSeverity] = useState<ReportSeverity>("medium");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [videoFile, setVideoFile] = useState<VideoFile | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [reportId, setReportId] = useState<string>("");
@@ -143,6 +145,7 @@ export default function Report() {
 
     try {
       let photo_url = "";
+      let video_url = "";
 
       // If there's a photo, convert to base64 for demo
       // In production, you'd upload to a file storage service
@@ -151,6 +154,16 @@ export default function Report() {
         photo_url = await new Promise<string>((resolve) => {
           reader.onload = () => resolve(reader.result as string);
           reader.readAsDataURL(photoFile);
+        });
+      }
+
+      // If there's a video, convert to base64 for demo
+      // In production, you'd upload to a file storage service with resumable uploads
+      if (videoFile) {
+        const reader = new FileReader();
+        video_url = await new Promise<string>((resolve) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.readAsDataURL(videoFile.file);
         });
       }
 
@@ -179,6 +192,14 @@ export default function Report() {
             message: message.trim(),
             category,
             photo_url: photo_url || undefined,
+            video_url: video_url || undefined,
+            video_metadata: videoFile ? {
+              duration: videoFile.duration || 0,
+              size: videoFile.size,
+              format: videoFile.format,
+              isRecorded: videoFile.isRecorded,
+              uploadMethod: videoFile.size > 10 * 1024 * 1024 ? 'resumable' : 'direct'
+            } : undefined,
           });
 
           reportData = {
@@ -202,6 +223,14 @@ export default function Report() {
             category,
             severity,
             photo_url: photo_url || undefined,
+            video_url: video_url || undefined,
+            video_metadata: videoFile ? {
+              duration: videoFile.duration || 0,
+              size: videoFile.size,
+              format: videoFile.format,
+              isRecorded: videoFile.isRecorded,
+              uploadMethod: videoFile.size > 10 * 1024 * 1024 ? 'resumable' : 'direct'
+            } : undefined,
             is_encrypted: false,
           };
 
@@ -320,6 +349,7 @@ export default function Report() {
                   setSubmitted(false);
                   setMessage("");
                   setPhotoFile(null);
+                  setVideoFile(null);
                   setReportId("");
                 }}
               >
@@ -500,6 +530,18 @@ export default function Report() {
                     />
                   </div>
                 </div>
+
+                {/* Video Upload/Recording Component */}
+                <VideoUploadRecorder
+                  onVideoChange={setVideoFile}
+                  config={{
+                    maxSizeMB: 100,
+                    maxDurationMinutes: 5,
+                    allowedFormats: ['video/mp4', 'video/webm', 'video/quicktime'],
+                    chunkSizeMB: 10,
+                  }}
+                  disabled={isSubmitting}
+                />
 
                 {error && (
                   <Alert variant="destructive">
