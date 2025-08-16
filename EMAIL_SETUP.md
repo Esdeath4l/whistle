@@ -124,7 +124,7 @@ The system sends HTML emails with:
 
 ## Current Configuration
 
-- **Admin Email**: `ritiofficial2006@gmail.com`
+- **Admin Email**: `ritisulo@gmail.com`
 - **Email Service**: Nodemailer with auto-provider detection
 - **Fallback**: Logs email content if service not configured
 - **Priority System**: 4-tier priority-based alert system
