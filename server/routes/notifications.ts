@@ -222,3 +222,43 @@ export const getNotificationSettings: RequestHandler = (req, res) => {
     adminPhone: "+919791150171",
   });
 };
+
+/**
+ * Test email service configuration
+ */
+export const testEmailService: RequestHandler = async (req, res) => {
+  try {
+    const { testEmailService: testService, sendTestEmail } = await import("../email-service");
+
+    // Test connection
+    const isConfigured = await testService();
+
+    if (!isConfigured) {
+      return res.status(503).json({
+        error: "Email service not configured",
+        message: "Set EMAIL_APP_PASSWORD environment variable"
+      });
+    }
+
+    // Send test email
+    const testSent = await sendTestEmail();
+
+    if (testSent) {
+      res.json({
+        success: true,
+        message: "Test email sent successfully to ritisulo@gmail.com"
+      });
+    } else {
+      res.status(500).json({
+        error: "Failed to send test email",
+        message: "Check server logs for details"
+      });
+    }
+  } catch (error) {
+    console.error("Email test error:", error);
+    res.status(500).json({
+      error: "Email test failed",
+      message: error instanceof Error ? error.message : "Unknown error"
+    });
+  }
+};
