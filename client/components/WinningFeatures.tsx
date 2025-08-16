@@ -36,60 +36,6 @@ export default function WinningFeatures() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <Card className="text-center border-2 border-primary/20 hover:border-primary/40 transition-colors">
-            <CardHeader>
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <Lock className="w-8 h-8 text-primary" />
-              </div>
-              <CardTitle className="text-lg">E2E Encryption</CardTitle>
-              <CardDescription>
-                Military-grade AES-256 encryption ensures reports are secure
-                from submission to admin review.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="text-center border-2 border-success/20 hover:border-success/40 transition-colors">
-            <CardHeader>
-              <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-8 h-8 text-success" />
-              </div>
-              <CardTitle className="text-lg">Real-time Alerts</CardTitle>
-              <CardDescription>
-                Instant notifications via email/SMS with AI-powered severity
-                detection and automatic escalation.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="text-center border-2 border-info/20 hover:border-info/40 transition-colors">
-            <CardHeader>
-              <div className="w-16 h-16 rounded-full bg-info/10 flex items-center justify-center mx-auto mb-4">
-                <QrCode className="w-8 h-8 text-info" />
-              </div>
-              <CardTitle className="text-lg">QR Innovation</CardTitle>
-              <CardDescription>
-                Printable QR codes with embedded safety info - zero-friction
-                access without downloads or URLs.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="text-center border-2 border-warning/20 hover:border-warning/40 transition-colors">
-            <CardHeader>
-              <div className="w-16 h-16 rounded-full bg-warning/10 flex items-center justify-center mx-auto mb-4">
-                <Brain className="w-8 h-8 text-warning" />
-              </div>
-              <CardTitle className="text-lg">AI Classification</CardTitle>
-              <CardDescription>
-                Smart categorization and severity detection automatically routes
-                urgent reports for immediate attention.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
-
         {/* Technical Innovation */}
         <div className="grid md:grid-cols-3 gap-8">
           <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
