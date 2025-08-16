@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import { Report } from "@shared/api";
+import nodemailer from "nodemailer";
 
 // In-memory storage for SSE connections
 const sseConnections = new Set<any>();
@@ -106,35 +107,105 @@ export function notifyNewReport(report: Report) {
 }
 
 /**
+ * Create email transporter based on configuration
+ */
+function createEmailTransporter() {
+  // For Gmail, you'll need to use App Password instead of regular password
+  // Go to Google Account settings > Security > App passwords to generate one
+  const emailConfig = {
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER || 'whistle.git@gmail.com',
+      pass: process.env.EMAIL_PASSWORD || '' // App password required
+    }
+  };
+
+  // Fallback to console logging if no email credentials
+  if (!process.env.EMAIL_PASSWORD) {
+    console.warn('⚠️  No EMAIL_PASSWORD environment variable set. Email notifications will be logged to console only.');
+    return null;
+  }
+
+  return nodemailer.createTransporter(emailConfig);
+}
+
+/**
  * Email notification for urgent reports
  */
 async function sendEmailAlert(report: Report) {
   try {
-    // In production, integrate with email service (SendGrid, AWS SES, etc.)
-    console.log("📧 Email alert sent for urgent report:", report.id);
+    const transporter = createEmailTransporter();
 
-    // Simulate email sending
     const emailData = {
-      to: "admin@whistle-app.com", // Admin email
+      from: process.env.EMAIL_USER || 'whistle.git@gmail.com',
+      to: 'whistle.git@gmail.com', // Your admin email
       subject: `🚨 URGENT: New ${report.category} Report - ${report.id}`,
-      body: `
-        A new urgent harassment report has been submitted:
-        
-        Report ID: ${report.id}
-        Category: ${report.category}
-        Severity: ${report.severity}
-        Submitted: ${report.created_at}
-        
-        Please log into the admin dashboard immediately to review and respond.
-        
-        - Whistle Security System
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <div style="background: #dc2626; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h2 style="margin: 0; font-size: 24px;">🚨 URGENT HARASSMENT REPORT</h2>
+          </div>
+
+          <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #dc2626; margin-top: 0;">Report Details:</h3>
+            <ul style="list-style: none; padding: 0;">
+              <li style="margin-bottom: 10px;"><strong>Report ID:</strong> ${report.id}</li>
+              <li style="margin-bottom: 10px;"><strong>Category:</strong> ${report.category}</li>
+              <li style="margin-bottom: 10px;"><strong>Severity:</strong> <span style="color: #dc2626; font-weight: bold;">${report.severity.toUpperCase()}</span></li>
+              <li style="margin-bottom: 10px;"><strong>Submitted:</strong> ${new Date(report.created_at).toLocaleString()}</li>
+              <li style="margin-bottom: 10px;"><strong>Status:</strong> ${report.status}</li>
+            </ul>
+          </div>
+
+          <div style="background: #fee2e2; padding: 20px; border-radius: 8px; border-left: 4px solid #dc2626;">
+            <p style="margin: 0; font-weight: bold; color: #dc2626;">
+              ⚠️ This report requires immediate attention. Please log into the admin dashboard to review and respond.
+            </p>
+          </div>
+
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e5e5; text-align: center;">
+            <p style="margin: 0; color: #666; font-size: 14px;">
+              - Whistle Security System<br>
+              Automated alert for urgent reports
+            </p>
+          </div>
+        </div>
       `,
+      text: `
+🚨 URGENT HARASSMENT REPORT
+
+A new urgent harassment report has been submitted:
+
+Report ID: ${report.id}
+Category: ${report.category}
+Severity: ${report.severity}
+Submitted: ${new Date(report.created_at).toLocaleString()}
+Status: ${report.status}
+
+⚠️ This report requires immediate attention. Please log into the admin dashboard to review and respond.
+
+- Whistle Security System
+Automated alert for urgent reports
+      `
     };
 
-    // Log the email (in production, send actual email)
-    console.log("Email notification:", emailData);
+    if (transporter) {
+      // Send actual email
+      const info = await transporter.sendMail(emailData);
+      console.log('📧 Email alert sent successfully:', info.messageId);
+      console.log('📧 Email sent to:', emailData.to);
+    } else {
+      // Fallback: log to console
+      console.log('📧 Email notification (console fallback):', emailData);
+      console.log('📧 Would send to:', emailData.to);
+    }
   } catch (error) {
-    console.error("Failed to send email notification:", error);
+    console.error('❌ Failed to send email notification:', error);
+    // Log the email details for debugging
+    console.log('📧 Email that failed to send:');
+    console.log('  - To:', 'whistle.git@gmail.com');
+    console.log('  - Subject:', `🚨 URGENT: New ${report.category} Report - ${report.id}`);
+    console.log('  - Report ID:', report.id);
   }
 }
 
@@ -210,7 +281,7 @@ export const getNotificationSettings: RequestHandler = (req, res) => {
     pushEnabled: true,
     urgentAlerts: true,
     categories: ["harassment", "medical", "emergency", "safety"],
-    adminEmail: "admin@whistle-app.com",
+    adminEmail: "whistle.git@gmail.com",
     adminPhone: "+1234567890",
   });
 };
