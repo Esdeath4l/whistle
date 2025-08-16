@@ -13,6 +13,7 @@ import {
   sendEmailNotification,
   sendSMSNotification,
   getNotificationSettings,
+  testEmailService,
 } from "./routes/notifications";
 
 export function createServer() {
@@ -41,6 +42,7 @@ export function createServer() {
   app.post("/api/notifications/email", sendEmailNotification);
   app.post("/api/notifications/sms", sendSMSNotification);
   app.get("/api/notifications/settings", getNotificationSettings);
+  app.post("/api/notifications/test-email", testEmailService);
 
   return app;
 }
