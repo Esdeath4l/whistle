@@ -44,6 +44,7 @@ import {
   Shield,
   MessageCircle,
   Settings,
+  Video,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -276,6 +277,8 @@ export default function Admin() {
           message: "[DECRYPTION ERROR]",
           category: "encrypted",
           photo_url: undefined,
+          video_url: undefined,
+          video_metadata: undefined,
         };
       }
     }
@@ -283,6 +286,8 @@ export default function Admin() {
       message: report.message,
       category: report.category,
       photo_url: report.photo_url,
+      video_url: report.video_url,
+      video_metadata: report.video_metadata,
     };
   };
 
@@ -511,6 +516,14 @@ export default function Admin() {
                             Photo
                           </Badge>
                         )}
+                        {(report.video_url ||
+                          (report.is_encrypted &&
+                            getDecryptedReport(report).video_url)) && (
+                          <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300">
+                            <Video className="w-3 h-3 mr-1" />
+                            Video
+                          </Badge>
+                        )}
                       </div>
                       {getStatusBadge(report.status)}
                     </div>
@@ -601,6 +614,34 @@ export default function Admin() {
                                       alt="Report evidence"
                                       className="max-w-full h-auto rounded-lg border"
                                     />
+                                  </div>
+                                </div>
+                              )}
+
+                              {(selectedReport.video_url ||
+                                (selectedReport.is_encrypted &&
+                                 getDecryptedReport(selectedReport).video_url)) && (
+                                <div>
+                                  <Label className="text-sm font-medium">
+                                    Video Evidence
+                                    {selectedReport.video_metadata && (
+                                      <Badge variant="outline" className="ml-2">
+                                        {(selectedReport.video_metadata.size / 1024 / 1024).toFixed(1)}MB • {Math.floor((selectedReport.video_metadata.duration || 0) / 60)}:{String(Math.floor((selectedReport.video_metadata.duration || 0) % 60)).padStart(2, '0')}
+                                        {selectedReport.video_metadata.isRecorded && ' • Recorded'}
+                                      </Badge>
+                                    )}
+                                  </Label>
+                                  <div className="mt-2">
+                                    <video
+                                      src={selectedReport.is_encrypted
+                                        ? getDecryptedReport(selectedReport).video_url
+                                        : selectedReport.video_url}
+                                      controls
+                                      className="max-w-full h-auto rounded-lg border bg-black"
+                                      style={{ maxHeight: '300px' }}
+                                    >
+                                      Your browser does not support video playback.
+                                    </video>
                                   </div>
                                 </div>
                               )}
