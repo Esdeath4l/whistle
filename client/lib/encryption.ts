@@ -7,6 +7,8 @@ export interface EncryptedData {
   encryptedMessage: string;
   encryptedCategory: string;
   encryptedPhotoUrl?: string;
+  encryptedVideoUrl?: string;
+  encryptedVideoMetadata?: string;
   iv: string;
   timestamp: string;
 }
@@ -18,6 +20,8 @@ export function encryptReportData(data: {
   message: string;
   category: string;
   photo_url?: string;
+  video_url?: string;
+  video_metadata?: any;
 }): EncryptedData {
   const iv = CryptoJS.lib.WordArray.random(16);
   const timestamp = new Date().toISOString();
@@ -33,11 +37,19 @@ export function encryptReportData(data: {
   const encryptedPhotoUrl = data.photo_url
     ? CryptoJS.AES.encrypt(data.photo_url, ENCRYPTION_KEY, { iv }).toString()
     : undefined;
+  const encryptedVideoUrl = data.video_url
+    ? CryptoJS.AES.encrypt(data.video_url, ENCRYPTION_KEY, { iv }).toString()
+    : undefined;
+  const encryptedVideoMetadata = data.video_metadata
+    ? CryptoJS.AES.encrypt(JSON.stringify(data.video_metadata), ENCRYPTION_KEY, { iv }).toString()
+    : undefined;
 
   return {
     encryptedMessage,
     encryptedCategory,
     encryptedPhotoUrl,
+    encryptedVideoUrl,
+    encryptedVideoMetadata,
     iv: iv.toString(),
     timestamp,
   };
@@ -50,6 +62,8 @@ export function decryptReportData(encryptedData: EncryptedData): {
   message: string;
   category: string;
   photo_url?: string;
+  video_url?: string;
+  video_metadata?: any;
 } {
   const iv = CryptoJS.enc.Hex.parse(encryptedData.iv);
 
@@ -71,10 +85,24 @@ export function decryptReportData(encryptedData: EncryptedData): {
       }).toString(CryptoJS.enc.Utf8)
     : undefined;
 
+  const decryptedVideoUrl = encryptedData.encryptedVideoUrl
+    ? CryptoJS.AES.decrypt(encryptedData.encryptedVideoUrl, ENCRYPTION_KEY, {
+        iv,
+      }).toString(CryptoJS.enc.Utf8)
+    : undefined;
+
+  const decryptedVideoMetadata = encryptedData.encryptedVideoMetadata
+    ? JSON.parse(CryptoJS.AES.decrypt(encryptedData.encryptedVideoMetadata, ENCRYPTION_KEY, {
+        iv,
+      }).toString(CryptoJS.enc.Utf8))
+    : undefined;
+
   return {
     message: decryptedMessage,
     category: decryptedCategory,
     photo_url: decryptedPhotoUrl,
+    video_url: decryptedVideoUrl,
+    video_metadata: decryptedVideoMetadata,
   };
 }
 
