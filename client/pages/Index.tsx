@@ -21,7 +21,6 @@ import {
 import { Link } from "react-router-dom";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import WinningFeatures from "@/components/WinningFeatures";
 
 export default function Index() {
   return (
