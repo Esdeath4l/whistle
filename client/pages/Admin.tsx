@@ -479,13 +479,21 @@ export default function Admin() {
                             : report.category,
                         )}
                         {getSeverityBadge(report.severity)}
-                        {report.is_encrypted && (
+                        {report.is_encrypted ? (
                           <Badge
                             variant="secondary"
-                            className="bg-green-100 text-green-800"
+                            className="bg-green-100 text-green-800 border-green-300"
                           >
                             <Lock className="w-3 h-3 mr-1" />
                             E2E Encrypted
+                          </Badge>
+                        ) : (
+                          <Badge
+                            variant="outline"
+                            className="bg-amber-50 text-amber-700 border-amber-300"
+                          >
+                            <Lock className="w-3 h-3 mr-1 opacity-50" />
+                            Plain Text
                           </Badge>
                         )}
                         {(report.photo_url ||
