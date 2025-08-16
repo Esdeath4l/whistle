@@ -379,7 +379,7 @@ export const getNotificationSettings: RequestHandler = (req, res) => {
     pushEnabled: true,
     urgentAlerts: true,
     categories: ["harassment", "medical", "emergency", "safety", "feedback"],
-    adminEmail: "ritisulo@gmail.com",
+    adminEmail: "whistle.git@gmail.com",
     emailServiceConfigured: !!process.env.EMAIL_USER,
     priorityRules: {
       urgent: "Immediate email alert",
