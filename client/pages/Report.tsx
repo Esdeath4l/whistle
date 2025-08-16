@@ -160,11 +160,32 @@ export default function Report() {
       // If there's a video, convert to base64 for demo
       // In production, you'd upload to a file storage service with resumable uploads
       if (videoFile) {
-        const reader = new FileReader();
-        video_url = await new Promise<string>((resolve) => {
-          reader.onload = () => resolve(reader.result as string);
-          reader.readAsDataURL(videoFile.file);
-        });
+        // Safety check: Don't process extremely large videos that could crash the browser
+        if (videoFile.size > 50 * 1024 * 1024) { // 50MB limit for base64 conversion
+          setError("Video file too large for demo. In production, this would use cloud storage.");
+          setIsSubmitting(false);
+          return;
+        }
+
+        try {
+          const reader = new FileReader();
+          video_url = await new Promise<string>((resolve, reject) => {
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = () => reject(new Error("Failed to read video file"));
+            reader.readAsDataURL(videoFile.file);
+          });
+
+          console.log("Video processed for submission:", {
+            size: `${(videoFile.size / 1024 / 1024).toFixed(2)}MB`,
+            duration: `${(videoFile.duration || 0 / 60).toFixed(1)}min`,
+            format: videoFile.format
+          });
+        } catch (error) {
+          console.error("Failed to process video:", error);
+          setError("Failed to process video file. Please try again.");
+          setIsSubmitting(false);
+          return;
+        }
       }
 
       let reportData: CreateReportRequest;
