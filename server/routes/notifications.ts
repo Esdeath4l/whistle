@@ -113,16 +113,18 @@ function createEmailTransporter() {
   // For Gmail, you'll need to use App Password instead of regular password
   // Go to Google Account settings > Security > App passwords to generate one
   const emailConfig = {
-    service: 'gmail',
+    service: "gmail",
     auth: {
-      user: process.env.EMAIL_USER || 'whistle.git@gmail.com',
-      pass: process.env.EMAIL_PASSWORD || '' // App password required
-    }
+      user: process.env.EMAIL_USER || "whistle.git@gmail.com",
+      pass: process.env.EMAIL_PASSWORD || "", // App password required
+    },
   };
 
   // Fallback to console logging if no email credentials
   if (!process.env.EMAIL_PASSWORD) {
-    console.warn('⚠️  No EMAIL_PASSWORD environment variable set. Email notifications will be logged to console only.');
+    console.warn(
+      "⚠️  No EMAIL_PASSWORD environment variable set. Email notifications will be logged to console only.",
+    );
     return null;
   }
 
@@ -137,8 +139,8 @@ async function sendEmailAlert(report: Report) {
     const transporter = createEmailTransporter();
 
     const emailData = {
-      from: process.env.EMAIL_USER || 'whistle.git@gmail.com',
-      to: 'whistle.git@gmail.com', // Your admin email
+      from: process.env.EMAIL_USER || "whistle.git@gmail.com",
+      to: "whistle.git@gmail.com", // Your admin email
       subject: `🚨 URGENT: New ${report.category} Report - ${report.id}`,
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
@@ -186,26 +188,29 @@ Status: ${report.status}
 
 - Whistle Security System
 Automated alert for urgent reports
-      `
+      `,
     };
 
     if (transporter) {
       // Send actual email
       const info = await transporter.sendMail(emailData);
-      console.log('📧 Email alert sent successfully:', info.messageId);
-      console.log('📧 Email sent to:', emailData.to);
+      console.log("📧 Email alert sent successfully:", info.messageId);
+      console.log("📧 Email sent to:", emailData.to);
     } else {
       // Fallback: log to console
-      console.log('📧 Email notification (console fallback):', emailData);
-      console.log('📧 Would send to:', emailData.to);
+      console.log("📧 Email notification (console fallback):", emailData);
+      console.log("📧 Would send to:", emailData.to);
     }
   } catch (error) {
-    console.error('❌ Failed to send email notification:', error);
+    console.error("❌ Failed to send email notification:", error);
     // Log the email details for debugging
-    console.log('📧 Email that failed to send:');
-    console.log('  - To:', 'whistle.git@gmail.com');
-    console.log('  - Subject:', `🚨 URGENT: New ${report.category} Report - ${report.id}`);
-    console.log('  - Report ID:', report.id);
+    console.log("📧 Email that failed to send:");
+    console.log("  - To:", "whistle.git@gmail.com");
+    console.log(
+      "  - Subject:",
+      `🚨 URGENT: New ${report.category} Report - ${report.id}`,
+    );
+    console.log("  - Report ID:", report.id);
   }
 }
 
@@ -298,7 +303,7 @@ export const testEmailAlert: RequestHandler = async (req, res) => {
       severity: "urgent",
       created_at: new Date().toISOString(),
       status: "pending",
-      is_encrypted: false
+      is_encrypted: false,
     };
 
     await sendEmailAlert(testReport);
@@ -306,14 +311,14 @@ export const testEmailAlert: RequestHandler = async (req, res) => {
     res.json({
       success: true,
       message: "Test email sent to whistle.git@gmail.com",
-      reportId: testReport.id
+      reportId: testReport.id,
     });
   } catch (error) {
     console.error("Test email failed:", error);
     res.status(500).json({
       success: false,
       error: "Failed to send test email",
-      details: error instanceof Error ? error.message : String(error)
+      details: error instanceof Error ? error.message : String(error),
     });
   }
 };
