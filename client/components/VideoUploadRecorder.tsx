@@ -75,6 +75,7 @@ export default function VideoUploadRecorder({
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState("");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -249,29 +250,35 @@ export default function VideoUploadRecorder({
       
       mediaRecorder.onstop = () => {
         console.log('Recording stopped, processing video...');
-        const blob = new Blob(chunksRef.current, { type: 'video/webm' });
-        const file = new File([blob], `recording-${Date.now()}.webm`, { type: 'video/webm' });
+        setIsProcessing(true);
 
-        console.log('Video recorded:', {
-          size: `${(blob.size / 1024 / 1024).toFixed(2)}MB`,
-          duration: `${recordingTime}s`,
-          chunks: chunksRef.current.length
-        });
+        // Small delay to show processing state
+        setTimeout(() => {
+          const blob = new Blob(chunksRef.current, { type: 'video/webm' });
+          const file = new File([blob], `recording-${Date.now()}.webm`, { type: 'video/webm' });
 
-        const videoFile: VideoFile = {
-          file,
-          url: URL.createObjectURL(blob),
-          duration: recordingTime,
-          size: blob.size,
-          format: 'video/webm',
-          isRecorded: true,
-        };
+          console.log('Video recorded:', {
+            size: `${(blob.size / 1024 / 1024).toFixed(2)}MB`,
+            duration: `${recordingTime}s`,
+            chunks: chunksRef.current.length
+          });
 
-        setCurrentVideo(videoFile);
-        onVideoChange(videoFile);
-        cleanup();
+          const videoFile: VideoFile = {
+            file,
+            url: URL.createObjectURL(blob),
+            duration: recordingTime,
+            size: blob.size,
+            format: 'video/webm',
+            isRecorded: true,
+          };
 
-        console.log('Video file created and set, ready for form submission');
+          setCurrentVideo(videoFile);
+          onVideoChange(videoFile);
+          setIsProcessing(false);
+          cleanup();
+
+          console.log('Video file created and set, ready for form submission');
+        }, 500);
       };
       
       mediaRecorder.start(1000); // Capture data every second
@@ -300,10 +307,11 @@ export default function VideoUploadRecorder({
   // Stop recording
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
+      console.log('Stopping recording...');
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       setIsPaused(false);
-      
+
       if (recordingTimerRef.current) {
         clearInterval(recordingTimerRef.current);
         recordingTimerRef.current = null;
@@ -505,7 +513,12 @@ export default function VideoUploadRecorder({
                       </div>
 
                       <div className="flex items-center justify-center gap-2">
-                        {!isRecording ? (
+                        {isProcessing ? (
+                          <Button type="button" disabled>
+                            <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            Processing Video...
+                          </Button>
+                        ) : !isRecording ? (
                           <Button
                             type="button"
                             onClick={startRecording}
