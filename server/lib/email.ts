@@ -1,10 +1,10 @@
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
 
 interface EmailData {
   to: string;
   subject: string;
   body: string;
-  priority: 'low' | 'normal' | 'high';
+  priority: "low" | "normal" | "high";
 }
 
 /**
@@ -31,8 +31,8 @@ class EmailService {
         if (emailHost) {
           this.transporter = nodemailer.createTransporter({
             host: emailHost,
-            port: parseInt(emailPort || '587'),
-            secure: emailPort === '465', // true for 465, false for other ports
+            port: parseInt(emailPort || "587"),
+            secure: emailPort === "465", // true for 465, false for other ports
             auth: {
               user: emailUser,
               pass: emailPass,
@@ -50,38 +50,40 @@ class EmailService {
         }
 
         this.isConfigured = true;
-        console.log('📧 Email service configured successfully');
+        console.log("📧 Email service configured successfully");
       } else {
-        console.log('📧 Email service not configured - missing credentials');
-        console.log('   Set EMAIL_USER and EMAIL_PASS environment variables to enable email alerts');
+        console.log("📧 Email service not configured - missing credentials");
+        console.log(
+          "   Set EMAIL_USER and EMAIL_PASS environment variables to enable email alerts",
+        );
       }
     } catch (error) {
-      console.error('Failed to configure email service:', error);
+      console.error("Failed to configure email service:", error);
     }
   }
 
   private getEmailService(email: string): string {
-    const domain = email.split('@')[1]?.toLowerCase();
-    
+    const domain = email.split("@")[1]?.toLowerCase();
+
     const serviceMap: { [key: string]: string } = {
-      'gmail.com': 'gmail',
-      'outlook.com': 'outlook',
-      'hotmail.com': 'hotmail',
-      'yahoo.com': 'yahoo',
-      'yahoo.co.uk': 'yahoo',
-      'icloud.com': 'icloud',
+      "gmail.com": "gmail",
+      "outlook.com": "outlook",
+      "hotmail.com": "hotmail",
+      "yahoo.com": "yahoo",
+      "yahoo.co.uk": "yahoo",
+      "icloud.com": "icloud",
     };
 
-    return serviceMap[domain] || 'gmail'; // Default to gmail
+    return serviceMap[domain] || "gmail"; // Default to gmail
   }
 
   async sendEmail(emailData: EmailData): Promise<boolean> {
     if (!this.isConfigured || !this.transporter) {
-      console.log('📧 Email service not configured - logging email instead:');
-      console.log('   To:', emailData.to);
-      console.log('   Subject:', emailData.subject);
-      console.log('   Priority:', emailData.priority);
-      console.log('   Body:', emailData.body.substring(0, 200) + '...');
+      console.log("📧 Email service not configured - logging email instead:");
+      console.log("   To:", emailData.to);
+      console.log("   Subject:", emailData.subject);
+      console.log("   Priority:", emailData.priority);
+      console.log("   Body:", emailData.body.substring(0, 200) + "...");
       return false;
     }
 
@@ -95,32 +97,34 @@ class EmailService {
         priority: emailData.priority,
       });
 
-      console.log('📧 Email sent successfully:', info.messageId);
-      console.log('   To:', emailData.to);
-      console.log('   Subject:', emailData.subject);
+      console.log("📧 Email sent successfully:", info.messageId);
+      console.log("   To:", emailData.to);
+      console.log("   Subject:", emailData.subject);
       return true;
     } catch (error) {
-      console.error('📧 Failed to send email:', error);
-      
+      console.error("📧 Failed to send email:", error);
+
       // Fallback: log the email content
-      console.log('📧 Email content (fallback logging):');
-      console.log('   To:', emailData.to);
-      console.log('   Subject:', emailData.subject);
-      console.log('   Priority:', emailData.priority);
-      console.log('   Body:', emailData.body);
-      
+      console.log("📧 Email content (fallback logging):");
+      console.log("   To:", emailData.to);
+      console.log("   Subject:", emailData.subject);
+      console.log("   Priority:", emailData.priority);
+      console.log("   Body:", emailData.body);
+
       return false;
     }
   }
 
   private convertToHtml(text: string, priority: string): string {
     const priorityColors = {
-      high: '#dc2626', // red
-      normal: '#ea580c', // orange
-      low: '#16a34a', // green
+      high: "#dc2626", // red
+      normal: "#ea580c", // orange
+      low: "#16a34a", // green
     };
 
-    const color = priorityColors[priority as keyof typeof priorityColors] || priorityColors.normal;
+    const color =
+      priorityColors[priority as keyof typeof priorityColors] ||
+      priorityColors.normal;
 
     return `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -148,10 +152,10 @@ class EmailService {
 
     try {
       await this.transporter.verify();
-      console.log('📧 Email connection test successful');
+      console.log("📧 Email connection test successful");
       return true;
     } catch (error) {
-      console.error('📧 Email connection test failed:', error);
+      console.error("📧 Email connection test failed:", error);
       return false;
     }
   }

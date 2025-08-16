@@ -31,9 +31,10 @@ export function createServer() {
     const fs = require("fs");
     const path = require("path");
 
-    const dataDir = process.env.NODE_ENV === "production"
-      ? path.join("/tmp", "whistle-data")
-      : path.join(process.cwd(), "server", "data");
+    const dataDir =
+      process.env.NODE_ENV === "production"
+        ? path.join("/tmp", "whistle-data")
+        : path.join(process.cwd(), "server", "data");
     const reportsFile = path.join(dataDir, "reports.json");
 
     res.json({
@@ -44,16 +45,18 @@ export function createServer() {
       dataDirExists: fs.existsSync(dataDir),
       reportsFileExists: fs.existsSync(reportsFile),
       emailConfigured: !!process.env.EMAIL_USER,
-      emailUser: process.env.EMAIL_USER ? `${process.env.EMAIL_USER.split('@')[0]}@***` : 'not configured',
+      emailUser: process.env.EMAIL_USER
+        ? `${process.env.EMAIL_USER.split("@")[0]}@***`
+        : "not configured",
       cwd: process.cwd(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   });
 
   // Email test endpoint (admin only)
   app.post("/api/test-email", async (req, res) => {
     try {
-      const { emailService } = await import('./lib/email');
+      const { emailService } = await import("./lib/email");
 
       // Simple admin check
       const authHeader = req.headers.authorization;
@@ -87,28 +90,28 @@ If you received this email, priority-based alerts are now active for:
 The email alert system is now ready to notify you of new reports based on their priority level.
 
 - Whistle Security System`,
-          priority: "normal"
+          priority: "normal",
         });
 
         res.json({
           success: true,
           message: "Email test successful",
           emailSent: success,
-          emailConfigured: true
+          emailConfigured: true,
         });
       } else {
         res.json({
           success: false,
           message: "Email service not configured or connection failed",
           emailConfigured: false,
-          help: "Set EMAIL_USER and EMAIL_PASS environment variables"
+          help: "Set EMAIL_USER and EMAIL_PASS environment variables",
         });
       }
     } catch (error) {
       console.error("Email test error:", error);
       res.status(500).json({
         error: "Email test failed",
-        details: error instanceof Error ? error.message : "Unknown error"
+        details: error instanceof Error ? error.message : "Unknown error",
       });
     }
   });

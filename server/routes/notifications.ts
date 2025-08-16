@@ -150,15 +150,24 @@ async function sendPriorityBasedEmailAlert(report: Report) {
   const adminEmail = "whistle.git@gmail.com";
 
   // Determine if email should be sent based on priority
-  const shouldSendEmail = shouldSendEmailForPriority(report.severity, report.category);
+  const shouldSendEmail = shouldSendEmailForPriority(
+    report.severity,
+    report.category,
+  );
 
   if (!shouldSendEmail) {
-    console.log(`📧 Skipping email for ${report.severity} priority report:`, report.id);
+    console.log(
+      `📧 Skipping email for ${report.severity} priority report:`,
+      report.id,
+    );
     return;
   }
 
   try {
-    const priorityConfig = getEmailPriorityConfig(report.severity, report.category);
+    const priorityConfig = getEmailPriorityConfig(
+      report.severity,
+      report.category,
+    );
 
     const emailData = {
       to: adminEmail,
@@ -173,16 +182,17 @@ async function sendPriorityBasedEmailAlert(report: Report) {
         Severity: ${report.severity}
         Submitted: ${new Date(report.created_at).toLocaleString()}
 
-        ${report.is_encrypted ?
-          "⚠️  This report contains encrypted data that requires admin access to decrypt." :
-          `Message Preview: ${report.message.substring(0, 100)}${report.message.length > 100 ? '...' : ''}`
+        ${
+          report.is_encrypted
+            ? "⚠️  This report contains encrypted data that requires admin access to decrypt."
+            : `Message Preview: ${report.message.substring(0, 100)}${report.message.length > 100 ? "..." : ""}`
         }
 
         Action Required:
         ================
         ${priorityConfig.actionRequired}
 
-        Admin Dashboard: ${process.env.FRONTEND_URL || 'http://localhost:3000'}/admin
+        Admin Dashboard: ${process.env.FRONTEND_URL || "http://localhost:3000"}/admin
 
         - Whistle Security System
         Automated Alert System
@@ -191,16 +201,18 @@ async function sendPriorityBasedEmailAlert(report: Report) {
     };
 
     // Log the email (integrate with real email service in production)
-    console.log(`📧 ${priorityConfig.urgency} email notification sent to ${adminEmail}:`, {
-      reportId: report.id,
-      severity: report.severity,
-      category: report.category,
-      subject: emailData.subject
-    });
+    console.log(
+      `📧 ${priorityConfig.urgency} email notification sent to ${adminEmail}:`,
+      {
+        reportId: report.id,
+        severity: report.severity,
+        category: report.category,
+        subject: emailData.subject,
+      },
+    );
 
     // In production, replace this with actual email service
     await sendActualEmail(emailData);
-
   } catch (error) {
     console.error("Failed to send priority-based email notification:", error);
   }
@@ -209,7 +221,10 @@ async function sendPriorityBasedEmailAlert(report: Report) {
 /**
  * Determine if email should be sent based on priority rules
  */
-function shouldSendEmailForPriority(severity?: string, category?: string): boolean {
+function shouldSendEmailForPriority(
+  severity?: string,
+  category?: string,
+): boolean {
   // Always send for urgent and high priority
   if (severity === "urgent" || severity === "high") return true;
 
@@ -217,7 +232,11 @@ function shouldSendEmailForPriority(severity?: string, category?: string): boole
   if (category === "emergency" || category === "harassment") return true;
 
   // Send for medium priority medical and safety issues
-  if ((category === "medical" || category === "safety") && severity === "medium") return true;
+  if (
+    (category === "medical" || category === "safety") &&
+    severity === "medium"
+  )
+    return true;
 
   // Don't send for low priority feedback
   if (severity === "low" && category === "feedback") return false;
@@ -238,8 +257,10 @@ function getEmailPriorityConfig(severity?: string, category?: string) {
       emoji: "🚨",
       urgency: "CRITICAL ALERT",
       priority: "high",
-      alertText: "🔴 IMMEDIATE ACTION REQUIRED - A critical incident has been reported that may require emergency response.",
-      actionRequired: "1. Review immediately (within 5 minutes)\n2. Contact relevant authorities if needed\n3. Respond to reporter ASAP\n4. Document all actions taken"
+      alertText:
+        "🔴 IMMEDIATE ACTION REQUIRED - A critical incident has been reported that may require emergency response.",
+      actionRequired:
+        "1. Review immediately (within 5 minutes)\n2. Contact relevant authorities if needed\n3. Respond to reporter ASAP\n4. Document all actions taken",
     };
   }
 
@@ -248,8 +269,10 @@ function getEmailPriorityConfig(severity?: string, category?: string) {
       emoji: "⚠️",
       urgency: "HIGH PRIORITY",
       priority: "high",
-      alertText: "🟠 HIGH PRIORITY REPORT - A serious incident requiring prompt attention has been reported.",
-      actionRequired: "1. Review within 30 minutes\n2. Investigate thoroughly\n3. Respond within 2 hours\n4. Consider escalation if needed"
+      alertText:
+        "🟠 HIGH PRIORITY REPORT - A serious incident requiring prompt attention has been reported.",
+      actionRequired:
+        "1. Review within 30 minutes\n2. Investigate thoroughly\n3. Respond within 2 hours\n4. Consider escalation if needed",
     };
   }
 
@@ -258,8 +281,10 @@ function getEmailPriorityConfig(severity?: string, category?: string) {
       emoji: "📋",
       urgency: "STANDARD PRIORITY",
       priority: "normal",
-      alertText: "🟡 STANDARD REPORT - A new incident report has been submitted for review.",
-      actionRequired: "1. Review within 4 hours\n2. Investigate as appropriate\n3. Respond within 24 hours"
+      alertText:
+        "🟡 STANDARD REPORT - A new incident report has been submitted for review.",
+      actionRequired:
+        "1. Review within 4 hours\n2. Investigate as appropriate\n3. Respond within 24 hours",
     };
   }
 
@@ -268,8 +293,9 @@ function getEmailPriorityConfig(severity?: string, category?: string) {
     emoji: "📝",
     urgency: "LOW PRIORITY",
     priority: "low",
-    alertText: "🟢 ROUTINE REPORT - A new report has been submitted for your review.",
-    actionRequired: "1. Review within 24 hours\n2. Respond as appropriate"
+    alertText:
+      "🟢 ROUTINE REPORT - A new report has been submitted for your review.",
+    actionRequired: "1. Review within 24 hours\n2. Respond as appropriate",
   };
 }
 
@@ -284,7 +310,7 @@ async function sendEmailAlert(report: Report) {
  * Send actual email using Nodemailer service
  */
 async function sendActualEmail(emailData: any) {
-  const { emailService } = await import('../lib/email');
+  const { emailService } = await import("../lib/email");
 
   try {
     const success = await emailService.sendEmail({
@@ -302,7 +328,7 @@ async function sendActualEmail(emailData: any) {
 
     return success;
   } catch (error) {
-    console.error('❌ Failed to send email alert:', error);
+    console.error("❌ Failed to send email alert:", error);
     return false;
   }
 }
@@ -385,7 +411,7 @@ export const getNotificationSettings: RequestHandler = (req, res) => {
       urgent: "Immediate email alert",
       high: "High priority email alert",
       medium: "Standard email alert (based on category)",
-      low: "Email alert for important categories only"
-    }
+      low: "Email alert for important categories only",
+    },
   });
 };
