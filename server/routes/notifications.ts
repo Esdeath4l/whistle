@@ -158,37 +158,63 @@ async function sendEmailAlert(report: Report) {
   try {
     const transporter = createEmailTransporter();
 
+    // Get the base URL (you may want to configure this via environment variable)
+    const baseUrl = process.env.BASE_URL || 'http://localhost:8080';
+    const adminDashboardUrl = `${baseUrl}/admin`;
+    const reportSubmissionUrl = `${baseUrl}/report`;
+    const statusCheckUrl = `${baseUrl}/check-status`;
+
     const emailData = {
       from: process.env.EMAIL_USER || "whistle.git@gmail.com",
       to: "whistle.git@gmail.com", // Your admin email
       subject: `🚨 URGENT: New ${report.category} Report - ${report.id}`,
       html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-          <div style="background: #dc2626; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
+          <!-- Header -->
+          <div style="background: #dc2626; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
             <h2 style="margin: 0; font-size: 24px;">🚨 URGENT HARASSMENT REPORT</h2>
+            <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 14px;">Immediate Action Required</p>
           </div>
 
+          <!-- Report Details -->
           <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-            <h3 style="color: #dc2626; margin-top: 0;">Report Details:</h3>
+            <h3 style="color: #dc2626; margin-top: 0;">📋 Report Details:</h3>
             <ul style="list-style: none; padding: 0;">
-              <li style="margin-bottom: 10px;"><strong>Report ID:</strong> ${report.id}</li>
+              <li style="margin-bottom: 10px;"><strong>Report ID:</strong> <code style="background: #e5e5e5; padding: 2px 6px; border-radius: 4px;">${report.id}</code></li>
               <li style="margin-bottom: 10px;"><strong>Category:</strong> ${report.category}</li>
-              <li style="margin-bottom: 10px;"><strong>Severity:</strong> <span style="color: #dc2626; font-weight: bold;">${report.severity.toUpperCase()}</span></li>
+              <li style="margin-bottom: 10px;"><strong>Severity:</strong> <span style="color: #dc2626; font-weight: bold; background: #fee2e2; padding: 2px 8px; border-radius: 4px;">${report.severity.toUpperCase()}</span></li>
               <li style="margin-bottom: 10px;"><strong>Submitted:</strong> ${new Date(report.created_at).toLocaleString()}</li>
               <li style="margin-bottom: 10px;"><strong>Status:</strong> ${report.status}</li>
             </ul>
           </div>
 
-          <div style="background: #fee2e2; padding: 20px; border-radius: 8px; border-left: 4px solid #dc2626;">
+          <!-- Action Required -->
+          <div style="background: #fee2e2; padding: 20px; border-radius: 8px; border-left: 4px solid #dc2626; margin-bottom: 20px;">
             <p style="margin: 0; font-weight: bold; color: #dc2626;">
-              ⚠️ This report requires immediate attention. Please log into the admin dashboard to review and respond.
+              ⚠️ This report requires immediate attention. Click the button below to review and respond.
             </p>
           </div>
 
+          <!-- Action Buttons -->
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${adminDashboardUrl}" style="background: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; margin: 0 10px 10px 0;">🔧 Review in Admin Dashboard</a>
+            <a href="${statusCheckUrl}" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; margin: 0 10px 10px 0;">📊 Check Report Status</a>
+          </div>
+
+          <!-- Additional Info -->
+          <div style="background: #f0f9ff; padding: 20px; border-radius: 8px; border: 1px solid #bae6fd; margin-bottom: 20px;">
+            <h4 style="color: #0369a1; margin-top: 0;">📨 Quick Actions:</h4>
+            <p style="margin: 10px 0; font-size: 14px;">• <strong>Review Report:</strong> <a href="${adminDashboardUrl}" style="color: #0369a1;">Admin Dashboard</a></p>
+            <p style="margin: 10px 0; font-size: 14px;">• <strong>Submit New Report:</strong> <a href="${reportSubmissionUrl}" style="color: #0369a1;">Report Submission Form</a></p>
+            <p style="margin: 10px 0; font-size: 14px;">• <strong>Check Status:</strong> <a href="${statusCheckUrl}" style="color: #0369a1;">Status Checker</a></p>
+          </div>
+
+          <!-- Footer -->
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e5e5; text-align: center;">
             <p style="margin: 0; color: #666; font-size: 14px;">
-              - Whistle Security System<br>
-              Automated alert for urgent reports
+              <strong>🛡️ Whistle Security System</strong><br>
+              Automated alert for urgent reports<br>
+              <span style="font-size: 12px; color: #999;">This email was sent to whistle.git@gmail.com</span>
             </p>
           </div>
         </div>
@@ -204,9 +230,16 @@ Severity: ${report.severity}
 Submitted: ${new Date(report.created_at).toLocaleString()}
 Status: ${report.status}
 
-⚠️ This report requires immediate attention. Please log into the admin dashboard to review and respond.
+⚠️ This report requires immediate attention.
 
-- Whistle Security System
+📋 QUICK ACTIONS:
+• Review Report: ${adminDashboardUrl}
+• Submit New Report: ${reportSubmissionUrl}
+• Check Status: ${statusCheckUrl}
+
+Please log into the admin dashboard to review and respond immediately.
+
+🛡️ Whistle Security System
 Automated alert for urgent reports
       `,
     };
@@ -214,12 +247,18 @@ Automated alert for urgent reports
     if (transporter) {
       // Send actual email
       const info = await transporter.sendMail(emailData);
-      console.log("📧 Email alert sent successfully:", info.messageId);
-      console.log("📧 Email sent to:", emailData.to);
+      console.log("📧 ✅ Email alert sent successfully!");
+      console.log("📧 Message ID:", info.messageId);
+      console.log("📧 Sent to:", emailData.to);
+      console.log("📧 Subject:", emailData.subject);
+      console.log("📧 Admin Dashboard Link:", `${baseUrl}/admin`);
     } else {
       // Fallback: log to console
-      console.log("📧 Email notification (console fallback):", emailData);
-      console.log("📧 Would send to:", emailData.to);
+      console.log("📧 Email notification (console fallback):");
+      console.log("📧 To:", emailData.to);
+      console.log("📧 Subject:", emailData.subject);
+      console.log("📧 Admin Dashboard Link:", `${baseUrl}/admin`);
+      console.log("📧 Report Form Link:", `${baseUrl}/report`);
     }
   } catch (error) {
     console.error("❌ Failed to send email notification:", error);
