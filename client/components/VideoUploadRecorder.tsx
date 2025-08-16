@@ -460,7 +460,11 @@ export default function VideoUploadRecorder({
                           Please allow camera permissions to record video
                         </p>
                       </div>
-                      <Button onClick={startCamera} disabled={disabled}>
+                      <Button
+                        type="button"
+                        onClick={startCamera}
+                        disabled={disabled}
+                      >
                         <Camera className="w-4 h-4 mr-2" />
                         Enable Camera
                       </Button>
@@ -493,8 +497,9 @@ export default function VideoUploadRecorder({
 
                       <div className="flex items-center justify-center gap-2">
                         {!isRecording ? (
-                          <Button 
-                            onClick={startRecording} 
+                          <Button
+                            type="button"
+                            onClick={startRecording}
                             disabled={disabled || maxDurationReached}
                             className="bg-red-500 hover:bg-red-600 text-white"
                           >
@@ -502,8 +507,9 @@ export default function VideoUploadRecorder({
                             Start Recording
                           </Button>
                         ) : (
-                          <Button 
-                            onClick={stopRecording} 
+                          <Button
+                            type="button"
+                            onClick={stopRecording}
                             disabled={disabled}
                             variant="destructive"
                           >
