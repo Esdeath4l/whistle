@@ -235,6 +235,33 @@ export const getReportStatus: RequestHandler = (req, res) => {
   }
 };
 
+export const getReportDetails: RequestHandler = (req, res) => {
+  try {
+    // Admin authentication check
+    const authHeader = req.headers.authorization;
+    if (
+      !authHeader ||
+      authHeader !== `Bearer ${ADMIN_USERNAME}:${ADMIN_PASSWORD}`
+    ) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const { id } = req.params;
+
+    const report = reports.find((report) => report.id === id);
+    if (!report) {
+      return res.status(404).json({ error: "Report not found" });
+    }
+
+    // Return full report details including media for admin view
+    console.log(`Fetching full details for report ${id}`);
+    res.json(report);
+  } catch (error) {
+    console.error("Error fetching report details:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 export const updateReport: RequestHandler = (req, res) => {
   try {
     // Simple admin check
