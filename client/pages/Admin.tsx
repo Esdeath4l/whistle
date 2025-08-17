@@ -64,6 +64,7 @@ export default function Admin() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
   const [adminResponse, setAdminResponse] = useState("");
   const [statusFilter, setStatusFilter] = useState<ReportStatus | "all">("all");
 
@@ -131,11 +132,36 @@ export default function Admin() {
       if (response.ok) {
         const data: GetReportsResponse = await response.json();
         setReports(data.reports);
+        console.log(`Loaded ${data.reports.length} reports successfully`);
       }
     } catch (error) {
       console.error("Error fetching reports:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchReportDetails = async (reportId: string) => {
+    setLoadingDetails(true);
+    try {
+      console.log(`Fetching full details for report ${reportId}`);
+      const response = await fetch(`/api/reports/${reportId}/details`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const fullReport: Report = await response.json();
+        console.log(`Loaded full details for report ${reportId}`);
+        setSelectedReport(fullReport);
+      } else {
+        console.error("Failed to fetch report details");
+      }
+    } catch (error) {
+      console.error("Error fetching report details:", error);
+    } finally {
+      setLoadingDetails(false);
     }
   };
 
