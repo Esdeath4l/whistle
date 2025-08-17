@@ -155,7 +155,10 @@ export function decryptReportData(encryptedData: EncryptedData): {
       video_metadata: decryptedVideoMetadata,
     };
   } catch (error) {
-    console.error('Legacy decryption failed:', error);
+    // Don't log expected decryption failures to reduce console noise
+    if (!error.message.includes('Incompatible encryption') && !error.message.includes('Malformed UTF-8')) {
+      console.error('Legacy decryption failed:', error);
+    }
     throw new Error(`Legacy decryption failed: ${error.message}`);
   }
 }
