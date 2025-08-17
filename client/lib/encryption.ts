@@ -72,7 +72,7 @@ function safeDecrypt(encryptedText: string, key: string, iv: CryptoJS.lib.WordAr
       utf8String = decrypted.toString(CryptoJS.enc.Utf8);
     } catch (utf8Error) {
       // UTF-8 conversion failed - likely wrong key or incompatible encryption format
-      console.error('UTF-8 conversion failed:', utf8Error);
+      // Don't log this as error since it's expected for incompatible data
       throw new Error('Incompatible encryption format or wrong decryption key');
     }
 
