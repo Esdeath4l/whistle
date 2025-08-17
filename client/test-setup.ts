@@ -119,7 +119,22 @@ vi.spyOn(document, "createElement").mockImplementation((tagName: string) => {
       paused: { value: true, writable: true },
       muted: { value: false, writable: true },
       volume: { value: 1, writable: true },
+      src: { value: "", writable: true },
     });
+
+    // Mock the onloadedmetadata behavior to trigger immediately
+    let _onloadedmetadata: (() => void) | null = null;
+    Object.defineProperty(element, "onloadedmetadata", {
+      get: () => _onloadedmetadata,
+      set: (handler: (() => void) | null) => {
+        _onloadedmetadata = handler;
+        // Trigger the handler immediately in next tick to simulate metadata loading
+        if (handler) {
+          setTimeout(() => handler(), 0);
+        }
+      },
+    });
+
     return element;
   }
   return originalCreateElement(tagName);
