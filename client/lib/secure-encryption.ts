@@ -13,7 +13,7 @@ export interface SecureEncryptedData {
   encryptedPhotoUrl?: string;
   encryptedVideoUrl?: string;
   encryptedVideoMetadata?: string;
-  
+
   // Cryptographic metadata
   iv: string;
   salt: string;
@@ -22,7 +22,7 @@ export interface SecureEncryptedData {
     iterations: number;
     algorithm: string;
   };
-  
+
   // Integrity verification
   hmac: string;
   version: string;
@@ -44,7 +44,7 @@ export class SecureE2EEManager {
   private currentKeyPair: KeyPair | null = null;
   private readonly VERSION = "1.0.0";
   private readonly KEY_DERIVATION_ITERATIONS = 100000; // PBKDF2 iterations
-  
+
   static getInstance(): SecureE2EEManager {
     if (!SecureE2EEManager.instance) {
       SecureE2EEManager.instance = new SecureE2EEManager();
@@ -58,34 +58,32 @@ export class SecureE2EEManager {
    */
   generateEphemeralKeys(): KeyPair {
     console.log("🔑 Generating ephemeral E2EE keys for this session");
-    
+
     // Generate cryptographically secure random values
     const sessionEntropy = CryptoJS.lib.WordArray.random(32); // 256 bits
     const userEntropy = this.gatherUserEntropy();
     const timestampEntropy = CryptoJS.enc.Utf8.parse(Date.now().toString());
-    
+
     // Combine entropy sources
     const combinedEntropy = sessionEntropy
       .concat(userEntropy)
       .concat(timestampEntropy);
-    
+
     // Generate salt for key derivation
     const salt = CryptoJS.lib.WordArray.random(32); // 256-bit salt
-    
+
     // Create session ID
-    const sessionId = CryptoJS.SHA256(combinedEntropy).toString().substring(0, 16);
-    
+    const sessionId = CryptoJS.SHA256(combinedEntropy)
+      .toString()
+      .substring(0, 16);
+
     // Derive encryption key using PBKDF2
-    const encryptionKey = CryptoJS.PBKDF2(
-      combinedEntropy.toString(),
-      salt,
-      {
-        keySize: 256 / 32, // 256-bit key
-        iterations: this.KEY_DERIVATION_ITERATIONS,
-        hasher: CryptoJS.algo.SHA256
-      }
-    ).toString();
-    
+    const encryptionKey = CryptoJS.PBKDF2(combinedEntropy.toString(), salt, {
+      keySize: 256 / 32, // 256-bit key
+      iterations: this.KEY_DERIVATION_ITERATIONS,
+      hasher: CryptoJS.algo.SHA256,
+    }).toString();
+
     // Derive separate HMAC key for integrity
     const hmacSalt = CryptoJS.lib.WordArray.random(32);
     const hmacKey = CryptoJS.PBKDF2(
@@ -94,25 +92,25 @@ export class SecureE2EEManager {
       {
         keySize: 256 / 32, // 256-bit key
         iterations: this.KEY_DERIVATION_ITERATIONS,
-        hasher: CryptoJS.algo.SHA256
-      }
+        hasher: CryptoJS.algo.SHA256,
+      },
     ).toString();
-    
+
     const keyPair: KeyPair = {
       encryptionKey,
       hmacKey,
       derivedAt: Date.now(),
-      sessionId
+      sessionId,
     };
-    
+
     this.currentKeyPair = keyPair;
-    
+
     console.log("✅ Ephemeral keys generated:", {
       sessionId,
       derivedAt: new Date(keyPair.derivedAt).toISOString(),
-      keyStrength: "256-bit AES + HMAC-SHA256"
+      keyStrength: "256-bit AES + HMAC-SHA256",
     });
-    
+
     return keyPair;
   }
 
@@ -121,22 +119,22 @@ export class SecureE2EEManager {
    */
   private gatherUserEntropy(): CryptoJS.lib.WordArray {
     const entropy: string[] = [];
-    
+
     // Browser fingerprinting for entropy (not for tracking)
     entropy.push(navigator.userAgent);
     entropy.push(screen.width + "x" + screen.height);
     entropy.push(navigator.language);
     entropy.push(Date.now().toString());
     entropy.push(Math.random().toString());
-    
+
     // Performance timing entropy
     if (performance && performance.now) {
       entropy.push(performance.now().toString());
     }
-    
+
     // Timezone entropy
     entropy.push(new Date().getTimezoneOffset().toString());
-    
+
     return CryptoJS.enc.Utf8.parse(entropy.join("|"));
   }
 
@@ -154,39 +152,55 @@ export class SecureE2EEManager {
     if (!this.currentKeyPair) {
       this.generateEphemeralKeys();
     }
-    
+
     const keyPair = this.currentKeyPair!;
     console.log("🔒 Encrypting report data with E2EE");
-    
+
     // Generate unique IV for this encryption
     const iv = CryptoJS.lib.WordArray.random(16); // 128-bit IV
     const salt = CryptoJS.lib.WordArray.random(32); // 256-bit salt
     const timestamp = new Date().toISOString();
-    
+
     // Encrypt each field separately
-    const encryptedMessage = this.encryptField(data.message, keyPair.encryptionKey, iv);
-    const encryptedCategory = this.encryptField(data.category, keyPair.encryptionKey, iv);
-    
+    const encryptedMessage = this.encryptField(
+      data.message,
+      keyPair.encryptionKey,
+      iv,
+    );
+    const encryptedCategory = this.encryptField(
+      data.category,
+      keyPair.encryptionKey,
+      iv,
+    );
+
     let encryptedPhotoUrl: string | undefined;
     let encryptedVideoUrl: string | undefined;
     let encryptedVideoMetadata: string | undefined;
-    
+
     if (data.photo_url) {
-      encryptedPhotoUrl = this.encryptField(data.photo_url, keyPair.encryptionKey, iv);
-    }
-    
-    if (data.video_url) {
-      encryptedVideoUrl = this.encryptField(data.video_url, keyPair.encryptionKey, iv);
-    }
-    
-    if (data.video_metadata) {
-      encryptedVideoMetadata = this.encryptField(
-        JSON.stringify(data.video_metadata), 
-        keyPair.encryptionKey, 
-        iv
+      encryptedPhotoUrl = this.encryptField(
+        data.photo_url,
+        keyPair.encryptionKey,
+        iv,
       );
     }
-    
+
+    if (data.video_url) {
+      encryptedVideoUrl = this.encryptField(
+        data.video_url,
+        keyPair.encryptionKey,
+        iv,
+      );
+    }
+
+    if (data.video_metadata) {
+      encryptedVideoMetadata = this.encryptField(
+        JSON.stringify(data.video_metadata),
+        keyPair.encryptionKey,
+        iv,
+      );
+    }
+
     // Create payload for HMAC
     const payloadForHmac = {
       encryptedMessage,
@@ -197,15 +211,15 @@ export class SecureE2EEManager {
       iv: iv.toString(),
       salt: salt.toString(),
       timestamp,
-      sessionId: keyPair.sessionId
+      sessionId: keyPair.sessionId,
     };
-    
+
     // Generate HMAC for integrity verification
     const hmac = CryptoJS.HmacSHA256(
       JSON.stringify(payloadForHmac),
-      keyPair.hmacKey
+      keyPair.hmacKey,
     ).toString();
-    
+
     const encryptedData: SecureEncryptedData = {
       encryptedMessage,
       encryptedCategory,
@@ -217,26 +231,29 @@ export class SecureE2EEManager {
       timestamp,
       keyDerivationParams: {
         iterations: this.KEY_DERIVATION_ITERATIONS,
-        algorithm: "PBKDF2-SHA256"
+        algorithm: "PBKDF2-SHA256",
       },
       hmac,
-      version: this.VERSION
+      version: this.VERSION,
     };
-    
+
     console.log("✅ Report data encrypted successfully:", {
       sessionId: keyPair.sessionId,
       hasPhoto: !!data.photo_url,
       hasVideo: !!data.video_url,
-      hmacVerified: true
+      hmacVerified: true,
     });
-    
+
     return encryptedData;
   }
 
   /**
    * Decrypt report data (admin side)
    */
-  decryptReportData(encryptedData: SecureEncryptedData, keyPair?: KeyPair): {
+  decryptReportData(
+    encryptedData: SecureEncryptedData,
+    keyPair?: KeyPair,
+  ): {
     message: string;
     category: string;
     photo_url?: string;
@@ -244,13 +261,13 @@ export class SecureE2EEManager {
     video_metadata?: any;
   } {
     console.log("🔓 Decrypting report data");
-    
+
     // Use provided keyPair or current session keys
     const keys = keyPair || this.currentKeyPair;
     if (!keys) {
       throw new Error("No decryption keys available");
     }
-    
+
     // Verify data integrity first
     const payloadForHmac = {
       encryptedMessage: encryptedData.encryptedMessage,
@@ -261,94 +278,104 @@ export class SecureE2EEManager {
       iv: encryptedData.iv,
       salt: encryptedData.salt,
       timestamp: encryptedData.timestamp,
-      sessionId: keys.sessionId
+      sessionId: keys.sessionId,
     };
-    
+
     const computedHmac = CryptoJS.HmacSHA256(
       JSON.stringify(payloadForHmac),
-      keys.hmacKey
+      keys.hmacKey,
     ).toString();
-    
+
     if (computedHmac !== encryptedData.hmac) {
-      throw new Error("HMAC verification failed - data may be corrupted or tampered");
+      throw new Error(
+        "HMAC verification failed - data may be corrupted or tampered",
+      );
     }
-    
+
     const iv = CryptoJS.enc.Hex.parse(encryptedData.iv);
-    
+
     // Decrypt each field
     const decryptedMessage = this.decryptField(
       encryptedData.encryptedMessage,
       keys.encryptionKey,
-      iv
+      iv,
     );
-    
+
     const decryptedCategory = this.decryptField(
       encryptedData.encryptedCategory,
       keys.encryptionKey,
-      iv
+      iv,
     );
-    
+
     let decryptedPhotoUrl: string | undefined;
     let decryptedVideoUrl: string | undefined;
     let decryptedVideoMetadata: any;
-    
+
     if (encryptedData.encryptedPhotoUrl) {
       decryptedPhotoUrl = this.decryptField(
         encryptedData.encryptedPhotoUrl,
         keys.encryptionKey,
-        iv
+        iv,
       );
     }
-    
+
     if (encryptedData.encryptedVideoUrl) {
       decryptedVideoUrl = this.decryptField(
         encryptedData.encryptedVideoUrl,
         keys.encryptionKey,
-        iv
+        iv,
       );
     }
-    
+
     if (encryptedData.encryptedVideoMetadata) {
       const decryptedMetadataString = this.decryptField(
         encryptedData.encryptedVideoMetadata,
         keys.encryptionKey,
-        iv
+        iv,
       );
       decryptedVideoMetadata = JSON.parse(decryptedMetadataString);
     }
-    
+
     console.log("✅ Report data decrypted successfully");
-    
+
     return {
       message: decryptedMessage,
       category: decryptedCategory,
       photo_url: decryptedPhotoUrl,
       video_url: decryptedVideoUrl,
-      video_metadata: decryptedVideoMetadata
+      video_metadata: decryptedVideoMetadata,
     };
   }
 
   /**
    * Encrypt a single field
    */
-  private encryptField(data: string, key: string, iv: CryptoJS.lib.WordArray): string {
+  private encryptField(
+    data: string,
+    key: string,
+    iv: CryptoJS.lib.WordArray,
+  ): string {
     return CryptoJS.AES.encrypt(data, key, {
       iv: iv,
       mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7
+      padding: CryptoJS.pad.Pkcs7,
     }).toString();
   }
 
   /**
    * Decrypt a single field
    */
-  private decryptField(encryptedData: string, key: string, iv: CryptoJS.lib.WordArray): string {
+  private decryptField(
+    encryptedData: string,
+    key: string,
+    iv: CryptoJS.lib.WordArray,
+  ): string {
     const decrypted = CryptoJS.AES.decrypt(encryptedData, key, {
       iv: iv,
       mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7
+      padding: CryptoJS.pad.Pkcs7,
     });
-    
+
     return decrypted.toString(CryptoJS.enc.Utf8);
   }
 
@@ -362,25 +389,23 @@ export class SecureE2EEManager {
     sessionId: string;
   }): KeyPair {
     console.log("🔑 Generating admin decryption keys");
-    
+
     // Use admin credentials + session ID for key derivation
     const credentialEntropy = CryptoJS.enc.Utf8.parse(
-      adminCredentials.username + adminCredentials.password + adminCredentials.sessionId
+      adminCredentials.username +
+        adminCredentials.password +
+        adminCredentials.sessionId,
     );
-    
+
     const salt = CryptoJS.enc.Utf8.parse("whistle-admin-salt-2024");
-    
+
     // Derive encryption key
-    const encryptionKey = CryptoJS.PBKDF2(
-      credentialEntropy.toString(),
-      salt,
-      {
-        keySize: 256 / 32,
-        iterations: this.KEY_DERIVATION_ITERATIONS,
-        hasher: CryptoJS.algo.SHA256
-      }
-    ).toString();
-    
+    const encryptionKey = CryptoJS.PBKDF2(credentialEntropy.toString(), salt, {
+      keySize: 256 / 32,
+      iterations: this.KEY_DERIVATION_ITERATIONS,
+      hasher: CryptoJS.algo.SHA256,
+    }).toString();
+
     // Derive HMAC key
     const hmacKey = CryptoJS.PBKDF2(
       credentialEntropy.toString() + "_admin_hmac",
@@ -388,15 +413,15 @@ export class SecureE2EEManager {
       {
         keySize: 256 / 32,
         iterations: this.KEY_DERIVATION_ITERATIONS,
-        hasher: CryptoJS.algo.SHA256
-      }
+        hasher: CryptoJS.algo.SHA256,
+      },
     ).toString();
-    
+
     return {
       encryptionKey,
       hmacKey,
       derivedAt: Date.now(),
-      sessionId: adminCredentials.sessionId
+      sessionId: adminCredentials.sessionId,
     };
   }
 
@@ -415,10 +440,10 @@ export class SecureE2EEManager {
     if (!this.currentKeyPair) {
       return null;
     }
-    
+
     return {
       sessionId: this.currentKeyPair.sessionId,
-      derivedAt: this.currentKeyPair.derivedAt
+      derivedAt: this.currentKeyPair.derivedAt,
     };
   }
 }

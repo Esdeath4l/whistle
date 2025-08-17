@@ -37,9 +37,10 @@ This implementation provides **military-grade end-to-end encryption** with **per
 ## 🔐 **Core Security Features**
 
 ### **1. Ephemeral Key Generation**
+
 - **Algorithm**: PBKDF2-SHA256 with 100,000 iterations
 - **Key Strength**: 256-bit AES + 256-bit HMAC keys
-- **Entropy Sources**: 
+- **Entropy Sources**:
   - Cryptographically secure random (256 bits)
   - User environment fingerprint (non-tracking)
   - Performance timing entropy
@@ -52,12 +53,14 @@ const keys = secureE2EE.generateEphemeralKeys();
 ```
 
 ### **2. Military-Grade Encryption**
+
 - **Primary**: AES-256-CBC (FIPS 140-2 approved)
 - **Mode**: Cipher Block Chaining with unique IVs
 - **Integrity**: HMAC-SHA256 for tamper detection
 - **Padding**: PKCS#7 standard padding
 
 ### **3. Perfect Forward Secrecy (PFS)**
+
 - **Automatic Key Rotation**: Every 15 minutes
 - **Session Cleanup**: On inactivity, page close, tab switch
 - **Maximum Session**: 2 hours hard limit
@@ -65,12 +68,13 @@ const keys = secureE2EE.generateEphemeralKeys();
 
 ```typescript
 // PFS automatically active
-forwardSecrecy.startSession();     // Generate ephemeral keys
+forwardSecrecy.startSession(); // Generate ephemeral keys
 // ... user activity ...
-forwardSecrecy.clearSession();     // Keys permanently destroyed
+forwardSecrecy.clearSession(); // Keys permanently destroyed
 ```
 
 ### **4. File Attachment Encryption**
+
 - **Chunked Processing**: 1MB chunks for memory efficiency
 - **Large File Support**: Up to 100MB with progress tracking
 - **Metadata Protection**: File names, sizes, types encrypted
@@ -89,7 +93,7 @@ startSecureSession(); // Generates ephemeral keys
 // 2. Data Encryption (Transparent)
 const encryptedData = encryptReportData({
   message: "Sensitive report content",
-  category: "harassment", 
+  category: "harassment",
   photo_url: "base64_photo_data",
   video_url: "base64_video_data"
 });
@@ -97,7 +101,7 @@ const encryptedData = encryptReportData({
 // 3. Result: Complete ciphertext package
 {
   encryptedMessage: "AES256_encrypted_content",
-  encryptedCategory: "AES256_encrypted_category", 
+  encryptedCategory: "AES256_encrypted_category",
   encryptedPhotoUrl: "AES256_encrypted_photo",
   encryptedVideoUrl: "AES256_encrypted_video",
   iv: "random_128bit_iv",
@@ -118,7 +122,7 @@ const encryptedData = encryptReportData({
 const report = {
   id: "report_123",
   message: "[ENCRYPTED]", // Placeholder
-  category: "harassment", // Placeholder  
+  category: "harassment", // Placeholder
   encrypted_data: {
     // Complete encrypted payload from client
     encryptedMessage: "...",
@@ -126,7 +130,7 @@ const report = {
     hmac: "...",
     // ... all crypto metadata
   },
-  is_encrypted: true
+  is_encrypted: true,
 };
 
 // 🚫 Server CANNOT decrypt without admin credentials
@@ -138,13 +142,13 @@ const report = {
 // Admin keys derived from credentials + session ID
 const adminKeys = secureE2EE.generateAdminKeys({
   username: "admin_username",
-  password: "admin_password", 
+  password: "admin_password",
   sessionId: report.encrypted_data.sessionId
 });
 
 // Decrypt with integrity verification
 const decrypted = secureE2EE.decryptReportData(
-  report.encrypted_data, 
+  report.encrypted_data,
   adminKeys
 );
 
@@ -162,23 +166,27 @@ const decrypted = secureE2EE.decryptReportData(
 ## 🛡️ **Security Guarantees**
 
 ### **Confidentiality**
+
 - ✅ **Client-Only Decryption**: Only users with proper credentials can decrypt
 - ✅ **Server Blindness**: Server never sees plaintext content
 - ✅ **Transport Security**: HTTPS + client-side encryption (defense in depth)
 - ✅ **Memory Protection**: Automatic clearance of sensitive data
 
-### **Integrity** 
+### **Integrity**
+
 - ✅ **Tamper Detection**: HMAC-SHA256 verification prevents data modification
 - ✅ **Replay Protection**: Timestamps and session IDs prevent replay attacks
 - ✅ **Version Control**: Crypto version tracking for future upgrades
 
 ### **Forward Secrecy**
+
 - ✅ **Ephemeral Keys**: Session keys destroyed after use
 - ✅ **Key Rotation**: Automatic 15-minute rotation
 - ✅ **Compromise Recovery**: Past data remains secure even if current keys compromised
 - ✅ **Session Isolation**: Each report uses unique session keys
 
 ### **Availability**
+
 - ✅ **Graceful Degradation**: Falls back to legacy encryption if needed
 - ✅ **Performance Optimized**: Chunked processing for large files
 - ✅ **Memory Efficient**: Streaming encryption prevents browser crashes
@@ -188,19 +196,20 @@ const decrypted = secureE2EE.decryptReportData(
 
 ## 📊 **Performance Characteristics**
 
-| Operation | Performance | Memory Usage | Security Level |
-|-----------|-------------|--------------|----------------|
-| Text Encryption | <50ms | <1MB | Military Grade |
-| Photo Encryption (5MB) | <500ms | <10MB | Military Grade |
-| Video Encryption (50MB) | <5s | <20MB | Military Grade |
-| Key Generation | <200ms | <1MB | 256-bit Entropy |
-| Forward Secrecy Cleanup | <10ms | Minimal | Complete |
+| Operation               | Performance | Memory Usage | Security Level  |
+| ----------------------- | ----------- | ------------ | --------------- |
+| Text Encryption         | <50ms       | <1MB         | Military Grade  |
+| Photo Encryption (5MB)  | <500ms      | <10MB        | Military Grade  |
+| Video Encryption (50MB) | <5s         | <20MB        | Military Grade  |
+| Key Generation          | <200ms      | <1MB         | 256-bit Entropy |
+| Forward Secrecy Cleanup | <10ms       | Minimal      | Complete        |
 
 ---
 
 ## 🔄 **Lifecycle Management**
 
 ### **Session Lifecycle**
+
 ```
 🔄 Start Session → 🔑 Generate Keys → 🔒 Encrypt Data → 📤 Submit → 🗑️ Clear Keys
      ↑                                                                    │
@@ -208,6 +217,7 @@ const decrypted = secureE2EE.decryptReportData(
 ```
 
 ### **Automatic Triggers for Key Clearance**
+
 1. **User Inactivity**: 30 minutes
 2. **Page Hidden**: Tab switch, minimize
 3. **Page Unload**: Browser close, navigation
@@ -225,7 +235,7 @@ const decrypted = secureE2EE.decryptReportData(
 // Test 1: Basic Encryption/Decryption
 const testData = {
   message: "Test harassment report",
-  category: "harassment"
+  category: "harassment",
 };
 
 const encrypted = encryptReportData(testData);
@@ -263,7 +273,7 @@ const session1Keys = getSessionInfo();
 encryptReportData({ message: "Session 1 data" });
 clearSessionForPFS(); // Keys destroyed
 
-startSecureSession(); 
+startSecureSession();
 const session2Keys = getSessionInfo();
 
 // Verify: session1Keys.sessionId !== session2Keys.sessionId
@@ -276,13 +286,15 @@ const session2Keys = getSessionInfo();
 ## 🎯 **Compliance & Standards**
 
 ### **Cryptographic Standards**
+
 - ✅ **NIST SP 800-38A**: AES-CBC mode implementation
 - ✅ **FIPS 140-2**: Approved cryptographic algorithms
-- ✅ **RFC 3962**: PBKDF2 key derivation 
+- ✅ **RFC 3962**: PBKDF2 key derivation
 - ✅ **RFC 2104**: HMAC implementation
 - ✅ **RFC 4086**: Random number generation guidelines
 
 ### **Industry Best Practices**
+
 - ✅ **OWASP**: Cryptographic Storage Cheat Sheet compliance
 - ✅ **NSA Suite B**: 256-bit encryption standards
 - ✅ **PCI DSS**: Strong cryptography requirements
@@ -293,6 +305,7 @@ const session2Keys = getSessionInfo();
 ## 🚨 **Threat Model Coverage**
 
 ### **Threats Mitigated**
+
 - ✅ **Server Compromise**: Encrypted data remains secure
 - ✅ **Database Breach**: Only ciphertext exposed
 - ✅ **Man-in-the-Middle**: Client-side encryption + HTTPS
@@ -302,6 +315,7 @@ const session2Keys = getSessionInfo();
 - ✅ **Browser Exploits**: Session isolation and cleanup
 
 ### **Attack Scenarios Tested**
+
 - ✅ **Passive Surveillance**: All data encrypted at rest
 - ✅ **Active Interception**: Integrity verification prevents tampering
 - ✅ **Credential Stuffing**: Key derivation includes session context
@@ -313,13 +327,14 @@ const session2Keys = getSessionInfo();
 ## 📈 **Monitoring & Metrics**
 
 ### **Security Metrics Tracked**
+
 ```typescript
 const securityStatus = getSecurityStatus();
 // Returns:
 {
   hasActiveSession: boolean,
   sessionAge: number,
-  nextRotation: number, 
+  nextRotation: number,
   forwardSecrecyActive: boolean,
   metrics: {
     sessionsCreated: number,
@@ -331,6 +346,7 @@ const securityStatus = getSecurityStatus();
 ```
 
 ### **Alerts & Recommendations**
+
 - 🚨 **Long Sessions**: Alert if session > 1 hour
 - 🚨 **Failed Clearance**: Monitor incomplete session cleanup
 - 🚨 **High Memory**: Warning for large file encryption
@@ -358,6 +374,7 @@ const securityStatus = getSecurityStatus();
 ## 🔧 **Developer Usage**
 
 ### **Basic Usage (Automatic)**
+
 ```typescript
 // E2EE is now transparent - just use the existing API
 import { encryptReportData, decryptReportData } from "@/lib/secure-encryption";
@@ -370,6 +387,7 @@ const decrypted = decryptReportData(encrypted);
 ```
 
 ### **Advanced Usage (Manual Control)**
+
 ```typescript
 import { secureE2EE, forwardSecrecy } from "@/lib/secure-encryption";
 

@@ -178,7 +178,10 @@ export default function Admin() {
     response?: string,
   ) => {
     try {
-      console.log(`Updating report ${reportId}:`, { status, response: response ? "provided" : "none" });
+      console.log(`Updating report ${reportId}:`, {
+        status,
+        response: response ? "provided" : "none",
+      });
 
       const updateData: UpdateReportRequest = { status };
       if (response) {
@@ -200,7 +203,10 @@ export default function Admin() {
         setSelectedReport(null);
         setAdminResponse("");
       } else {
-        console.error(`❌ Failed to update report ${reportId}:`, await res.text());
+        console.error(
+          `❌ Failed to update report ${reportId}:`,
+          await res.text(),
+        );
       }
     } catch (error) {
       console.error("Error updating report:", error);
@@ -316,7 +322,7 @@ export default function Admin() {
           adminKeys = secureE2EE.generateAdminKeys({
             username: "ritika", // Current admin username
             password: "satoru 2624", // Current admin password
-            sessionId: report.encrypted_data.sessionId
+            sessionId: report.encrypted_data.sessionId,
           });
         }
 
@@ -327,7 +333,9 @@ export default function Admin() {
 
         // Fallback to legacy decryption if enhanced fails
         try {
-          const { decryptReportData: legacyDecrypt } = require("@/lib/encryption");
+          const {
+            decryptReportData: legacyDecrypt,
+          } = require("@/lib/encryption");
           console.log("🔄 Falling back to legacy decryption");
           return legacyDecrypt(report.encrypted_data);
         } catch (legacyError) {
@@ -745,18 +753,26 @@ export default function Admin() {
                                           : selectedReport.video_url;
 
                                       // Check for placeholder video data from optimized loading
-                                      if (videoUrl === '[LARGE_VIDEO_DATA]' ||
-                                          (selectedReport.is_encrypted &&
-                                           getDecryptedReport(selectedReport).video_url === '[LARGE_ENCRYPTED_VIDEO]')) {
+                                      if (
+                                        videoUrl === "[LARGE_VIDEO_DATA]" ||
+                                        (selectedReport.is_encrypted &&
+                                          getDecryptedReport(selectedReport)
+                                            .video_url ===
+                                            "[LARGE_ENCRYPTED_VIDEO]")
+                                      ) {
                                         return (
                                           <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                                             <div className="flex items-center gap-2 mb-2">
                                               <Video className="w-5 h-5 text-blue-600" />
-                                              <span className="font-medium text-blue-800">Video Available</span>
+                                              <span className="font-medium text-blue-800">
+                                                Video Available
+                                              </span>
                                             </div>
                                             <p className="text-sm text-blue-700">
-                                              Video evidence is available but not loaded for performance.
-                                              In production, this would be streamed from cloud storage.
+                                              Video evidence is available but
+                                              not loaded for performance. In
+                                              production, this would be streamed
+                                              from cloud storage.
                                             </p>
                                           </div>
                                         );

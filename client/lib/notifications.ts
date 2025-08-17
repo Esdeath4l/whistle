@@ -106,7 +106,10 @@ export class NotificationService {
       this.eventSource.close();
     }
 
-    console.log("Setting up real-time notifications with token:", adminToken.substring(0, 10) + "...");
+    console.log(
+      "Setting up real-time notifications with token:",
+      adminToken.substring(0, 10) + "...",
+    );
 
     try {
       this.eventSource = new EventSource(
@@ -176,7 +179,11 @@ export class NotificationService {
   private handleNewReportNotification(data: any) {
     const { reportId, category, severity } = data;
 
-    console.log("🚨 New report notification:", { reportId, category, severity });
+    console.log("🚨 New report notification:", {
+      reportId,
+      category,
+      severity,
+    });
 
     // Show toast notification
     this.showToast({

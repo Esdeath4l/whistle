@@ -25,7 +25,7 @@ export class ForwardSecrecyManager {
       sessionsCreated: 0,
       sessionsCleared: 0,
       averageSessionDuration: 0,
-      lastKeyRotation: 0
+      lastKeyRotation: 0,
     };
     this.setupForwardSecrecy();
   }
@@ -44,12 +44,12 @@ export class ForwardSecrecyManager {
     console.log("🛡️ Setting up Perfect Forward Secrecy");
 
     // Clear keys on page unload
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener("beforeunload", () => {
       this.clearSessionImmediate("Page unload");
     });
 
     // Clear keys on page visibility change (tab switch, minimize)
-    document.addEventListener('visibilitychange', () => {
+    document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         this.scheduleKeyClearance("Page hidden");
       } else {
@@ -71,22 +71,22 @@ export class ForwardSecrecyManager {
    */
   startSession(): void {
     console.log("🔑 Starting new secure session with PFS");
-    
+
     // Clear any existing session first
     this.clearSessionImmediate("New session starting");
-    
+
     // Generate new ephemeral keys
     secureE2EE.generateEphemeralKeys();
-    
+
     this.sessionStartTime = Date.now();
     this.sessionMetrics.sessionsCreated++;
     this.sessionMetrics.lastKeyRotation = Date.now();
-    
+
     // Set maximum session duration limit
     setTimeout(() => {
       this.clearSessionImmediate("Maximum session duration reached");
     }, this.MAX_SESSION_DURATION);
-    
+
     console.log("✅ Secure session started with ephemeral keys");
   }
 
@@ -95,22 +95,22 @@ export class ForwardSecrecyManager {
    */
   clearSessionImmediate(reason: string): void {
     console.log(`🗑️ Clearing session for PFS: ${reason}`);
-    
+
     // Clear cryptographic keys
     secureE2EE.clearSessionKeys();
-    
+
     // Clear any cached encrypted data
     this.clearBrowserCaches();
-    
+
     // Update metrics
     if (this.sessionStartTime > 0) {
       const sessionDuration = Date.now() - this.sessionStartTime;
       this.updateSessionMetrics(sessionDuration);
       this.sessionStartTime = 0;
     }
-    
+
     this.sessionMetrics.sessionsCleared++;
-    
+
     console.log(`✅ Session cleared successfully: ${reason}`);
   }
 
@@ -121,12 +121,14 @@ export class ForwardSecrecyManager {
     if (this.keyRotationTimer) {
       clearTimeout(this.keyRotationTimer);
     }
-    
+
     this.keyRotationTimer = setTimeout(() => {
       this.clearSessionImmediate(reason);
     }, this.SESSION_TIMEOUT);
-    
-    console.log(`⏰ Scheduled key clearance in ${this.SESSION_TIMEOUT / 1000}s: ${reason}`);
+
+    console.log(
+      `⏰ Scheduled key clearance in ${this.SESSION_TIMEOUT / 1000}s: ${reason}`,
+    );
   }
 
   /**
@@ -144,28 +146,34 @@ export class ForwardSecrecyManager {
    * Setup user inactivity detection
    */
   private setupInactivityDetection(): void {
-    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    const events = [
+      "mousedown",
+      "mousemove",
+      "keypress",
+      "scroll",
+      "touchstart",
+    ];
     let inactivityTimer: NodeJS.Timeout | null = null;
-    
+
     const resetInactivityTimer = () => {
       if (inactivityTimer) {
         clearTimeout(inactivityTimer);
       }
-      
+
       // Clear keys after 30 minutes of inactivity
       inactivityTimer = setTimeout(() => {
         this.clearSessionImmediate("User inactivity timeout");
       }, this.SESSION_TIMEOUT);
     };
-    
+
     // Set up event listeners for user activity
-    events.forEach(event => {
+    events.forEach((event) => {
       document.addEventListener(event, resetInactivityTimer, true);
     });
-    
+
     // Initial timer
     resetInactivityTimer();
-    
+
     console.log("👤 User inactivity detection active");
   }
 
@@ -174,18 +182,21 @@ export class ForwardSecrecyManager {
    */
   private setupKeyRotation(): void {
     // Rotate keys every 15 minutes for active sessions
-    setInterval(() => {
-      const sessionInfo = secureE2EE.getSessionInfo();
-      if (sessionInfo) {
-        const sessionAge = Date.now() - sessionInfo.derivedAt;
-        const rotationInterval = 15 * 60 * 1000; // 15 minutes
-        
-        if (sessionAge > rotationInterval) {
-          console.log("🔄 Automatic key rotation triggered");
-          this.rotateKeys("Automatic rotation");
+    setInterval(
+      () => {
+        const sessionInfo = secureE2EE.getSessionInfo();
+        if (sessionInfo) {
+          const sessionAge = Date.now() - sessionInfo.derivedAt;
+          const rotationInterval = 15 * 60 * 1000; // 15 minutes
+
+          if (sessionAge > rotationInterval) {
+            console.log("🔄 Automatic key rotation triggered");
+            this.rotateKeys("Automatic rotation");
+          }
         }
-      }
-    }, 5 * 60 * 1000); // Check every 5 minutes
+      },
+      5 * 60 * 1000,
+    ); // Check every 5 minutes
   }
 
   /**
@@ -193,18 +204,18 @@ export class ForwardSecrecyManager {
    */
   private rotateKeys(reason: string): void {
     console.log(`🔄 Rotating encryption keys: ${reason}`);
-    
+
     const oldSessionInfo = secureE2EE.getSessionInfo();
-    
+
     // Generate new ephemeral keys
     const newKeys = secureE2EE.generateEphemeralKeys();
-    
+
     this.sessionMetrics.lastKeyRotation = Date.now();
-    
+
     console.log("✅ Keys rotated successfully:", {
       oldSession: oldSessionInfo?.sessionId,
       newSession: newKeys.sessionId,
-      reason
+      reason,
     });
   }
 
@@ -215,18 +226,18 @@ export class ForwardSecrecyManager {
     try {
       // Clear sessionStorage
       sessionStorage.clear();
-      
+
       // Clear any cached form data
-      const forms = document.querySelectorAll('form');
-      forms.forEach(form => {
+      const forms = document.querySelectorAll("form");
+      forms.forEach((form) => {
         if (form.reset) {
           form.reset();
         }
       });
-      
+
       // Clear any cached blobs/object URLs
       // Note: We can't enumerate all object URLs, but we clear what we can track
-      
+
       console.log("🧹 Browser caches cleared");
     } catch (error) {
       console.warn("Failed to clear some browser caches:", error);
@@ -239,9 +250,9 @@ export class ForwardSecrecyManager {
   private updateSessionMetrics(duration: number): void {
     const totalSessions = this.sessionMetrics.sessionsCleared;
     const currentAverage = this.sessionMetrics.averageSessionDuration;
-    
+
     // Calculate running average
-    this.sessionMetrics.averageSessionDuration = 
+    this.sessionMetrics.averageSessionDuration =
       (currentAverage * (totalSessions - 1) + duration) / totalSessions;
   }
 
@@ -256,25 +267,25 @@ export class ForwardSecrecyManager {
     metrics: SessionMetrics;
   } {
     const sessionInfo = secureE2EE.getSessionInfo();
-    
+
     if (!sessionInfo) {
       return {
         hasActiveSession: false,
         forwardSecrecyActive: true,
-        metrics: this.sessionMetrics
+        metrics: this.sessionMetrics,
       };
     }
-    
+
     const sessionAge = Date.now() - sessionInfo.derivedAt;
     const rotationInterval = 15 * 60 * 1000; // 15 minutes
     const nextRotation = rotationInterval - (sessionAge % rotationInterval);
-    
+
     return {
       hasActiveSession: true,
       sessionAge,
       nextRotation,
       forwardSecrecyActive: true,
-      metrics: this.sessionMetrics
+      metrics: this.sessionMetrics,
     };
   }
 
@@ -291,19 +302,25 @@ export class ForwardSecrecyManager {
   getPFSRecommendations(): string[] {
     const status = this.getSecurityStatus();
     const recommendations: string[] = [];
-    
+
     if (status.hasActiveSession && status.sessionAge! > 60 * 60 * 1000) {
-      recommendations.push("Session has been active for over 1 hour - consider rotating keys");
+      recommendations.push(
+        "Session has been active for over 1 hour - consider rotating keys",
+      );
     }
-    
+
     if (status.metrics.averageSessionDuration > 2 * 60 * 60 * 1000) {
-      recommendations.push("Average session duration is high - consider shorter session limits");
+      recommendations.push(
+        "Average session duration is high - consider shorter session limits",
+      );
     }
-    
+
     if (status.metrics.sessionsCleared < status.metrics.sessionsCreated * 0.8) {
-      recommendations.push("Some sessions may not be properly cleared - check PFS implementation");
+      recommendations.push(
+        "Some sessions may not be properly cleared - check PFS implementation",
+      );
     }
-    
+
     return recommendations;
   }
 }
