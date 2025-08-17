@@ -350,7 +350,9 @@ export default function Admin() {
           } catch (legacyError) {
             // Only log unexpected errors, not expected decryption failures
             if (!legacyError.message?.includes("Incompatible encryption") &&
-                !legacyError.message?.includes("Malformed UTF-8")) {
+                !legacyError.message?.includes("Malformed UTF-8") &&
+                !legacyError.message?.includes("Legacy decryption failed") &&
+                !legacyError.message?.includes("wrong decryption key")) {
               console.error("Legacy decryption also failed:", legacyError);
             }
 
