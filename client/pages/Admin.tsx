@@ -722,6 +722,24 @@ export default function Admin() {
                                               .video_url
                                           : selectedReport.video_url;
 
+                                      // Check for placeholder video data from optimized loading
+                                      if (videoUrl === '[LARGE_VIDEO_DATA]' ||
+                                          (selectedReport.is_encrypted &&
+                                           getDecryptedReport(selectedReport).video_url === '[LARGE_ENCRYPTED_VIDEO]')) {
+                                        return (
+                                          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                            <div className="flex items-center gap-2 mb-2">
+                                              <Video className="w-5 h-5 text-blue-600" />
+                                              <span className="font-medium text-blue-800">Video Available</span>
+                                            </div>
+                                            <p className="text-sm text-blue-700">
+                                              Video evidence is available but not loaded for performance.
+                                              In production, this would be streamed from cloud storage.
+                                            </p>
+                                          </div>
+                                        );
+                                      }
+
                                       // Check if video URL is too large (base64 data URLs can be huge)
                                       if (
                                         videoUrl &&
