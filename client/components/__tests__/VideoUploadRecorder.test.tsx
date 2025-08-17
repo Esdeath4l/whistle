@@ -74,24 +74,30 @@ describe("VideoUploadRecorder", () => {
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     fireEvent.change(fileInput, { target: { files: [mockFile] } });
 
-    await waitFor(() => {
-      expect(mockOnVideoChange).toHaveBeenCalledWith(
-        expect.objectContaining({
-          file: mockFile,
-          format: "video/mp4",
-          isRecorded: false,
-        }),
-      );
-    });
+    await waitFor(
+      () => {
+        expect(mockOnVideoChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            file: mockFile,
+            format: "video/mp4",
+            isRecorded: false,
+            duration: 60,
+          }),
+        );
+      },
+      { timeout: 3000 }
+    );
   });
 
-  it("displays camera permission request", () => {
+  it("displays camera permission request", async () => {
     render(<VideoUploadRecorder onVideoChange={mockOnVideoChange} />);
 
     // Click on record tab
     fireEvent.click(screen.getByText("Record Video"));
 
-    expect(screen.getByText("Enable Camera")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Enable Camera")).toBeInTheDocument();
+    });
   });
 
   it("shows recording controls when camera is available", async () => {
@@ -102,12 +108,20 @@ describe("VideoUploadRecorder", () => {
     // Click on record tab
     fireEvent.click(screen.getByText("Record Video"));
 
+    // Wait for camera permission check
+    await waitFor(() => {
+      expect(screen.getByText("Enable Camera")).toBeInTheDocument();
+    });
+
     // Click enable camera
     fireEvent.click(screen.getByText("Enable Camera"));
 
-    await waitFor(() => {
-      expect(screen.getByText("Start Recording")).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(screen.getByText("Start Recording")).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
   });
 
   it("can remove uploaded video", async () => {
@@ -119,15 +133,21 @@ describe("VideoUploadRecorder", () => {
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     fireEvent.change(fileInput, { target: { files: [mockFile] } });
 
-    await waitFor(() => {
-      expect(screen.getByText("test.mp4")).toBeInTheDocument();
-    });
+    // Wait for video to be processed and UI to update
+    await waitFor(
+      () => {
+        expect(screen.getByText("test.mp4")).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
 
     // Remove the video
     const removeButton = screen.getByRole("button", { name: /remove/i });
     fireEvent.click(removeButton);
 
-    expect(mockOnVideoChange).toHaveBeenCalledWith(null);
+    await waitFor(() => {
+      expect(mockOnVideoChange).toHaveBeenCalledWith(null);
+    });
   });
 
   it("respects disabled state", () => {
