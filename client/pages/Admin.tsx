@@ -54,6 +54,7 @@ import {
   UpdateReportRequest,
 } from "@shared/api";
 import { secureE2EE } from "@/lib/secure-encryption";
+import { decryptReportData as legacyDecrypt } from "@/lib/encryption";
 import { notificationService } from "@/lib/notifications";
 
 export default function Admin() {
