@@ -331,12 +331,21 @@ export class SecureE2EEManager {
     }
 
     if (encryptedData.encryptedVideoMetadata) {
-      const decryptedMetadataString = this.decryptField(
-        encryptedData.encryptedVideoMetadata,
-        keys.encryptionKey,
-        iv,
-      );
-      decryptedVideoMetadata = JSON.parse(decryptedMetadataString);
+      try {
+        const decryptedMetadataString = this.decryptField(
+          encryptedData.encryptedVideoMetadata,
+          keys.encryptionKey,
+          iv,
+        );
+
+        // Only parse if we have a non-empty string
+        if (decryptedMetadataString && decryptedMetadataString.trim()) {
+          decryptedVideoMetadata = JSON.parse(decryptedMetadataString);
+        }
+      } catch (error) {
+        console.error("Failed to decrypt or parse video metadata in secure encryption:", error);
+        decryptedVideoMetadata = undefined;
+      }
     }
 
     console.log("✅ Report data decrypted successfully");
