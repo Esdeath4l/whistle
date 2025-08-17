@@ -106,3 +106,21 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 }));
+
+// Enhanced document.createElement mock to return proper DOM elements
+const originalCreateElement = document.createElement.bind(document);
+vi.spyOn(document, "createElement").mockImplementation((tagName: string) => {
+  if (tagName === "video") {
+    const element = originalCreateElement("video");
+    // Add common video properties
+    Object.defineProperties(element, {
+      duration: { value: 60, writable: true },
+      currentTime: { value: 0, writable: true },
+      paused: { value: true, writable: true },
+      muted: { value: false, writable: true },
+      volume: { value: 1, writable: true },
+    });
+    return element;
+  }
+  return originalCreateElement(tagName);
+});
