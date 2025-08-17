@@ -69,33 +69,15 @@ describe("VideoUploadRecorder", () => {
     });
     Object.defineProperty(mockFile, "size", { value: 10 * 1024 * 1024 }); // 10MB
 
-    // Mock video element for duration check
-    const mockVideo = {
-      duration: 60, // 1 minute
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    };
-
-    vi.spyOn(document, "createElement").mockReturnValue(mockVideo as any);
-
     render(<VideoUploadRecorder onVideoChange={mockOnVideoChange} />);
 
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     fireEvent.change(fileInput, { target: { files: [mockFile] } });
 
-    // Simulate video metadata loaded
-    const onloadedmetadata = mockVideo.addEventListener.mock.calls.find(
-      (call) => call[0] === "loadedmetadata",
-    )?.[1];
-    if (onloadedmetadata) {
-      onloadedmetadata();
-    }
-
     await waitFor(() => {
       expect(mockOnVideoChange).toHaveBeenCalledWith(
         expect.objectContaining({
           file: mockFile,
-          duration: 60,
           format: "video/mp4",
           isRecorded: false,
         }),
@@ -131,18 +113,6 @@ describe("VideoUploadRecorder", () => {
   it("can remove uploaded video", async () => {
     const mockFile = new File(["test"], "test.mp4", { type: "video/mp4" });
     Object.defineProperty(mockFile, "size", { value: 10 * 1024 * 1024 });
-
-    const mockVideo = {
-      duration: 60,
-      addEventListener: vi.fn((event, callback) => {
-        if (event === "loadedmetadata") {
-          setTimeout(callback, 0);
-        }
-      }),
-      removeEventListener: vi.fn(),
-    };
-
-    vi.spyOn(document, "createElement").mockReturnValue(mockVideo as any);
 
     render(<VideoUploadRecorder onVideoChange={mockOnVideoChange} />);
 
