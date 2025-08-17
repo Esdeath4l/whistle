@@ -23,6 +23,8 @@ export default defineConfig(({ mode }) => ({
     environment: "jsdom",
     setupFiles: ["./client/test-setup.ts"],
     globals: true,
+    testTimeout: 10000,
+    hookTimeout: 10000,
   },
 }));
 

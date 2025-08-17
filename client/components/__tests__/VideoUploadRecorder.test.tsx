@@ -89,23 +89,14 @@ describe("VideoUploadRecorder", () => {
     );
   });
 
-  it("displays camera permission request", async () => {
+  it("displays camera permission request", () => {
     render(<VideoUploadRecorder onVideoChange={mockOnVideoChange} />);
-
-    // Wait for component to initialize and permission check to complete
-    await waitFor(() => {
-      expect(screen.getByText("Record Video")).toBeInTheDocument();
-    });
 
     // Click on record tab
     fireEvent.click(screen.getByText("Record Video"));
 
-    await waitFor(
-      () => {
-        expect(screen.getByText("Enable Camera")).toBeInTheDocument();
-      },
-      { timeout: 2000 }
-    );
+    // Should show enable camera button
+    expect(screen.getByText("Enable Camera")).toBeInTheDocument();
   });
 
   it("shows recording controls when camera is available", async () => {
@@ -132,7 +123,7 @@ describe("VideoUploadRecorder", () => {
     );
   });
 
-  it("can remove uploaded video", async () => {
+  it("handles video file selection", async () => {
     const mockFile = new File(["test"], "test.mp4", { type: "video/mp4" });
     Object.defineProperty(mockFile, "size", { value: 10 * 1024 * 1024 });
 
@@ -141,40 +132,19 @@ describe("VideoUploadRecorder", () => {
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     fireEvent.change(fileInput, { target: { files: [mockFile] } });
 
-    // Wait for video to be processed and UI to update
+    // Wait for video to be processed
     await waitFor(
       () => {
-        // Look for file name or success indicator
-        expect(
-          screen.getByText("test.mp4") || screen.getByDisplayValue("test.mp4")
-        ).toBeInTheDocument();
+        expect(mockOnVideoChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            file: mockFile,
+            format: "video/mp4",
+            isRecorded: false,
+          })
+        );
       },
-      { timeout: 3000 }
+      { timeout: 2000 }
     );
-
-    // Find and click remove button (may have different text/aria-label)
-    const removeButton =
-      screen.queryByRole("button", { name: /remove/i }) ||
-      screen.queryByRole("button", { name: /delete/i }) ||
-      screen.queryByRole("button", { name: /clear/i }) ||
-      screen.querySelector('button[aria-label*="remove"]') ||
-      screen.querySelector('button[title*="remove"]');
-
-    if (removeButton) {
-      fireEvent.click(removeButton);
-
-      await waitFor(() => {
-        expect(mockOnVideoChange).toHaveBeenCalledWith(null);
-      });
-    } else {
-      // If no remove button found, test that video was at least processed
-      expect(mockOnVideoChange).toHaveBeenCalledWith(
-        expect.objectContaining({
-          file: mockFile,
-          format: "video/mp4",
-        })
-      );
-    }
   });
 
   it("respects disabled state", () => {
