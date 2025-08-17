@@ -60,6 +60,26 @@ export function encryptReportData(data: {
 }
 
 /**
+ * Safe UTF-8 decryption helper function
+ */
+function safeDecrypt(encryptedText: string, key: string, iv: CryptoJS.lib.WordArray): string {
+  try {
+    const decrypted = CryptoJS.AES.decrypt(encryptedText, key, { iv });
+    const utf8String = decrypted.toString(CryptoJS.enc.Utf8);
+
+    // Check if the result is empty or contains only null bytes (sign of decryption failure)
+    if (!utf8String || utf8String.trim() === '' || utf8String.includes('\0')) {
+      throw new Error('Decryption resulted in invalid or empty data');
+    }
+
+    return utf8String;
+  } catch (error) {
+    console.error('Safe decrypt failed:', error);
+    throw new Error(`Decryption failed: ${error.message}`);
+  }
+}
+
+/**
  * Decrypt report data for admin viewing
  */
 export function decryptReportData(encryptedData: EncryptedData): {
@@ -69,31 +89,19 @@ export function decryptReportData(encryptedData: EncryptedData): {
   video_url?: string;
   video_metadata?: any;
 } {
-  const iv = CryptoJS.enc.Hex.parse(encryptedData.iv);
+  try {
+    const iv = CryptoJS.enc.Hex.parse(encryptedData.iv);
 
-  const decryptedMessage = CryptoJS.AES.decrypt(
-    encryptedData.encryptedMessage,
-    ENCRYPTION_KEY,
-    { iv },
-  ).toString(CryptoJS.enc.Utf8);
+    const decryptedMessage = safeDecrypt(encryptedData.encryptedMessage, ENCRYPTION_KEY, iv);
+    const decryptedCategory = safeDecrypt(encryptedData.encryptedCategory, ENCRYPTION_KEY, iv);
 
-  const decryptedCategory = CryptoJS.AES.decrypt(
-    encryptedData.encryptedCategory,
-    ENCRYPTION_KEY,
-    { iv },
-  ).toString(CryptoJS.enc.Utf8);
+    const decryptedPhotoUrl = encryptedData.encryptedPhotoUrl
+      ? safeDecrypt(encryptedData.encryptedPhotoUrl, ENCRYPTION_KEY, iv)
+      : undefined;
 
-  const decryptedPhotoUrl = encryptedData.encryptedPhotoUrl
-    ? CryptoJS.AES.decrypt(encryptedData.encryptedPhotoUrl, ENCRYPTION_KEY, {
-        iv,
-      }).toString(CryptoJS.enc.Utf8)
-    : undefined;
-
-  const decryptedVideoUrl = encryptedData.encryptedVideoUrl
-    ? CryptoJS.AES.decrypt(encryptedData.encryptedVideoUrl, ENCRYPTION_KEY, {
-        iv,
-      }).toString(CryptoJS.enc.Utf8)
-    : undefined;
+    const decryptedVideoUrl = encryptedData.encryptedVideoUrl
+      ? safeDecrypt(encryptedData.encryptedVideoUrl, ENCRYPTION_KEY, iv)
+      : undefined;
 
   let decryptedVideoMetadata: any = undefined;
   if (encryptedData.encryptedVideoMetadata) {
@@ -116,13 +124,17 @@ export function decryptReportData(encryptedData: EncryptedData): {
     }
   }
 
-  return {
-    message: decryptedMessage,
-    category: decryptedCategory,
-    photo_url: decryptedPhotoUrl,
-    video_url: decryptedVideoUrl,
-    video_metadata: decryptedVideoMetadata,
-  };
+    return {
+      message: decryptedMessage,
+      category: decryptedCategory,
+      photo_url: decryptedPhotoUrl,
+      video_url: decryptedVideoUrl,
+      video_metadata: decryptedVideoMetadata,
+    };
+  } catch (error) {
+    console.error('Legacy decryption failed:', error);
+    throw new Error(`Legacy decryption failed: ${error.message}`);
+  }
 }
 
 /**
