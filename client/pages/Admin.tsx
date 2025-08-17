@@ -638,7 +638,13 @@ export default function Admin() {
                       {report.is_encrypted ? (
                         <span className="flex items-center gap-2">
                           <Lock className="w-4 h-4 text-primary" />
-                          {getDecryptedReport(report).message}
+                          <span className={
+                            getDecryptedReport(report).message.startsWith("[Encrypted Report")
+                              ? "italic text-muted-foreground"
+                              : ""
+                          }>
+                            {getDecryptedReport(report).message}
+                          </span>
                         </span>
                       ) : (
                         report.message
