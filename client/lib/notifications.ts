@@ -12,12 +12,17 @@ export class NotificationService {
   private eventSource: EventSource | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
+  private onNewReportCallback: (() => void) | null = null;
 
   static getInstance(): NotificationService {
     if (!NotificationService.instance) {
       NotificationService.instance = new NotificationService();
     }
     return NotificationService.instance;
+  }
+
+  setOnNewReportCallback(callback: () => void) {
+    this.onNewReportCallback = callback;
   }
 
   /**
@@ -148,7 +153,15 @@ export class NotificationService {
   }
 
   private handleNotificationEvent(data: any) {
+    console.log("🔔 Handling notification event:", data);
+
     switch (data.type) {
+      case "connected":
+        console.log("✅ SSE connection established");
+        break;
+      case "heartbeat":
+        // Silent heartbeat
+        break;
       case "new_report":
         this.handleNewReportNotification(data);
         break;
@@ -162,6 +175,8 @@ export class NotificationService {
 
   private handleNewReportNotification(data: any) {
     const { reportId, category, severity } = data;
+
+    console.log("🚨 New report notification:", { reportId, category, severity });
 
     // Show toast notification
     this.showToast({
@@ -182,10 +197,18 @@ export class NotificationService {
 
     // Update document title for attention
     this.updateDocumentTitle("🚨 New Report");
+
+    // Refresh report list if callback is set
+    if (this.onNewReportCallback) {
+      console.log("🔄 Refreshing report list due to new report");
+      this.onNewReportCallback();
+    }
   }
 
   private handleUrgentReportNotification(data: any) {
     const { reportId, category } = data;
+
+    console.log("🚨 URGENT report notification:", { reportId, category });
 
     // Show urgent toast notification
     this.showToast({
@@ -206,6 +229,12 @@ export class NotificationService {
 
     // Flash document title
     this.flashDocumentTitle("🚨 URGENT REPORT");
+
+    // Refresh report list if callback is set
+    if (this.onNewReportCallback) {
+      console.log("🔄 Refreshing report list due to urgent report");
+      this.onNewReportCallback();
+    }
   }
 
   private playUrgentSound() {
