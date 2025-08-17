@@ -707,7 +707,12 @@ export default function Admin() {
                                   )}
                                 </Label>
                                 <div className="mt-2 p-4 bg-muted rounded-lg">
-                                  <p className="whitespace-pre-wrap">
+                                  <p className={`whitespace-pre-wrap ${
+                                    selectedReport.is_encrypted &&
+                                    getDecryptedReport(selectedReport).message.startsWith("[Encrypted Report")
+                                      ? "italic text-muted-foreground"
+                                      : ""
+                                  }`}>
                                     {selectedReport.is_encrypted
                                       ? getDecryptedReport(selectedReport)
                                           .message
