@@ -38,7 +38,7 @@ describe("VideoUploadRecorder", () => {
 
     render(<VideoUploadRecorder onVideoChange={mockOnVideoChange} />);
 
-    const fileInput = screen.getByRole("textbox", { hidden: true });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     fireEvent.change(fileInput, { target: { files: [mockFile] } });
 
     await waitFor(() => {
@@ -55,7 +55,7 @@ describe("VideoUploadRecorder", () => {
 
     render(<VideoUploadRecorder onVideoChange={mockOnVideoChange} />);
 
-    const fileInput = screen.getByRole("textbox", { hidden: true });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     fireEvent.change(fileInput, { target: { files: [mockFile] } });
 
     await waitFor(() => {
@@ -80,12 +80,12 @@ describe("VideoUploadRecorder", () => {
 
     render(<VideoUploadRecorder onVideoChange={mockOnVideoChange} />);
 
-    const fileInput = screen.getByRole("textbox", { hidden: true });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     fireEvent.change(fileInput, { target: { files: [mockFile] } });
 
     // Simulate video metadata loaded
     const onloadedmetadata = mockVideo.addEventListener.mock.calls.find(
-      (call) => call[0] === "onloadedmetadata",
+      (call) => call[0] === "loadedmetadata",
     )?.[1];
     if (onloadedmetadata) {
       onloadedmetadata();
@@ -146,7 +146,7 @@ describe("VideoUploadRecorder", () => {
 
     render(<VideoUploadRecorder onVideoChange={mockOnVideoChange} />);
 
-    const fileInput = screen.getByRole("textbox", { hidden: true });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     fireEvent.change(fileInput, { target: { files: [mockFile] } });
 
     await waitFor(() => {
