@@ -43,6 +43,7 @@ import {
 } from "@shared/api";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { encryptReportData } from "@/lib/secure-encryption";
+import { startSecureSession, clearSessionForPFS } from "@/lib/forward-secrecy";
 import VideoUploadRecorder, {
   VideoFile,
 } from "@/components/VideoUploadRecorder";
