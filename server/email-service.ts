@@ -123,7 +123,7 @@ Required Actions:
 3. Take appropriate administrative action
 4. Respond within your organization's SLA timeframe
 
-Admin Dashboard: ${process.env.ADMIN_DASHBOARD_URL }
+Admin Dashboard: ${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8080'}/admin
 
 This is an automated alert from the Whistle Harassment Reporting System.
 Report ID: ${report.id} | Timestamp: ${new Date().toISOString()}
