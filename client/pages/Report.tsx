@@ -526,6 +526,7 @@ export default function Report() {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     className="min-h-[120px] resize-none"
+                    maxLength={5000}
                     required
                   />
                   <p className="text-xs text-muted-foreground">
