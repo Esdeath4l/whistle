@@ -5,8 +5,8 @@ import { Report } from "@shared/api";
 const sseConnections = new Set<any>();
 
 // Admin authentication credentials
-const ADMIN_USERNAME = "process.env.ADMIN_USERNAME";
-const ADMIN_PASSWORD = "process.env.ADMIN_PASSWORD";
+const ADMIN_USERNAME = "ritika";
+const ADMIN_PASSWORD = "satoru 2624";
 
 /**
  * Server-Sent Events endpoint for real-time notifications
