@@ -67,19 +67,28 @@ export const streamNotifications: RequestHandler = (req, res) => {
 export function broadcastNotification(notification: any) {
   const data = `data: ${JSON.stringify(notification)}\n\n`;
 
+  console.log(`📡 Broadcasting notification to ${sseConnections.size} connected admins:`, {
+    type: notification.type,
+    reportId: notification.reportId,
+    connections: sseConnections.size
+  });
+
+  let successCount = 0;
+  let failureCount = 0;
+
   sseConnections.forEach((connection) => {
     try {
       connection.res.write(data);
+      successCount++;
+      console.log(`✅ Sent notification to connection ${connection.id}`);
     } catch (error) {
-      console.error("Failed to send notification to connection:", error);
+      failureCount++;
+      console.error(`❌ Failed to send notification to connection ${connection.id}:`, error);
       sseConnections.delete(connection);
     }
   });
 
-  console.log(
-    `Broadcasted notification to ${sseConnections.size} connections:`,
-    notification.type,
-  );
+  console.log(`📊 Notification broadcast complete: ${successCount} success, ${failureCount} failed`);
 }
 
 /**
