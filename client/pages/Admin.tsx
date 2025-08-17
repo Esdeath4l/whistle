@@ -347,8 +347,10 @@ export default function Admin() {
           let errorMessage = "[DECRYPTION ERROR - Unable to decrypt report]";
           if (legacyError instanceof SyntaxError && legacyError.message.includes("JSON")) {
             errorMessage = "[DECRYPTION ERROR - Corrupted video metadata]";
-          } else if (legacyError.message?.includes("Malformed UTF-8")) {
-            errorMessage = "[DECRYPTION ERROR - Invalid encryption format]";
+          } else if (legacyError.message?.includes("Malformed UTF-8") || legacyError.message?.includes("invalid or empty data")) {
+            errorMessage = "[DECRYPTION ERROR - Wrong encryption key or corrupted data]";
+          } else if (legacyError.message?.includes("Legacy decryption failed")) {
+            errorMessage = "[DECRYPTION ERROR - Encryption format incompatible]";
           }
 
           return {
