@@ -578,10 +578,11 @@ export default function Admin() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => setSelectedReport(report)}
+                            onClick={() => fetchReportDetails(report.id)}
+                            disabled={loadingDetails}
                           >
                             <Eye className="w-4 h-4 mr-2" />
-                            View Details
+                            {loadingDetails ? "Loading..." : "View Details"}
                           </Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
