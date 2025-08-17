@@ -59,6 +59,18 @@ export default function Report() {
   const [reportId, setReportId] = useState<string>("");
   const [error, setError] = useState<string>("");
 
+  // Initialize secure session with PFS when component mounts
+  useEffect(() => {
+    console.log("🛡️ Initializing secure session with Perfect Forward Secrecy");
+    startSecureSession();
+
+    // Cleanup session when component unmounts
+    return () => {
+      console.log("🛡️ Cleaning up secure session for PFS");
+      clearSessionForPFS();
+    };
+  }, []);
+
   const categoryOptions = [
     {
       value: "harassment",
