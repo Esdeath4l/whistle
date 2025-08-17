@@ -265,7 +265,10 @@ export class SecureE2EEManager {
     // Use provided keyPair or current session keys
     const keys = keyPair || this.currentKeyPair;
     if (!keys) {
-      throw new Error("No decryption keys available");
+      const errorMsg = keyPair === undefined && !this.currentKeyPair
+        ? "No decryption keys available - missing sessionId for admin key generation"
+        : "No decryption keys available";
+      throw new Error(errorMsg);
     }
 
     // Verify data integrity first
