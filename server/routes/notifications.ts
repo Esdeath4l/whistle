@@ -128,7 +128,7 @@ async function sendEmailAlert(report: Report) {
 
       // Fallback: Log the email details
       const emailData = {
-        to: process.env.EMAIL_TO,
+        to: "ritisulo@gmail.com",
         subject: `🚨 URGENT: New ${report.category} Report - ${report.id}`,
         body: `
           A new urgent harassment report has been submitted:
