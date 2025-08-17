@@ -53,7 +53,7 @@ import {
   GetReportsResponse,
   UpdateReportRequest,
 } from "@shared/api";
-import { decryptReportData } from "@/lib/encryption";
+import { secureE2EE } from "@/lib/secure-encryption";
 import { notificationService } from "@/lib/notifications";
 
 export default function Admin() {
@@ -308,16 +308,38 @@ export default function Admin() {
   const getDecryptedReport = (report: Report) => {
     if (report.is_encrypted && report.encrypted_data) {
       try {
-        return decryptReportData(report.encrypted_data);
+        console.log("🔓 Decrypting report with enhanced E2EE:", report.id);
+
+        // Generate admin keys for decryption if we have session info
+        let adminKeys = null;
+        if (report.encrypted_data.sessionId) {
+          adminKeys = secureE2EE.generateAdminKeys({
+            username: "ritika", // Current admin username
+            password: "satoru 2624", // Current admin password
+            sessionId: report.encrypted_data.sessionId
+          });
+        }
+
+        // Use enhanced decryption with admin keys
+        return secureE2EE.decryptReportData(report.encrypted_data, adminKeys);
       } catch (error) {
         console.error("Failed to decrypt report:", error);
-        return {
-          message: "[DECRYPTION ERROR]",
-          category: "encrypted",
-          photo_url: undefined,
-          video_url: undefined,
-          video_metadata: undefined,
-        };
+
+        // Fallback to legacy decryption if enhanced fails
+        try {
+          const { decryptReportData: legacyDecrypt } = require("@/lib/encryption");
+          console.log("🔄 Falling back to legacy decryption");
+          return legacyDecrypt(report.encrypted_data);
+        } catch (legacyError) {
+          console.error("Legacy decryption also failed:", legacyError);
+          return {
+            message: "[DECRYPTION ERROR - Enhanced E2EE failed]",
+            category: "encrypted",
+            photo_url: undefined,
+            video_url: undefined,
+            video_metadata: undefined,
+          };
+        }
       }
     }
     return {
