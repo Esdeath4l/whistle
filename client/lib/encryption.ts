@@ -67,13 +67,25 @@ function safeDecrypt(encryptedText: string, key: string, iv: CryptoJS.lib.WordAr
     const decrypted = CryptoJS.AES.decrypt(encryptedText, key, { iv });
     const utf8String = decrypted.toString(CryptoJS.enc.Utf8);
 
-    // Check if the result is empty or contains only null bytes (sign of decryption failure)
-    if (!utf8String || utf8String.trim() === '' || utf8String.includes('\0')) {
-      throw new Error('Decryption resulted in invalid or empty data');
+    // Only reject if we got null/undefined (not empty strings which can be valid)
+    // Also check for excessive null bytes which indicate decryption failure
+    if (utf8String === null || utf8String === undefined) {
+      throw new Error('Decryption resulted in null data');
+    }
+
+    // Check for excessive null bytes (more than 50% of the string) as sign of decryption failure
+    const nullByteCount = (utf8String.match(/\0/g) || []).length;
+    if (nullByteCount > utf8String.length / 2) {
+      throw new Error('Decryption resulted in corrupted data (too many null bytes)');
     }
 
     return utf8String;
   } catch (error) {
+    // If it's our custom error, re-throw it
+    if (error.message.includes('Decryption resulted in')) {
+      throw error;
+    }
+
     console.error('Safe decrypt failed:', error);
     throw new Error(`Decryption failed: ${error.message}`);
   }
