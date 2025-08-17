@@ -94,7 +94,10 @@ function safeDecrypt(encryptedText: string, key: string, iv: CryptoJS.lib.WordAr
       throw error;
     }
 
-    console.error('Safe decrypt failed:', error);
+    // Only log unexpected errors, not expected decryption failures
+    if (!error.message.includes('Malformed UTF-8')) {
+      console.error('Safe decrypt failed:', error);
+    }
     throw new Error(`Decryption failed: ${error.message}`);
   }
 }
