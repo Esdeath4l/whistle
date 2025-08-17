@@ -313,69 +313,82 @@ export default function Admin() {
   };
 
   const getDecryptedReport = (report: Report) => {
-    if (report.is_encrypted && report.encrypted_data) {
-      try {
-        console.log("🔓 Decrypting report with enhanced E2EE:", report.id);
-
-        // Generate admin keys for decryption if we have session info
-        let adminKeys = null;
-        if (report.encrypted_data.sessionId) {
-          adminKeys = secureE2EE.generateAdminKeys({
-            username: "ritika", // Current admin username
-            password: "satoru 2624", // Current admin password
-            sessionId: report.encrypted_data.sessionId,
-          });
-
-          // Use enhanced decryption with admin keys
-          return secureE2EE.decryptReportData(report.encrypted_data, adminKeys);
-        } else {
-          // No sessionId means this was encrypted with legacy system
-          console.log("🔄 No sessionId found, using legacy decryption");
-          return legacyDecrypt(report.encrypted_data);
-        }
-      } catch (error) {
-        console.error("Failed to decrypt report:", error);
-
-        // Fallback to legacy decryption if enhanced fails
+    // Safety wrapper to prevent any crashes
+    try {
+      if (report.is_encrypted && report.encrypted_data) {
         try {
-          console.log("🔄 Falling back to legacy decryption");
-          return legacyDecrypt(report.encrypted_data);
-        } catch (legacyError) {
-          console.error("Legacy decryption also failed:", legacyError);
+          console.log("🔓 Decrypting report with enhanced E2EE:", report.id);
 
-          // Provide more specific error messages based on error type
-          let errorMessage = "[DECRYPTION ERROR - Unable to decrypt report]";
-          if (legacyError instanceof SyntaxError && legacyError.message.includes("JSON")) {
-            errorMessage = "[DECRYPTION ERROR - Corrupted video metadata]";
-          } else if (legacyError.message?.includes("Malformed UTF-8")) {
-            errorMessage = "[DECRYPTION ERROR - Wrong encryption key or corrupted data]";
-          } else if (legacyError.message?.includes("Incompatible encryption format")) {
-            errorMessage = "[DECRYPTION ERROR - Report encrypted with different system]";
-          } else if (legacyError.message?.includes("corrupted data") || legacyError.message?.includes("null bytes")) {
-            errorMessage = "[DECRYPTION ERROR - Data corruption detected]";
-          } else if (legacyError.message?.includes("Legacy decryption failed")) {
-            errorMessage = "[DECRYPTION ERROR - Encryption format incompatible]";
-          } else if (legacyError.message?.includes("null data")) {
-            errorMessage = "[DECRYPTION ERROR - Empty encrypted data]";
+          // Generate admin keys for decryption if we have session info
+          let adminKeys = null;
+          if (report.encrypted_data.sessionId) {
+            adminKeys = secureE2EE.generateAdminKeys({
+              username: "ritika", // Current admin username
+              password: "satoru 2624", // Current admin password
+              sessionId: report.encrypted_data.sessionId,
+            });
+
+            // Use enhanced decryption with admin keys
+            return secureE2EE.decryptReportData(report.encrypted_data, adminKeys);
+          } else {
+            // No sessionId means this was encrypted with legacy system
+            console.log("🔄 No sessionId found, using legacy decryption");
+            return legacyDecrypt(report.encrypted_data);
           }
+        } catch (error) {
+          console.error("Failed to decrypt report:", error);
 
-          return {
-            message: errorMessage,
-            category: "encrypted",
-            photo_url: undefined,
-            video_url: undefined,
-            video_metadata: undefined,
-          };
+          // Fallback to legacy decryption if enhanced fails
+          try {
+            console.log("🔄 Falling back to legacy decryption");
+            return legacyDecrypt(report.encrypted_data);
+          } catch (legacyError) {
+            console.error("Legacy decryption also failed:", legacyError);
+
+            // Provide more specific error messages based on error type
+            let errorMessage = "[DECRYPTION ERROR - Unable to decrypt report]";
+            if (legacyError instanceof SyntaxError && legacyError.message.includes("JSON")) {
+              errorMessage = "[DECRYPTION ERROR - Corrupted video metadata]";
+            } else if (legacyError.message?.includes("Malformed UTF-8")) {
+              errorMessage = "[DECRYPTION ERROR - Wrong encryption key or corrupted data]";
+            } else if (legacyError.message?.includes("Incompatible encryption format")) {
+              errorMessage = "[DECRYPTION ERROR - Report encrypted with different system]";
+            } else if (legacyError.message?.includes("corrupted data") || legacyError.message?.includes("null bytes")) {
+              errorMessage = "[DECRYPTION ERROR - Data corruption detected]";
+            } else if (legacyError.message?.includes("Legacy decryption failed")) {
+              errorMessage = "[DECRYPTION ERROR - Encryption format incompatible]";
+            } else if (legacyError.message?.includes("null data")) {
+              errorMessage = "[DECRYPTION ERROR - Empty encrypted data]";
+            }
+
+            return {
+              message: errorMessage,
+              category: "encrypted",
+              photo_url: undefined,
+              video_url: undefined,
+              video_metadata: undefined,
+            };
+          }
         }
       }
+      return {
+        message: report.message,
+        category: report.category,
+        photo_url: report.photo_url,
+        video_url: report.video_url,
+        video_metadata: report.video_metadata,
+      };
+    } catch (unexpectedError) {
+      // Final safety net - should never reach here but prevents complete crashes
+      console.error("Unexpected error in getDecryptedReport:", unexpectedError);
+      return {
+        message: "[SYSTEM ERROR - Unable to process report]",
+        category: "error",
+        photo_url: undefined,
+        video_url: undefined,
+        video_metadata: undefined,
+      };
     }
-    return {
-      message: report.message,
-      category: report.category,
-      photo_url: report.photo_url,
-      video_url: report.video_url,
-      video_metadata: report.video_metadata,
-    };
   };
 
   if (!isAuthenticated) {
