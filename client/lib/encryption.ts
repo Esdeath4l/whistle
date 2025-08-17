@@ -95,17 +95,26 @@ export function decryptReportData(encryptedData: EncryptedData): {
       }).toString(CryptoJS.enc.Utf8)
     : undefined;
 
-  const decryptedVideoMetadata = encryptedData.encryptedVideoMetadata
-    ? JSON.parse(
-        CryptoJS.AES.decrypt(
-          encryptedData.encryptedVideoMetadata,
-          ENCRYPTION_KEY,
-          {
-            iv,
-          },
-        ).toString(CryptoJS.enc.Utf8),
-      )
-    : undefined;
+  let decryptedVideoMetadata: any = undefined;
+  if (encryptedData.encryptedVideoMetadata) {
+    try {
+      const decryptedMetadataString = CryptoJS.AES.decrypt(
+        encryptedData.encryptedVideoMetadata,
+        ENCRYPTION_KEY,
+        {
+          iv,
+        },
+      ).toString(CryptoJS.enc.Utf8);
+
+      // Only parse if we have a non-empty string
+      if (decryptedMetadataString && decryptedMetadataString.trim()) {
+        decryptedVideoMetadata = JSON.parse(decryptedMetadataString);
+      }
+    } catch (error) {
+      console.error("Failed to decrypt or parse video metadata:", error);
+      decryptedVideoMetadata = undefined;
+    }
+  }
 
   return {
     message: decryptedMessage,
