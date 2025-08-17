@@ -325,23 +325,25 @@ export default function Admin() {
             password: "satoru 2624", // Current admin password
             sessionId: report.encrypted_data.sessionId,
           });
-        }
 
-        // Use enhanced decryption with admin keys
-        return secureE2EE.decryptReportData(report.encrypted_data, adminKeys);
+          // Use enhanced decryption with admin keys
+          return secureE2EE.decryptReportData(report.encrypted_data, adminKeys);
+        } else {
+          // No sessionId means this was encrypted with legacy system
+          console.log("🔄 No sessionId found, using legacy decryption");
+          return legacyDecrypt(report.encrypted_data);
+        }
       } catch (error) {
         console.error("Failed to decrypt report:", error);
 
         // Fallback to legacy decryption if enhanced fails
         try {
-          // Import legacy decryption function properly for browser environment
-          const { decryptReportData: legacyDecrypt } = await import("@/lib/encryption");
           console.log("🔄 Falling back to legacy decryption");
           return legacyDecrypt(report.encrypted_data);
         } catch (legacyError) {
           console.error("Legacy decryption also failed:", legacyError);
           return {
-            message: "[DECRYPTION ERROR - Enhanced E2EE failed]",
+            message: "[DECRYPTION ERROR - Unable to decrypt report]",
             category: "encrypted",
             photo_url: undefined,
             video_url: undefined,
