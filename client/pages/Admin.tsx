@@ -336,29 +336,32 @@ export default function Admin() {
             return legacyDecrypt(report.encrypted_data);
           }
         } catch (error) {
-          console.error("Failed to decrypt report:", error);
+          // Don't log expected encryption errors
+          if (!error.message?.includes("No decryption keys available") &&
+              !error.message?.includes("sessionId")) {
+            console.error("Failed to decrypt report:", error);
+          }
 
           // Fallback to legacy decryption if enhanced fails
           try {
-            console.log("🔄 Falling back to legacy decryption");
             return legacyDecrypt(report.encrypted_data);
           } catch (legacyError) {
-            console.error("Legacy decryption also failed:", legacyError);
+            // Only log unexpected errors, not expected decryption failures
+            if (!legacyError.message?.includes("Incompatible encryption") &&
+                !legacyError.message?.includes("Malformed UTF-8")) {
+              console.error("Legacy decryption also failed:", legacyError);
+            }
 
-            // Provide more specific error messages based on error type
-            let errorMessage = "[DECRYPTION ERROR - Unable to decrypt report]";
+            // Provide clean, user-friendly error messages
+            let errorMessage = "[Encrypted Report - Cannot Display]";
             if (legacyError instanceof SyntaxError && legacyError.message.includes("JSON")) {
-              errorMessage = "[DECRYPTION ERROR - Corrupted video metadata]";
-            } else if (legacyError.message?.includes("Malformed UTF-8")) {
-              errorMessage = "[DECRYPTION ERROR - Wrong encryption key or corrupted data]";
-            } else if (legacyError.message?.includes("Incompatible encryption format")) {
-              errorMessage = "[DECRYPTION ERROR - Report encrypted with different system]";
-            } else if (legacyError.message?.includes("corrupted data") || legacyError.message?.includes("null bytes")) {
-              errorMessage = "[DECRYPTION ERROR - Data corruption detected]";
-            } else if (legacyError.message?.includes("Legacy decryption failed")) {
-              errorMessage = "[DECRYPTION ERROR - Encryption format incompatible]";
-            } else if (legacyError.message?.includes("null data")) {
-              errorMessage = "[DECRYPTION ERROR - Empty encrypted data]";
+              errorMessage = "[Encrypted Report - Metadata Issue]";
+            } else if (legacyError.message?.includes("Malformed UTF-8") ||
+                       legacyError.message?.includes("Incompatible encryption format")) {
+              errorMessage = "[Encrypted Report - Incompatible Format]";
+            } else if (legacyError.message?.includes("corrupted data") ||
+                       legacyError.message?.includes("null bytes")) {
+              errorMessage = "[Encrypted Report - Data Corrupted]";
             }
 
             return {
