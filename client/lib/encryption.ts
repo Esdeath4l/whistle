@@ -65,10 +65,18 @@ export function encryptReportData(data: {
 function safeDecrypt(encryptedText: string, key: string, iv: CryptoJS.lib.WordArray): string {
   try {
     const decrypted = CryptoJS.AES.decrypt(encryptedText, key, { iv });
-    const utf8String = decrypted.toString(CryptoJS.enc.Utf8);
+
+    // Attempt UTF-8 conversion with error handling
+    let utf8String: string;
+    try {
+      utf8String = decrypted.toString(CryptoJS.enc.Utf8);
+    } catch (utf8Error) {
+      // UTF-8 conversion failed - likely wrong key or incompatible encryption format
+      console.error('UTF-8 conversion failed:', utf8Error);
+      throw new Error('Incompatible encryption format or wrong decryption key');
+    }
 
     // Only reject if we got null/undefined (not empty strings which can be valid)
-    // Also check for excessive null bytes which indicate decryption failure
     if (utf8String === null || utf8String === undefined) {
       throw new Error('Decryption resulted in null data');
     }
@@ -82,7 +90,7 @@ function safeDecrypt(encryptedText: string, key: string, iv: CryptoJS.lib.WordAr
     return utf8String;
   } catch (error) {
     // If it's our custom error, re-throw it
-    if (error.message.includes('Decryption resulted in')) {
+    if (error.message.includes('Decryption resulted in') || error.message.includes('Incompatible encryption')) {
       throw error;
     }
 
