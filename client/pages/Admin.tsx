@@ -329,7 +329,10 @@ export default function Admin() {
             });
 
             // Use enhanced decryption with admin keys
-            return secureE2EE.decryptReportData(report.encrypted_data, adminKeys);
+            return secureE2EE.decryptReportData(
+              report.encrypted_data,
+              adminKeys,
+            );
           } else {
             // No sessionId means this was encrypted with legacy system
             console.log("🔄 No sessionId found, using legacy decryption");
@@ -337,10 +340,12 @@ export default function Admin() {
           }
         } catch (error) {
           // Don't log expected encryption errors
-          if (!error.message?.includes("No decryption keys available") &&
-              !error.message?.includes("sessionId") &&
-              !error.message?.includes("Incompatible encryption") &&
-              !error.message?.includes("Legacy decryption failed")) {
+          if (
+            !error.message?.includes("No decryption keys available") &&
+            !error.message?.includes("sessionId") &&
+            !error.message?.includes("Incompatible encryption") &&
+            !error.message?.includes("Legacy decryption failed")
+          ) {
             console.error("Failed to decrypt report:", error);
           }
 
@@ -349,22 +354,31 @@ export default function Admin() {
             return legacyDecrypt(report.encrypted_data);
           } catch (legacyError) {
             // Only log unexpected errors, not expected decryption failures
-            if (!legacyError.message?.includes("Incompatible encryption") &&
-                !legacyError.message?.includes("Malformed UTF-8") &&
-                !legacyError.message?.includes("Legacy decryption failed") &&
-                !legacyError.message?.includes("wrong decryption key")) {
+            if (
+              !legacyError.message?.includes("Incompatible encryption") &&
+              !legacyError.message?.includes("Malformed UTF-8") &&
+              !legacyError.message?.includes("Legacy decryption failed") &&
+              !legacyError.message?.includes("wrong decryption key")
+            ) {
               console.error("Legacy decryption also failed:", legacyError);
             }
 
             // Provide clean, user-friendly error messages
             let errorMessage = "[Encrypted Report - Cannot Display]";
-            if (legacyError instanceof SyntaxError && legacyError.message.includes("JSON")) {
+            if (
+              legacyError instanceof SyntaxError &&
+              legacyError.message.includes("JSON")
+            ) {
               errorMessage = "[Encrypted Report - Metadata Issue]";
-            } else if (legacyError.message?.includes("Malformed UTF-8") ||
-                       legacyError.message?.includes("Incompatible encryption format")) {
+            } else if (
+              legacyError.message?.includes("Malformed UTF-8") ||
+              legacyError.message?.includes("Incompatible encryption format")
+            ) {
               errorMessage = "[Encrypted Report - Incompatible Format]";
-            } else if (legacyError.message?.includes("corrupted data") ||
-                       legacyError.message?.includes("null bytes")) {
+            } else if (
+              legacyError.message?.includes("corrupted data") ||
+              legacyError.message?.includes("null bytes")
+            ) {
               errorMessage = "[Encrypted Report - Data Corrupted]";
             }
 
@@ -625,11 +639,15 @@ export default function Admin() {
                       {report.is_encrypted ? (
                         <span className="flex items-center gap-2">
                           <Lock className="w-4 h-4 text-primary" />
-                          <span className={
-                            getDecryptedReport(report).message.startsWith("[Encrypted Report")
-                              ? "italic text-muted-foreground"
-                              : ""
-                          }>
+                          <span
+                            className={
+                              getDecryptedReport(report).message.startsWith(
+                                "[Encrypted Report",
+                              )
+                                ? "italic text-muted-foreground"
+                                : ""
+                            }
+                          >
                             {getDecryptedReport(report).message}
                           </span>
                         </span>
@@ -694,12 +712,16 @@ export default function Admin() {
                                   )}
                                 </Label>
                                 <div className="mt-2 p-4 bg-muted rounded-lg">
-                                  <p className={`whitespace-pre-wrap ${
-                                    selectedReport.is_encrypted &&
-                                    getDecryptedReport(selectedReport).message.startsWith("[Encrypted Report")
-                                      ? "italic text-muted-foreground"
-                                      : ""
-                                  }`}>
+                                  <p
+                                    className={`whitespace-pre-wrap ${
+                                      selectedReport.is_encrypted &&
+                                      getDecryptedReport(
+                                        selectedReport,
+                                      ).message.startsWith("[Encrypted Report")
+                                        ? "italic text-muted-foreground"
+                                        : ""
+                                    }`}
+                                  >
                                     {selectedReport.is_encrypted
                                       ? getDecryptedReport(selectedReport)
                                           .message

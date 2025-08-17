@@ -265,9 +265,10 @@ export class SecureE2EEManager {
     // Use provided keyPair or current session keys
     const keys = keyPair || this.currentKeyPair;
     if (!keys) {
-      const errorMsg = keyPair === undefined && !this.currentKeyPair
-        ? "No decryption keys available - missing sessionId for admin key generation"
-        : "No decryption keys available";
+      const errorMsg =
+        keyPair === undefined && !this.currentKeyPair
+          ? "No decryption keys available - missing sessionId for admin key generation"
+          : "No decryption keys available";
       throw new Error(errorMsg);
     }
 
@@ -343,7 +344,10 @@ export class SecureE2EEManager {
           decryptedVideoMetadata = JSON.parse(decryptedMetadataString);
         }
       } catch (error) {
-        console.error("Failed to decrypt or parse video metadata in secure encryption:", error);
+        console.error(
+          "Failed to decrypt or parse video metadata in secure encryption:",
+          error,
+        );
         decryptedVideoMetadata = undefined;
       }
     }

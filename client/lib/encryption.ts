@@ -62,7 +62,11 @@ export function encryptReportData(data: {
 /**
  * Safe UTF-8 decryption helper function
  */
-function safeDecrypt(encryptedText: string, key: string, iv: CryptoJS.lib.WordArray): string {
+function safeDecrypt(
+  encryptedText: string,
+  key: string,
+  iv: CryptoJS.lib.WordArray,
+): string {
   try {
     const decrypted = CryptoJS.AES.decrypt(encryptedText, key, { iv });
 
@@ -73,30 +77,35 @@ function safeDecrypt(encryptedText: string, key: string, iv: CryptoJS.lib.WordAr
     } catch (utf8Error) {
       // UTF-8 conversion failed - likely wrong key or incompatible encryption format
       // Don't log this as error since it's expected for incompatible data
-      throw new Error('Incompatible encryption format or wrong decryption key');
+      throw new Error("Incompatible encryption format or wrong decryption key");
     }
 
     // Only reject if we got null/undefined (not empty strings which can be valid)
     if (utf8String === null || utf8String === undefined) {
-      throw new Error('Decryption resulted in null data');
+      throw new Error("Decryption resulted in null data");
     }
 
     // Check for excessive null bytes (more than 50% of the string) as sign of decryption failure
     const nullByteCount = (utf8String.match(/\0/g) || []).length;
     if (nullByteCount > utf8String.length / 2) {
-      throw new Error('Decryption resulted in corrupted data (too many null bytes)');
+      throw new Error(
+        "Decryption resulted in corrupted data (too many null bytes)",
+      );
     }
 
     return utf8String;
   } catch (error) {
     // If it's our custom error, re-throw it
-    if (error.message.includes('Decryption resulted in') || error.message.includes('Incompatible encryption')) {
+    if (
+      error.message.includes("Decryption resulted in") ||
+      error.message.includes("Incompatible encryption")
+    ) {
       throw error;
     }
 
     // Only log unexpected errors, not expected decryption failures
-    if (!error.message.includes('Malformed UTF-8')) {
-      console.error('Safe decrypt failed:', error);
+    if (!error.message.includes("Malformed UTF-8")) {
+      console.error("Safe decrypt failed:", error);
     }
     throw new Error(`Decryption failed: ${error.message}`);
   }
@@ -115,8 +124,16 @@ export function decryptReportData(encryptedData: EncryptedData): {
   try {
     const iv = CryptoJS.enc.Hex.parse(encryptedData.iv);
 
-    const decryptedMessage = safeDecrypt(encryptedData.encryptedMessage, ENCRYPTION_KEY, iv);
-    const decryptedCategory = safeDecrypt(encryptedData.encryptedCategory, ENCRYPTION_KEY, iv);
+    const decryptedMessage = safeDecrypt(
+      encryptedData.encryptedMessage,
+      ENCRYPTION_KEY,
+      iv,
+    );
+    const decryptedCategory = safeDecrypt(
+      encryptedData.encryptedCategory,
+      ENCRYPTION_KEY,
+      iv,
+    );
 
     const decryptedPhotoUrl = encryptedData.encryptedPhotoUrl
       ? safeDecrypt(encryptedData.encryptedPhotoUrl, ENCRYPTION_KEY, iv)
@@ -126,26 +143,26 @@ export function decryptReportData(encryptedData: EncryptedData): {
       ? safeDecrypt(encryptedData.encryptedVideoUrl, ENCRYPTION_KEY, iv)
       : undefined;
 
-  let decryptedVideoMetadata: any = undefined;
-  if (encryptedData.encryptedVideoMetadata) {
-    try {
-      const decryptedMetadataString = CryptoJS.AES.decrypt(
-        encryptedData.encryptedVideoMetadata,
-        ENCRYPTION_KEY,
-        {
-          iv,
-        },
-      ).toString(CryptoJS.enc.Utf8);
+    let decryptedVideoMetadata: any = undefined;
+    if (encryptedData.encryptedVideoMetadata) {
+      try {
+        const decryptedMetadataString = CryptoJS.AES.decrypt(
+          encryptedData.encryptedVideoMetadata,
+          ENCRYPTION_KEY,
+          {
+            iv,
+          },
+        ).toString(CryptoJS.enc.Utf8);
 
-      // Only parse if we have a non-empty string
-      if (decryptedMetadataString && decryptedMetadataString.trim()) {
-        decryptedVideoMetadata = JSON.parse(decryptedMetadataString);
+        // Only parse if we have a non-empty string
+        if (decryptedMetadataString && decryptedMetadataString.trim()) {
+          decryptedVideoMetadata = JSON.parse(decryptedMetadataString);
+        }
+      } catch (error) {
+        console.error("Failed to decrypt or parse video metadata:", error);
+        decryptedVideoMetadata = undefined;
       }
-    } catch (error) {
-      console.error("Failed to decrypt or parse video metadata:", error);
-      decryptedVideoMetadata = undefined;
     }
-  }
 
     return {
       message: decryptedMessage,
@@ -156,8 +173,11 @@ export function decryptReportData(encryptedData: EncryptedData): {
     };
   } catch (error) {
     // Don't log expected decryption failures to reduce console noise
-    if (!error.message.includes('Incompatible encryption') && !error.message.includes('Malformed UTF-8')) {
-      console.error('Legacy decryption failed:', error);
+    if (
+      !error.message.includes("Incompatible encryption") &&
+      !error.message.includes("Malformed UTF-8")
+    ) {
+      console.error("Legacy decryption failed:", error);
     }
     throw new Error(`Legacy decryption failed: ${error.message}`);
   }
