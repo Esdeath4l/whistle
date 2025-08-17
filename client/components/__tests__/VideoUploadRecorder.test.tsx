@@ -2,36 +2,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import VideoUploadRecorder, { VideoFile } from "../VideoUploadRecorder";
 
-// Mock browser APIs
-const mockGetUserMedia = vi.fn();
-const mockMediaRecorder = vi.fn();
-
 beforeEach(() => {
   // Reset mocks
   vi.clearAllMocks();
-
-  // Mock navigator.mediaDevices
-  Object.defineProperty(global.navigator, "mediaDevices", {
-    value: {
-      getUserMedia: mockGetUserMedia,
-    },
-    writable: true,
-  });
-
-  // Mock MediaRecorder
-  global.MediaRecorder = mockMediaRecorder as any;
-
-  // Mock permissions API
-  Object.defineProperty(global.navigator, "permissions", {
-    value: {
-      query: vi.fn().mockResolvedValue({ state: "granted" }),
-    },
-    writable: true,
-  });
-
-  // Mock URL.createObjectURL
-  global.URL.createObjectURL = vi.fn().mockReturnValue("mock-url");
-  global.URL.revokeObjectURL = vi.fn();
 });
 
 describe("VideoUploadRecorder", () => {
@@ -140,7 +113,7 @@ describe("VideoUploadRecorder", () => {
   });
 
   it("shows recording controls when camera is available", async () => {
-    mockGetUserMedia.mockResolvedValue(new MediaStream());
+    navigator.mediaDevices.getUserMedia = vi.fn().mockResolvedValue(new MediaStream());
 
     render(<VideoUploadRecorder onVideoChange={mockOnVideoChange} />);
 
