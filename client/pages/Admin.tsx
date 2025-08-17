@@ -102,6 +102,10 @@ export default function Admin() {
         // Setup real-time notifications with delay to ensure auth is ready
         setTimeout(() => {
           console.log("Setting up real-time notifications...");
+          notificationService.setOnNewReportCallback(() => {
+            console.log("🔄 Auto-refreshing reports due to notification");
+            fetchReports();
+          });
           notificationService.setupRealtimeNotifications(authToken);
         }, 1000);
 
