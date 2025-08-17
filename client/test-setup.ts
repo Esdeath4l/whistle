@@ -1,0 +1,108 @@
+import "@testing-library/jest-dom";
+import { vi } from "vitest";
+
+// Mock MediaStream and related APIs
+class MockMediaStream {
+  constructor() {
+    // Mock implementation
+  }
+
+  getTracks() {
+    return [];
+  }
+
+  getVideoTracks() {
+    return [];
+  }
+
+  getAudioTracks() {
+    return [];
+  }
+
+  addTrack() {
+    // Mock implementation
+  }
+
+  removeTrack() {
+    // Mock implementation
+  }
+
+  addEventListener() {
+    // Mock implementation
+  }
+
+  removeEventListener() {
+    // Mock implementation
+  }
+}
+
+// Mock MediaRecorder
+class MockMediaRecorder {
+  static isTypeSupported() {
+    return true;
+  }
+
+  constructor() {
+    this.state = "inactive";
+    this.ondataavailable = null;
+    this.onstop = null;
+    this.onstart = null;
+  }
+
+  start() {
+    this.state = "recording";
+    if (this.onstart) this.onstart();
+  }
+
+  stop() {
+    this.state = "inactive";
+    if (this.onstop) this.onstop();
+  }
+
+  addEventListener() {
+    // Mock implementation
+  }
+
+  removeEventListener() {
+    // Mock implementation
+  }
+}
+
+// Set up global mocks
+global.MediaStream = MockMediaStream as any;
+global.MediaRecorder = MockMediaRecorder as any;
+
+// Mock navigator.mediaDevices
+Object.defineProperty(global.navigator, "mediaDevices", {
+  value: {
+    getUserMedia: vi.fn().mockResolvedValue(new MockMediaStream()),
+    enumerateDevices: vi.fn().mockResolvedValue([]),
+  },
+  writable: true,
+});
+
+// Mock navigator.permissions
+Object.defineProperty(global.navigator, "permissions", {
+  value: {
+    query: vi.fn().mockResolvedValue({ state: "granted" }),
+  },
+  writable: true,
+});
+
+// Mock URL methods
+global.URL.createObjectURL = vi.fn().mockReturnValue("mock-url");
+global.URL.revokeObjectURL = vi.fn();
+
+// Mock ResizeObserver (often needed for UI components)
+global.ResizeObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}));
+
+// Mock IntersectionObserver (often needed for UI components)
+global.IntersectionObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}));
