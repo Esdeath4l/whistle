@@ -42,7 +42,7 @@ import {
   ReportSeverity,
 } from "@shared/api";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { encryptReportData } from "@/lib/encryption";
+import { encryptReportData } from "@/lib/secure-encryption";
 import VideoUploadRecorder, {
   VideoFile,
 } from "@/components/VideoUploadRecorder";
