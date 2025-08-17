@@ -225,7 +225,8 @@ export default function Report() {
         console.log("Submitting plain text report (mobile device detected)");
       } else {
         try {
-          // Try to encrypt data on desktop
+          // Generate ephemeral keys and encrypt data with enhanced E2EE
+          console.log("🔒 Initiating enhanced E2EE encryption...");
           const encryptedData = encryptReportData({
             message: message.trim(),
             category,
