@@ -37,6 +37,15 @@ export interface EncryptedReportData {
   encryptedVideoMetadata?: string;
   iv: string;
   timestamp: string;
+  // Enhanced E2EE fields
+  salt?: string;
+  keyDerivationParams?: {
+    iterations: number;
+    algorithm: string;
+  };
+  hmac?: string;
+  version?: string;
+  sessionId?: string;
 }
 
 export type ReportStatus = "pending" | "reviewed" | "flagged" | "resolved";
