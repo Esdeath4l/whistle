@@ -51,10 +51,14 @@ const NotFound = () => {
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-muted-foreground">
-              Sorry, the page you're looking for doesn't exist or has been moved.
+              Sorry, the page you're looking for doesn't exist or has been
+              moved.
             </p>
             <p className="text-sm text-muted-foreground">
-              You tried to access: <code className="bg-muted px-2 py-1 rounded">{location.pathname}</code>
+              You tried to access:{" "}
+              <code className="bg-muted px-2 py-1 rounded">
+                {location.pathname}
+              </code>
             </p>
             <div className="flex flex-col gap-3 pt-4">
               <Link to="/">
