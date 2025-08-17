@@ -223,7 +223,7 @@ export const getNotificationSettings: RequestHandler = (req, res) => {
     pushEnabled: true,
     urgentAlerts: true,
     categories: ["harassment", "medical", "emergency", "safety"],
-    adminEmail: process.env.EMAIL_TO,
+    adminEmail: "ritisulo@gmail.com",
     adminPhone: "+91888888881",
   });
 };
