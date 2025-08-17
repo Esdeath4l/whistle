@@ -174,6 +174,8 @@ export default function Admin() {
     response?: string,
   ) => {
     try {
+      console.log(`Updating report ${reportId}:`, { status, response: response ? "provided" : "none" });
+
       const updateData: UpdateReportRequest = { status };
       if (response) {
         updateData.admin_response = response;
@@ -189,9 +191,12 @@ export default function Admin() {
       });
 
       if (res.ok) {
+        console.log(`✅ Successfully updated report ${reportId}`);
         fetchReports();
         setSelectedReport(null);
         setAdminResponse("");
+      } else {
+        console.error(`❌ Failed to update report ${reportId}:`, await res.text());
       }
     } catch (error) {
       console.error("Error updating report:", error);
