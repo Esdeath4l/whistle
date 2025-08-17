@@ -529,7 +529,12 @@ export default function Report() {
                     required
                   />
                   <p className="text-xs text-muted-foreground">
-                    {message.length}/1000 characters
+                    {message.length}/5000 characters
+                    {message.length > 4000 && (
+                      <span className="text-warning ml-2">
+                        Approaching limit
+                      </span>
+                    )}
                   </p>
                 </div>
 
