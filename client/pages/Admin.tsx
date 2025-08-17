@@ -99,8 +99,11 @@ export default function Admin() {
         setIsAuthenticated(true);
         fetchReports();
 
-        // Setup real-time notifications
-        notificationService.setupRealtimeNotifications(authToken);
+        // Setup real-time notifications with delay to ensure auth is ready
+        setTimeout(() => {
+          console.log("Setting up real-time notifications...");
+          notificationService.setupRealtimeNotifications(authToken);
+        }, 1000);
 
         // Request notification permission
         if ("Notification" in window && Notification.permission === "default") {
