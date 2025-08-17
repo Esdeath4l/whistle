@@ -90,7 +90,7 @@ export async function sendEmailAlert(report: Report): Promise<boolean> {
             </div>
             
             <div style="text-align: center;">
-              <a href="${process.env.ADMIN_DASHBOARD_URL }" class="button">
+              <a href="${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8080'}/admin" class="button">
                 🔐 Access Admin Dashboard
               </a>
             </div>
