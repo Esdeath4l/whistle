@@ -89,6 +89,12 @@ export const createReport: RequestHandler = (req, res) => {
         return res.status(400).json({ error: "Message is required" });
       }
 
+      // Check message length (security measure)
+      if (message.length > 5000) {
+        console.log("Error: Message too long");
+        return res.status(400).json({ error: "Message must be under 5000 characters" });
+      }
+
       if (!category) {
         console.log("Error: Category is required");
         return res.status(400).json({ error: "Category is required" });
