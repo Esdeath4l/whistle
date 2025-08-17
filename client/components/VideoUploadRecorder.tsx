@@ -116,6 +116,8 @@ export default function VideoUploadRecorder({
       });
     } catch (error) {
       console.warn("Permission API not supported");
+      // Set initial state as null to show enable camera button
+      setCameraPermission(null);
     }
   };
 
