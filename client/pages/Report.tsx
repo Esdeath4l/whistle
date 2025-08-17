@@ -322,6 +322,10 @@ export default function Report() {
       console.log("Success:", result); // Debug log
       setReportId(result.id);
       setSubmitted(true);
+
+      // Clear session keys immediately after successful submission for PFS
+      console.log("🛡️ Clearing session after successful submission for Perfect Forward Secrecy");
+      clearSessionForPFS();
     } catch (err) {
       console.error("Error submitting report:", err);
       setError(
