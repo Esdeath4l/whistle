@@ -183,7 +183,7 @@ export default function Report() {
 
           console.log("Video processed for submission:", {
             size: `${(videoFile.size / 1024 / 1024).toFixed(2)}MB`,
-            duration: `${(videoFile.duration || 0 / 60).toFixed(1)}min`,
+            duration: `${((videoFile.duration || 0) / 60).toFixed(1)}min`,
             format: videoFile.format,
           });
         } catch (error) {
