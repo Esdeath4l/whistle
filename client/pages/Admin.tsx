@@ -342,8 +342,17 @@ export default function Admin() {
           return legacyDecrypt(report.encrypted_data);
         } catch (legacyError) {
           console.error("Legacy decryption also failed:", legacyError);
+
+          // Provide more specific error messages based on error type
+          let errorMessage = "[DECRYPTION ERROR - Unable to decrypt report]";
+          if (legacyError instanceof SyntaxError && legacyError.message.includes("JSON")) {
+            errorMessage = "[DECRYPTION ERROR - Corrupted video metadata]";
+          } else if (legacyError.message?.includes("Malformed UTF-8")) {
+            errorMessage = "[DECRYPTION ERROR - Invalid encryption format]";
+          }
+
           return {
-            message: "[DECRYPTION ERROR - Unable to decrypt report]",
+            message: errorMessage,
             category: "encrypted",
             photo_url: undefined,
             video_url: undefined,
