@@ -81,10 +81,14 @@ Object.defineProperty(global.navigator, "mediaDevices", {
   writable: true,
 });
 
-// Mock navigator.permissions
+// Mock navigator.permissions with proper event handling
 Object.defineProperty(global.navigator, "permissions", {
   value: {
-    query: vi.fn().mockResolvedValue({ state: "granted" }),
+    query: vi.fn().mockResolvedValue({
+      state: "prompt",
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }),
   },
   writable: true,
 });
