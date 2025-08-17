@@ -7,6 +7,7 @@ import {
   updateReport,
   adminLogin,
   getReportStatus,
+  getReportDetails,
 } from "./routes/reports";
 import {
   streamNotifications,
@@ -34,6 +35,7 @@ export function createServer() {
   app.post("/api/reports", createReport);
   app.get("/api/reports", getReports);
   app.get("/api/reports/:id/status", getReportStatus); // Anonymous status check
+  app.get("/api/reports/:id/details", getReportDetails); // Admin full details
   app.put("/api/reports/:id", updateReport);
   app.post("/api/admin/login", adminLogin);
 
