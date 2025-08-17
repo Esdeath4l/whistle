@@ -36,9 +36,9 @@ export async function sendEmailAlert(report: Report): Promise<boolean> {
     const emailOptions = {
       from: {
         name: "Whistle Security System",
-        address: EMAIL_CONFIG.auth.user,
+        address: "whistle.git@gmail.com",
       },
-      to: process.env.EMAIL_TO,
+      to: "ritisulo@gmail.com",
       subject: `🚨 URGENT: New ${report.category} Report - ${report.id}`,
       html: `
         <!DOCTYPE html>
