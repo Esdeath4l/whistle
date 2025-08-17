@@ -101,13 +101,15 @@ export class NotificationService {
       this.eventSource.close();
     }
 
+    console.log("Setting up real-time notifications with token:", adminToken.substring(0, 10) + "...");
+
     try {
       this.eventSource = new EventSource(
         `/api/notifications/stream?token=${encodeURIComponent(adminToken)}`,
       );
 
       this.eventSource.onopen = () => {
-        console.log("Real-time notifications connected");
+        console.log("✅ Real-time notifications connected successfully");
         this.reconnectAttempts = 0;
         this.showToast({
           title: "🔔 Notifications Active",
@@ -118,6 +120,7 @@ export class NotificationService {
 
       this.eventSource.onmessage = (event) => {
         try {
+          console.log("📨 Notification received:", event.data);
           const data = JSON.parse(event.data);
           this.handleNotificationEvent(data);
         } catch (error) {
@@ -125,13 +128,22 @@ export class NotificationService {
         }
       };
 
-      this.eventSource.onerror = () => {
-        console.error("Notification stream error");
-        this.eventSource?.close();
-        this.attemptReconnect(adminToken);
+      this.eventSource.onerror = (error) => {
+        console.error("❌ Notification stream error:", error);
+        console.log("EventSource readyState:", this.eventSource?.readyState);
+
+        if (this.eventSource?.readyState === EventSource.CLOSED) {
+          console.log("Connection closed, attempting to reconnect...");
+          this.attemptReconnect(adminToken);
+        }
       };
     } catch (error) {
       console.error("Failed to setup real-time notifications:", error);
+      this.showToast({
+        title: "❌ Notification Setup Failed",
+        description: "Could not connect to real-time notifications",
+        type: "error",
+      });
     }
   }
 
