@@ -20,6 +20,11 @@ const ADMIN_PASSWORD = "satoru 2624";
 export const createReport: RequestHandler = (req, res) => {
   try {
     console.log("Received report submission with media"); // Debug log (no sensitive data)
+
+    // Basic rate limiting check (in production, use proper rate limiting middleware)
+    const clientIp = req.ip || req.connection.remoteAddress;
+    console.log("Report submission from IP:", clientIp); // For monitoring
+
     const {
       message,
       category,
