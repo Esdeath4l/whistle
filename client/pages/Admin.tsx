@@ -349,6 +349,8 @@ export default function Admin() {
             errorMessage = "[DECRYPTION ERROR - Corrupted video metadata]";
           } else if (legacyError.message?.includes("Malformed UTF-8")) {
             errorMessage = "[DECRYPTION ERROR - Wrong encryption key or corrupted data]";
+          } else if (legacyError.message?.includes("Incompatible encryption format")) {
+            errorMessage = "[DECRYPTION ERROR - Report encrypted with different system]";
           } else if (legacyError.message?.includes("corrupted data") || legacyError.message?.includes("null bytes")) {
             errorMessage = "[DECRYPTION ERROR - Data corruption detected]";
           } else if (legacyError.message?.includes("Legacy decryption failed")) {
