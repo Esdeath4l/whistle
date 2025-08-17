@@ -173,9 +173,34 @@ export const getReports: RequestHandler = (req, res) => {
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     );
 
+    // Optimize report data for listing - remove large binary data
+    const optimizedReports = filteredReports.map(report => {
+      const optimized = { ...report };
+
+      // Remove large base64 data for list view performance
+      if (optimized.photo_url && optimized.photo_url.length > 100000) {
+        optimized.photo_url = '[LARGE_PHOTO_DATA]';
+      }
+      if (optimized.video_url && optimized.video_url.length > 100000) {
+        optimized.video_url = '[LARGE_VIDEO_DATA]';
+      }
+
+      // Also optimize encrypted data
+      if (optimized.encrypted_data) {
+        if (optimized.encrypted_data.encryptedPhotoUrl && optimized.encrypted_data.encryptedPhotoUrl.length > 100000) {
+          optimized.encrypted_data.encryptedPhotoUrl = '[LARGE_ENCRYPTED_PHOTO]';
+        }
+        if (optimized.encrypted_data.encryptedVideoUrl && optimized.encrypted_data.encryptedVideoUrl.length > 100000) {
+          optimized.encrypted_data.encryptedVideoUrl = '[LARGE_ENCRYPTED_VIDEO]';
+        }
+      }
+
+      return optimized;
+    });
+
     const response: GetReportsResponse = {
-      reports: filteredReports,
-      total: filteredReports.length,
+      reports: optimizedReports,
+      total: optimizedReports.length,
     };
 
     res.json(response);
