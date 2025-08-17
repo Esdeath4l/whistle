@@ -131,9 +131,17 @@ export const createReport: RequestHandler = (req, res) => {
     }
 
     reports.push(newReport);
-    console.log("Report created successfully:", newReport.id); // Debug log
+    console.log("✅ Report created successfully:", {
+      id: newReport.id,
+      category: newReport.category,
+      severity: newReport.severity,
+      hasVideo: !!newReport.video_url,
+      hasPhoto: !!newReport.photo_url,
+      isEncrypted: newReport.is_encrypted
+    });
 
     // Send real-time notification to admins
+    console.log("🔔 Triggering notification for report:", newReport.id);
     notifyNewReport(newReport);
 
     const response: CreateReportResponse = {
