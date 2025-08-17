@@ -338,7 +338,9 @@ export default function Admin() {
         } catch (error) {
           // Don't log expected encryption errors
           if (!error.message?.includes("No decryption keys available") &&
-              !error.message?.includes("sessionId")) {
+              !error.message?.includes("sessionId") &&
+              !error.message?.includes("Incompatible encryption") &&
+              !error.message?.includes("Legacy decryption failed")) {
             console.error("Failed to decrypt report:", error);
           }
 
