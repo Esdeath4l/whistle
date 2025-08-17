@@ -333,9 +333,8 @@ export default function Admin() {
 
         // Fallback to legacy decryption if enhanced fails
         try {
-          const {
-            decryptReportData: legacyDecrypt,
-          } = require("@/lib/encryption");
+          // Import legacy decryption function properly for browser environment
+          const { decryptReportData: legacyDecrypt } = await import("@/lib/encryption");
           console.log("🔄 Falling back to legacy decryption");
           return legacyDecrypt(report.encrypted_data);
         } catch (legacyError) {
