@@ -38,7 +38,9 @@ describe("VideoUploadRecorder", () => {
 
     render(<VideoUploadRecorder onVideoChange={mockOnVideoChange} />);
 
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const fileInput = document.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
     fireEvent.change(fileInput, { target: { files: [mockFile] } });
 
     await waitFor(() => {
@@ -55,7 +57,9 @@ describe("VideoUploadRecorder", () => {
 
     render(<VideoUploadRecorder onVideoChange={mockOnVideoChange} />);
 
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const fileInput = document.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
     fireEvent.change(fileInput, { target: { files: [mockFile] } });
 
     await waitFor(() => {
@@ -71,7 +75,9 @@ describe("VideoUploadRecorder", () => {
 
     render(<VideoUploadRecorder onVideoChange={mockOnVideoChange} />);
 
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const fileInput = document.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
     fireEvent.change(fileInput, { target: { files: [mockFile] } });
 
     await waitFor(
@@ -85,7 +91,7 @@ describe("VideoUploadRecorder", () => {
           }),
         );
       },
-      { timeout: 3000 }
+      { timeout: 3000 },
     );
   });
 
@@ -100,7 +106,9 @@ describe("VideoUploadRecorder", () => {
   });
 
   it("shows recording controls when camera is available", () => {
-    navigator.mediaDevices.getUserMedia = vi.fn().mockResolvedValue(new MediaStream());
+    navigator.mediaDevices.getUserMedia = vi
+      .fn()
+      .mockResolvedValue(new MediaStream());
 
     render(<VideoUploadRecorder onVideoChange={mockOnVideoChange} />);
 
@@ -117,7 +125,9 @@ describe("VideoUploadRecorder", () => {
 
     render(<VideoUploadRecorder onVideoChange={mockOnVideoChange} />);
 
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const fileInput = document.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
     fireEvent.change(fileInput, { target: { files: [mockFile] } });
 
     // Wait for video to be processed
@@ -128,10 +138,10 @@ describe("VideoUploadRecorder", () => {
             file: mockFile,
             format: "video/mp4",
             isRecorded: false,
-          })
+          }),
         );
       },
-      { timeout: 2000 }
+      { timeout: 2000 },
     );
   });
 
