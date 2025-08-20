@@ -8,6 +8,12 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    allowedHosts: [
+      "localhost",
+      "127.0.0.1",
+      ".replit.dev", 
+      "71548efc-24a2-4272-b321-f78993006bb7-00-2owklnm4fxv52.pike.replit.dev"
+    ],
   },
   build: {
     outDir: "dist/spa",
