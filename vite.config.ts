@@ -8,10 +8,12 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    // Add all hosts you need explicitly
     allowedHosts: [
       "localhost",
       "127.0.0.1",
-      ".replit.dev", 
+      "replit.dev",
+      "pike.replit.dev",
       "71548efc-24a2-4272-b321-f78993006bb7-00-2owklnm4fxv52.pike.replit.dev"
     ],
   },
