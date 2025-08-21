@@ -148,23 +148,26 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
   };
 
   // Filter reports with location data
-  const reportsWithLocation = reports.filter(report => 
-    report.location && 
-    typeof report.location.latitude === 'number' && 
+  const reportsWithLocation = reports.filter(report =>
+    report.location &&
+    typeof report.location.latitude === 'number' &&
     typeof report.location.longitude === 'number'
   );
+
+  // Group nearby reports for simple clustering
+  const reportGroups = groupNearbyReports(reportsWithLocation);
 
   // Calculate map center based on reports
   const getMapCenter = (): [number, number] => {
     if (reportsWithLocation.length === 0) {
       return [37.7749, -122.4194]; // Default to San Francisco
     }
-    
-    const avgLat = reportsWithLocation.reduce((sum, report) => 
+
+    const avgLat = reportsWithLocation.reduce((sum, report) =>
       sum + (report.location?.latitude || 0), 0) / reportsWithLocation.length;
-    const avgLon = reportsWithLocation.reduce((sum, report) => 
+    const avgLon = reportsWithLocation.reduce((sum, report) =>
       sum + (report.location?.longitude || 0), 0) / reportsWithLocation.length;
-    
+
     return [avgLat, avgLon];
   };
 
