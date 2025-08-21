@@ -15,6 +15,11 @@ import {
   getNotificationSettings,
   testEmailService,
 } from "./routes/notifications";
+import {
+  testEmailConfiguration,
+  sendTestEmailNotification,
+  testUrgentNotification,
+} from "./routes/test-email";
 
 export function createServer() {
   const app = express();
