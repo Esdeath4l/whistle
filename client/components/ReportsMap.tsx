@@ -164,48 +164,33 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
                 backgroundSize: '20px 20px'
               }}
             >
-              {/* Map Markers */}
-              {reportsWithLocation.map((report, index) => {
+              {/* Map Markers - Optimized rendering */}
+              {reportsWithLocation.slice(0, 20).map((report, index) => {
                 const x = 50 + (Math.sin(index * 0.8) * 35);
                 const y = 30 + (Math.cos(index * 0.6) * 40);
                 const isSelected = selectedReport?.id === report.id;
-                
+
                 return (
                   <div
                     key={report.id}
-                    className={`absolute cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200 hover:scale-110 ${
+                    className={`absolute cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-transform duration-200 hover:scale-110 ${
                       isSelected ? 'scale-125 z-20' : 'z-10'
                     }`}
-                    style={{ 
-                      left: `${x}%`, 
+                    style={{
+                      left: `${x}%`,
                       top: `${y}%`,
                     }}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setSelectedReport(report);
                       onReportSelect?.(report);
                     }}
                   >
-                    {/* Marker */}
-                    <div className={`relative ${isSelected ? 'animate-pulse' : ''}`}>
-                      <div className={`w-6 h-6 rounded-full border-2 border-white shadow-lg ${getReportColor(report)}`} />
+                    {/* Simplified Marker */}
+                    <div className="relative">
+                      <div className={`w-6 h-6 rounded-full border-2 border-white shadow-lg ${getReportColor(report)} ${isSelected ? 'animate-pulse' : ''}`} />
                       {/* Marker Pin */}
                       <div className={`absolute top-6 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent ${getReportColor(report).replace('bg-', 'border-t-')}`} />
-                      
-                      {/* Hover Tooltip */}
-                      {isSelected && (
-                        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 bg-white dark:bg-black border rounded-lg shadow-lg p-2 min-w-48 z-30">
-                          <div className="text-xs space-y-1">
-                            <div className="font-semibold">{report.category}</div>
-                            <div className="text-muted-foreground">
-                              {formatLocation(report.location!)}
-                            </div>
-                            <div className="text-muted-foreground">
-                              {formatDate(report.created_at)}
-                            </div>
-                            {getStatusBadge(report)}
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </div>
                 );
