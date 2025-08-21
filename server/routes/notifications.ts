@@ -4,9 +4,9 @@ import { Report } from "@shared/api";
 // In-memory storage for SSE connections
 const sseConnections = new Set<any>();
 
-// Admin authentication credentials
-const ADMIN_USERNAME = "process.env.ADMIN_USERNAME";
-const ADMIN_PASSWORD = "process.env.ADMIN_PASSWORD";
+// Admin authentication credentials (same as in reports.ts)
+const ADMIN_USERNAME = "ritika";
+const ADMIN_PASSWORD = "satoru 2624";
 
 /**
  * Server-Sent Events endpoint for real-time notifications
