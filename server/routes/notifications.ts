@@ -229,6 +229,25 @@ export const getNotificationSettings: RequestHandler = (req, res) => {
 };
 
 /**
+ * Test notification stream
+ */
+export const testNotificationStream: RequestHandler = (req, res) => {
+  const testNotification = {
+    type: "test",
+    message: "Test notification from server",
+    timestamp: new Date().toISOString(),
+  };
+
+  broadcastNotification(testNotification);
+
+  res.json({
+    success: true,
+    message: "Test notification sent to all connected clients",
+    activeConnections: sseConnections.size,
+  });
+};
+
+/**
  * Test email service configuration
  */
 export const testEmailService: RequestHandler = async (req, res) => {
