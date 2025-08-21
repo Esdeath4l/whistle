@@ -400,6 +400,37 @@ export class NotificationService {
       console.error("Failed to send SMS notification:", error);
     }
   }
+
+  private handleEmailStatusNotification(data: any, status: "success" | "warning" | "error") {
+    const { reportId, message } = data;
+
+    switch (status) {
+      case "success":
+        this.showToast({
+          title: "✅ Email Alert Sent",
+          description: `Urgent email notification sent for report ${reportId}`,
+          type: "success",
+          duration: 5000,
+        });
+        break;
+      case "warning":
+        this.showToast({
+          title: "⚠️ Email Not Configured",
+          description: `Email service needs setup - urgent report ${reportId} requires attention`,
+          type: "warning",
+          duration: 10000,
+        });
+        break;
+      case "error":
+        this.showToast({
+          title: "❌ Email Failed",
+          description: `Failed to send email alert for report ${reportId}`,
+          type: "error",
+          duration: 8000,
+        });
+        break;
+    }
+  }
 }
 
 export const notificationService = NotificationService.getInstance();
