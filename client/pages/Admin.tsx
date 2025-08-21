@@ -516,7 +516,7 @@ export default function Admin() {
                       location: {
                         latitude: 37.7749,
                         longitude: -122.4194,
-                        accuracy: 10,
+                        accuracy: 5, // High accuracy GPS (5m)
                         timestamp: Date.now(),
                         address: "123 Market Street, San Francisco, CA",
                       },
@@ -529,7 +529,7 @@ export default function Admin() {
                       location: {
                         latitude: 37.7849,
                         longitude: -122.4094,
-                        accuracy: 8,
+                        accuracy: 3, // Very high accuracy GPS (3m)
                         timestamp: Date.now(),
                         address: "456 Mission Street, San Francisco, CA",
                       },
@@ -543,7 +543,7 @@ export default function Admin() {
                       location: {
                         latitude: 37.7649,
                         longitude: -122.4294,
-                        accuracy: 12,
+                        accuracy: 8, // Good accuracy GPS (8m)
                         timestamp: Date.now(),
                         address: "789 Howard Street, San Francisco, CA",
                       },
