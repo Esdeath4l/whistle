@@ -196,7 +196,7 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
 
   return (
     <div className={className}>
-      <style jsx global>{`
+      <style>{`
         .leaflet-popup-content-wrapper {
           border-radius: 8px;
           box-shadow: 0 10px 25px rgba(0,0,0,0.1);
