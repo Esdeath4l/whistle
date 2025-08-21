@@ -225,8 +225,8 @@ export const getNotificationSettings: RequestHandler = (req, res) => {
     pushEnabled: true,
     urgentAlerts: true,
     categories: ["harassment", "medical", "emergency", "safety"],
-    adminEmail: process.env.EMAIL_TO,
-    adminPhone: "+91888888881",
+    adminEmail: process.env.EMAIL_TO || "admin@whistle.app",
+    adminPhone: process.env.ADMIN_PHONE || "+91888888881",
   });
 };
 
