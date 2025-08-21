@@ -45,6 +45,8 @@ import {
   MessageCircle,
   Settings,
   Video,
+  MapPin,
+  Map,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
