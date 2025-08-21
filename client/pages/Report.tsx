@@ -812,6 +812,22 @@ export default function Report() {
                   <p className="text-xs text-muted-foreground">
                     {message.length}/1000 characters
                   </p>
+
+                  {/* AI Moderation Warning */}
+                  {showModerationWarning && moderationResult && (
+                    <Alert variant="destructive" className="mt-2">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertDescription className="text-sm">
+                        {getModerationMessage(moderationResult)}
+                        {moderationResult.detectedTerms.length > 0 && (
+                          <div className="mt-1 text-xs">
+                            Detected: {moderationResult.detectedTerms.slice(0, 3).join(', ')}
+                            {moderationResult.detectedTerms.length > 3 && ` +${moderationResult.detectedTerms.length - 3} more`}
+                          </div>
+                        )}
+                      </AlertDescription>
+                    </Alert>
+                  )}
                 </div>
 
                 <div className="space-y-2">
