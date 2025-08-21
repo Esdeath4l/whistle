@@ -518,6 +518,46 @@ export default function Admin() {
 
               <Button
                 onClick={async () => {
+                  // Test urgent notification
+                  const urgentReport = {
+                    message: "URGENT TEST: Immediate threat in building - security needed now!",
+                    category: "emergency",
+                    severity: "urgent",
+                    location: {
+                      latitude: 37.7749,
+                      longitude: -122.4194,
+                      accuracy: 5,
+                      timestamp: Date.now(),
+                      address: "Emergency Test Location, San Francisco, CA",
+                    },
+                    share_location: true,
+                  };
+
+                  try {
+                    const response = await fetch("/api/reports", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify(urgentReport),
+                    });
+
+                    if (response.ok) {
+                      alert("🚨 Urgent test report created! You should receive notifications.");
+                      fetchReports();
+                    } else {
+                      alert("Failed to create urgent test report");
+                    }
+                  } catch (error) {
+                    alert("Error creating urgent test report: " + error);
+                  }
+                }}
+                variant="destructive"
+                size="sm"
+              >
+                🚨 Test Urgent Alert
+              </Button>
+
+              <Button
+                onClick={async () => {
                   // Add demo data for testing
                   const demoReports = [
                     {
