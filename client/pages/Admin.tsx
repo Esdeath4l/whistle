@@ -70,7 +70,6 @@ export default function Admin() {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [adminResponse, setAdminResponse] = useState("");
   const [statusFilter, setStatusFilter] = useState<ReportStatus | "all">("all");
-  const [showEmailSetup, setShowEmailSetup] = useState(false);
 
   const authToken = "ritika:satoru 2624"; // In production, this would be stored securely
 
