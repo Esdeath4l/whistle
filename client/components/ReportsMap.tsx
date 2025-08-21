@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import MarkerClusterGroup from 'react-leaflet-markercluster';
-import { Icon, divIcon } from 'leaflet';
+import { Icon } from 'leaflet';
 import { Report } from '@shared/api';
 import { Badge } from '@/components/ui/badge';
 import { formatLocation } from '@/lib/geolocation';
-import { 
-  AlertTriangle, 
-  Flag, 
-  MapPin, 
+import {
+  AlertTriangle,
+  Flag,
+  MapPin,
   Calendar,
   Shield,
   Eye
 } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
-import 'react-leaflet-markercluster/dist/styles.min.css';
 
 // Import leaflet images explicitly
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
