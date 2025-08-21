@@ -26,10 +26,7 @@ export async function sendEmailAlert(report: Report): Promise<boolean> {
       console.warn(
         "❌ Email service not configured - EMAIL_APP_PASSWORD missing",
       );
-      console.log(
-        "📧 Would send email for report:",
-        report.id,
-      );
+      console.log("📧 Would send email for report:", report.id);
       return false;
     }
 
@@ -90,7 +87,7 @@ export async function sendEmailAlert(report: Report): Promise<boolean> {
             </div>
             
             <div style="text-align: center;">
-              <a href="${process.env.ADMIN_DASHBOARD_URL || 'http://localhost:8080/admin'}" class="button">
+              <a href="${process.env.ADMIN_DASHBOARD_URL || "http://localhost:8080/admin"}" class="button">
                 🔐 Access Admin Dashboard
               </a>
             </div>
@@ -123,7 +120,7 @@ Required Actions:
 3. Take appropriate administrative action
 4. Respond within your organization's SLA timeframe
 
-Admin Dashboard: ${process.env.ADMIN_DASHBOARD_URL || 'http://localhost:8080/admin'}
+Admin Dashboard: ${process.env.ADMIN_DASHBOARD_URL || "http://localhost:8080/admin"}
 
 This is an automated alert from the Whistle Harassment Reporting System.
 Report ID: ${report.id} | Timestamp: ${new Date().toISOString()}

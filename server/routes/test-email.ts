@@ -9,10 +9,10 @@ import { Report } from "@shared/api";
 export const testEmailConfiguration: RequestHandler = async (req, res) => {
   try {
     console.log("Testing email configuration...");
-    
+
     // Check if email is configured
     const isConfigured = await testEmailService();
-    
+
     const result = {
       configured: isConfigured,
       EMAIL_USER: process.env.EMAIL_USER || "Not set",
@@ -20,9 +20,9 @@ export const testEmailConfiguration: RequestHandler = async (req, res) => {
       EMAIL_APP_PASSWORD: process.env.EMAIL_APP_PASSWORD ? "****" : "Not set",
       ADMIN_DASHBOARD_URL: process.env.ADMIN_DASHBOARD_URL || "Not set",
     };
-    
+
     console.log("Email configuration status:", result);
-    
+
     res.json({
       success: true,
       message: "Email configuration test completed",
@@ -44,9 +44,9 @@ export const testEmailConfiguration: RequestHandler = async (req, res) => {
 export const sendTestEmailNotification: RequestHandler = async (req, res) => {
   try {
     console.log("Attempting to send test email...");
-    
+
     const testSent = await sendTestEmail();
-    
+
     if (testSent) {
       res.json({
         success: true,
@@ -56,7 +56,8 @@ export const sendTestEmailNotification: RequestHandler = async (req, res) => {
       res.status(503).json({
         success: false,
         error: "Failed to send test email",
-        message: "Email service may not be configured properly. Check EMAIL_APP_PASSWORD environment variable.",
+        message:
+          "Email service may not be configured properly. Check EMAIL_APP_PASSWORD environment variable.",
       });
     }
   } catch (error) {
@@ -75,21 +76,22 @@ export const sendTestEmailNotification: RequestHandler = async (req, res) => {
 export const testUrgentNotification: RequestHandler = async (req, res) => {
   try {
     console.log("Testing urgent report notification...");
-    
+
     // Create a test urgent report
     const testReport: Report = {
       id: `test_urgent_${Date.now()}`,
-      message: "This is a test urgent harassment report to verify the notification system",
+      message:
+        "This is a test urgent harassment report to verify the notification system",
       category: "harassment",
       severity: "urgent",
       status: "pending",
       created_at: new Date().toISOString(),
       is_encrypted: false,
     };
-    
+
     // Trigger the notification system
     notifyNewReport(testReport);
-    
+
     res.json({
       success: true,
       message: "Urgent notification test triggered",
