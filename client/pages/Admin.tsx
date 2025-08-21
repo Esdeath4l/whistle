@@ -463,13 +463,6 @@ export default function Admin() {
                 Refresh
               </Button>
 
-              <Button
-                onClick={() => setShowEmailSetup(true)}
-                variant="outline"
-                size="sm"
-              >
-                📧 Setup Email Alerts
-              </Button>
 
               <Button
                 onClick={async () => {
