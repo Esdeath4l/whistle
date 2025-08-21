@@ -197,41 +197,42 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
   return (
     <div className={className}>
       <style jsx global>{`
-        .custom-cluster-icon .cluster-icon {
-          background: #3b82f6;
-          color: white;
-          border-radius: 50%;
-          width: 40px;
-          height: 40px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: bold;
-          border: 3px solid white;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-        
-        .custom-cluster-icon .cluster-flagged {
-          background: #dc2626;
-          animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.7; }
-        }
-        
         .leaflet-popup-content-wrapper {
           border-radius: 8px;
           box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
-        
+
         .leaflet-popup-content {
           margin: 0;
           padding: 0;
         }
+
+        .cluster-marker {
+          background: #3b82f6;
+          color: white;
+          border-radius: 50%;
+          width: 30px;
+          height: 30px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          border: 2px solid white;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          font-size: 12px;
+        }
+
+        .cluster-marker.flagged {
+          background: #dc2626;
+          animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.7; }
+        }
       `}</style>
-      
+
       <MapContainer
         center={getMapCenter()}
         zoom={12}
@@ -242,84 +243,153 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        
-        <MarkerClusterGroup
-          chunkedLoading
-          iconCreateFunction={createClusterIcon}
-        >
-          {reportsWithLocation.map((report) => (
-            <Marker
-              key={report.id}
-              position={[report.location!.latitude, report.location!.longitude]}
-              icon={getReportIcon(report)}
-              eventHandlers={{
-                click: () => onReportSelect?.(report)
-              }}
-              // Pass report data for cluster detection
-              {...({ report } as any)}
-            >
-              <Popup maxWidth={300} minWidth={250}>
-                <div className="p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      {getStatusBadge(report)}
+
+        {reportGroups.map((group, groupIndex) => {
+          if (group.length === 1) {
+            // Single report - show normal marker
+            const report = group[0];
+            return (
+              <Marker
+                key={report.id}
+                position={[report.location!.latitude, report.location!.longitude]}
+                icon={getReportIcon(report)}
+                eventHandlers={{
+                  click: () => onReportSelect?.(report)
+                }}
+              >
+                <Popup maxWidth={300} minWidth={250}>
+                  <div className="p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        {getStatusBadge(report)}
+                        {report.moderation?.isFlagged && (
+                          <Badge variant="outline" className="text-xs">
+                            ⚠️ AI Flagged
+                          </Badge>
+                        )}
+                      </div>
+                      <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                        {report.id.slice(-8)}
+                      </code>
+                    </div>
+
+                    <p className="text-sm mb-3 line-clamp-3">
+                      {report.message.length > 100
+                        ? `${report.message.substring(0, 100)}...`
+                        : report.message
+                      }
+                    </p>
+
+                    <div className="space-y-1 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {formatDate(report.created_at)}
+                      </div>
+
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />
+                        {formatLocation(report.location!)}
+                      </div>
+
+                      {report.location?.address && (
+                        <div className="text-xs text-muted-foreground truncate">
+                          📍 {report.location.address}
+                        </div>
+                      )}
+
                       {report.moderation?.isFlagged && (
-                        <Badge variant="outline" className="text-xs">
-                          ⚠️ AI Flagged
+                        <div className="text-xs text-yellow-700 bg-yellow-50 p-1 rounded">
+                          <Shield className="w-3 h-3 inline mr-1" />
+                          {report.moderation.reason}
+                        </div>
+                      )}
+                    </div>
+
+                    {onReportSelect && (
+                      <button
+                        onClick={() => onReportSelect(report)}
+                        className="mt-2 w-full text-xs bg-primary text-primary-foreground py-1 px-2 rounded hover:bg-primary/90 flex items-center justify-center gap-1"
+                      >
+                        <Eye className="w-3 h-3" />
+                        View Details
+                      </button>
+                    )}
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          } else {
+            // Multiple reports - show cluster marker
+            const firstReport = group[0];
+            const hasFlagged = group.some(r => r.status === 'flagged' || r.moderation?.isFlagged);
+
+            const clusterIcon = new Icon({
+              iconUrl: `data:image/svg+xml;base64,${btoa(`
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="30" height="30">
+                  <circle cx="15" cy="15" r="13" fill="${hasFlagged ? '#dc2626' : '#3b82f6'}" stroke="white" stroke-width="2"/>
+                  <text x="15" y="19" text-anchor="middle" fill="white" font-size="12" font-weight="bold">${group.length}</text>
+                </svg>
+              `)}`,
+              iconSize: [30, 30],
+              iconAnchor: [15, 15],
+              popupAnchor: [0, -15]
+            });
+
+            return (
+              <Marker
+                key={`cluster-${groupIndex}`}
+                position={[firstReport.location!.latitude, firstReport.location!.longitude]}
+                icon={clusterIcon}
+              >
+                <Popup maxWidth={350} minWidth={300}>
+                  <div className="p-3">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Flag className="w-4 h-4 text-primary" />
+                      <span className="font-medium">
+                        {group.length} Reports in this area
+                      </span>
+                      {hasFlagged && (
+                        <Badge variant="destructive" className="text-xs">
+                          Contains flagged reports
                         </Badge>
                       )}
                     </div>
-                    <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                      {report.id.slice(-8)}
-                    </code>
-                  </div>
-                  
-                  <p className="text-sm mb-3 line-clamp-3">
-                    {report.message.length > 100 
-                      ? `${report.message.substring(0, 100)}...` 
-                      : report.message
-                    }
-                  </p>
-                  
-                  <div className="space-y-1 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {formatDate(report.created_at)}
+
+                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                      {group.slice(0, 3).map(report => (
+                        <div key={report.id} className="border-l-2 border-primary/20 pl-2 text-xs">
+                          <div className="flex items-center gap-1 mb-1">
+                            {getStatusBadge(report)}
+                            <code className="bg-muted px-1 rounded">
+                              {report.id.slice(-6)}
+                            </code>
+                          </div>
+                          <p className="text-muted-foreground line-clamp-2">
+                            {report.message.substring(0, 80)}...
+                          </p>
+                        </div>
+                      ))}
+                      {group.length > 3 && (
+                        <p className="text-xs text-muted-foreground italic">
+                          +{group.length - 3} more reports...
+                        </p>
+                      )}
                     </div>
-                    
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3" />
-                      {formatLocation(report.location!)}
-                    </div>
-                    
-                    {report.location?.address && (
-                      <div className="text-xs text-muted-foreground truncate">
-                        📍 {report.location.address}
-                      </div>
-                    )}
-                    
-                    {report.moderation?.isFlagged && (
-                      <div className="text-xs text-yellow-700 bg-yellow-50 p-1 rounded">
-                        <Shield className="w-3 h-3 inline mr-1" />
-                        {report.moderation.reason}
-                      </div>
+
+                    {onReportSelect && (
+                      <button
+                        onClick={() => onReportSelect(group[0])}
+                        className="mt-2 w-full text-xs bg-primary text-primary-foreground py-1 px-2 rounded hover:bg-primary/90"
+                      >
+                        View First Report
+                      </button>
                     )}
                   </div>
-                  
-                  {onReportSelect && (
-                    <button
-                      onClick={() => onReportSelect(report)}
-                      className="mt-2 w-full text-xs bg-primary text-primary-foreground py-1 px-2 rounded hover:bg-primary/90 flex items-center justify-center gap-1"
-                    >
-                      <Eye className="w-3 h-3" />
-                      View Details
-                    </button>
-                  )}
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MarkerClusterGroup>
+                </Popup>
+              </Marker>
+            );
+          }
+        })}
       </MapContainer>
     </div>
   );
