@@ -749,7 +749,7 @@ export default function Admin() {
                             View Details
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
                           <DialogHeader>
                             <DialogTitle>Report Details</DialogTitle>
                             <DialogDescription>
@@ -758,7 +758,7 @@ export default function Admin() {
                           </DialogHeader>
 
                           {selectedReport && (
-                            <div className="space-y-6">
+                            <div className="space-y-6 overflow-y-auto pr-2 flex-1">
                               <div>
                                 <Label className="text-sm font-medium">
                                   Status
