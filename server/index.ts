@@ -44,6 +44,7 @@ export function createServer() {
   app.post("/api/notifications/sms", sendSMSNotification);
   app.get("/api/notifications/settings", getNotificationSettings);
   app.post("/api/notifications/test-email", testEmailService);
+  app.post("/api/notifications/test", testNotificationStream);
 
   return app;
 }
