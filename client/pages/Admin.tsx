@@ -468,15 +468,26 @@ export default function Admin() {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' }
                     });
-                    const result = await response.json();
 
-                    if (result.success) {
+                    let result;
+                    try {
+                      result = await response.json();
+                    } catch (jsonError) {
+                      result = { error: 'Invalid response format', message: response.statusText };
+                    }
+
+                    if (response.ok && result.success) {
                       alert('✅ Test email sent successfully! Check your inbox.');
                     } else {
-                      alert('❌ Email test failed: ' + result.message);
+                      const errorMsg = result.message || result.error || 'Unknown error';
+                      if (response.status === 503) {
+                        alert('⚠️ Email not configured yet.\n\nTo enable email notifications:\n1. Get Gmail App Password from https://myaccount.google.com/apppasswords\n2. Set EMAIL_APP_PASSWORD environment variable\n\nError: ' + errorMsg);
+                      } else {
+                        alert('❌ Email test failed: ' + errorMsg);
+                      }
                     }
                   } catch (error) {
-                    alert('❌ Email test error: ' + error);
+                    alert('❌ Network error: ' + (error instanceof Error ? error.message : 'Connection failed'));
                   }
                 }}
                 variant="outline"
