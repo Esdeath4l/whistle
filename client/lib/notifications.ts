@@ -273,11 +273,12 @@ export class NotificationService {
         }
       }, delay);
     } else {
-      console.log("Max reconnection attempts reached, giving up");
+      console.log("Max reconnection attempts reached, disabling notifications");
+      this.disableNotifications();
       this.showToast({
-        title: "❌ Notifications Disconnected",
+        title: "❌ Notifications Disabled",
         description:
-          "Real-time notifications are unavailable. The app will still function normally.",
+          "Real-time notifications are temporarily disabled due to connection issues. The app will still function normally.",
         type: "error",
         duration: 8000,
       });
