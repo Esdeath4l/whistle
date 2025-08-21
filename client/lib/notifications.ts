@@ -97,6 +97,12 @@ export class NotificationService {
    * Setup real-time notifications via Server-Sent Events
    */
   setupRealtimeNotifications(adminToken: string) {
+    // Skip if not in browser environment
+    if (typeof window === 'undefined' || typeof EventSource === 'undefined') {
+      console.log("SSE not supported in this environment");
+      return;
+    }
+
     if (this.eventSource) {
       this.eventSource.close();
     }
@@ -125,13 +131,30 @@ export class NotificationService {
         }
       };
 
-      this.eventSource.onerror = () => {
-        console.error("Notification stream error");
+      this.eventSource.onerror = (error) => {
+        console.warn("Notification stream connection issue:", error);
+
+        // Only show error if we're not already attempting to reconnect
+        if (this.reconnectAttempts === 0) {
+          this.showToast({
+            title: "⚠️ Notification Connection Issue",
+            description: "Attempting to reconnect to notification stream...",
+            type: "warning",
+            duration: 3000,
+          });
+        }
+
         this.eventSource?.close();
         this.attemptReconnect(adminToken);
       };
     } catch (error) {
       console.error("Failed to setup real-time notifications:", error);
+      this.showToast({
+        title: "❌ Notification Setup Failed",
+        description: "Could not establish notification connection. Some features may be limited.",
+        type: "error",
+        duration: 5000,
+      });
     }
   }
 
