@@ -293,6 +293,23 @@ export class NotificationService {
       this.eventSource.close();
       this.eventSource = null;
     }
+    this.reconnectAttempts = 0;
+  }
+
+  /**
+   * Disable real-time notifications
+   */
+  disableNotifications() {
+    this.notificationsEnabled = false;
+    this.disconnect();
+  }
+
+  /**
+   * Re-enable real-time notifications
+   */
+  enableNotifications() {
+    this.notificationsEnabled = true;
+    this.reconnectAttempts = 0;
   }
 
   /**
