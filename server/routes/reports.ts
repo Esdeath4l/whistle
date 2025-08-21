@@ -167,6 +167,7 @@ export const createReport: RequestHandler = (req, res) => {
     // Auto-flag urgent reports or AI-flagged content
     if (
       severity === "urgent" ||
+      category === "emergency" ||
       (moderation && moderation.isFlagged && moderation.confidence > 0.7)
     ) {
       newReport.status = "flagged";
@@ -176,7 +177,13 @@ export const createReport: RequestHandler = (req, res) => {
     console.log("Report created successfully:", newReport.id); // Debug log
 
     // Send real-time notification to admins
-    notifyNewReport(newReport);
+    try {
+      notifyNewReport(newReport);
+      console.log(`Notification sent for report ${newReport.id} (${newReport.severity} ${newReport.category})`);
+    } catch (notificationError) {
+      console.error("Failed to send notification:", notificationError);
+      // Don't fail the report creation if notification fails
+    }
 
     const response: CreateReportResponse = {
       id: newReport.id,
