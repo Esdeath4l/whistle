@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, MarkerClusterGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-markercluster';
 import { Icon, divIcon } from 'leaflet';
 import { Report } from '@shared/api';
 import { Badge } from '@/components/ui/badge';
