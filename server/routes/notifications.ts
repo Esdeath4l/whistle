@@ -86,22 +86,33 @@ export function broadcastNotification(notification: any) {
  * Send notification when new report is created
  */
 export function notifyNewReport(report: Report) {
+  // Determine if this is an urgent report
+  const isUrgent =
+    report.severity === "urgent" ||
+    report.category === "emergency" ||
+    report.status === "flagged" ||
+    (report.moderation?.isFlagged && report.moderation.confidence > 0.8);
+
   const notification = {
-    type:
-      report.severity === "urgent" || report.category === "emergency"
-        ? "urgent_report"
-        : "new_report",
+    type: isUrgent ? "urgent_report" : "new_report",
     reportId: report.id,
     category: report.category,
     severity: report.severity,
+    status: report.status,
     timestamp: new Date().toISOString(),
+    message: isUrgent ? "URGENT: Immediate attention required" : "New report received",
   };
+
+  console.log(`Creating ${notification.type} notification for report ${report.id}`);
 
   broadcastNotification(notification);
 
   // Send email notification for urgent reports
-  if (notification.type === "urgent_report") {
-    sendEmailAlert(report);
+  if (isUrgent) {
+    console.log(`Sending urgent email alert for report ${report.id}`);
+    sendEmailAlert(report).catch(error => {
+      console.error(`Failed to send email alert for report ${report.id}:`, error);
+    });
   }
 }
 
@@ -121,14 +132,22 @@ async function sendEmailAlert(report: Report) {
         "✅ Email alert sent successfully for urgent report:",
         report.id,
       );
+
+      // Broadcast email success notification
+      broadcastNotification({
+        type: "email_sent",
+        reportId: report.id,
+        message: "Urgent email alert sent successfully",
+        timestamp: new Date().toISOString(),
+      });
     } else {
       console.log(
         "⚠️ Email service not configured - logging notification instead",
       );
 
-      // Fallback: Log the email details
+      // Fallback: Log the email details and broadcast warning
       const emailData = {
-        to: process.env.EMAIL_TO,
+        to: process.env.EMAIL_TO || "admin@whistle.app",
         subject: `🚨 URGENT: New ${report.category} Report - ${report.id}`,
         body: `
           A new urgent harassment report has been submitted:
@@ -136,7 +155,11 @@ async function sendEmailAlert(report: Report) {
           Report ID: ${report.id}
           Category: ${report.category}
           Severity: ${report.severity}
+          Status: ${report.status}
           Submitted: ${report.created_at}
+          ${report.location ? `Location: ${report.location.latitude}, ${report.location.longitude}` : ''}
+
+          ${report.moderation?.isFlagged ? `⚠️ AI Flagged: ${report.moderation.reason}` : ''}
 
           Please log into the admin dashboard immediately to review and respond.
 
@@ -145,9 +168,26 @@ async function sendEmailAlert(report: Report) {
       };
 
       console.log("📧 Email notification (simulated):", emailData);
+
+      // Broadcast email configuration warning
+      broadcastNotification({
+        type: "email_warning",
+        reportId: report.id,
+        message: "Email service not configured - urgent report needs attention",
+        timestamp: new Date().toISOString(),
+      });
     }
   } catch (error) {
     console.error("❌ Failed to send email notification:", error);
+
+    // Broadcast email failure notification
+    broadcastNotification({
+      type: "email_error",
+      reportId: report.id,
+      message: "Failed to send urgent email alert",
+      error: error instanceof Error ? error.message : "Unknown error",
+      timestamp: new Date().toISOString(),
+    });
   }
 }
 
