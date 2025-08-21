@@ -474,7 +474,7 @@ export default function Admin() {
                     location: {
                       latitude: 37.7749,
                       longitude: -122.4194,
-                      accuracy: 5,
+                      accuracy: 2, // Very precise GPS for emergency (2m)
                       timestamp: Date.now(),
                       address: "Emergency Test Location, San Francisco, CA",
                     },
