@@ -1106,10 +1106,21 @@ export default function Admin() {
                                   id="admin-response"
                                   placeholder="Add an administrative response..."
                                   value={adminResponse}
-                                  onChange={(e) =>
-                                    setAdminResponse(e.target.value)
-                                  }
+                                  onChange={(e) => {
+                                    // Prevent event bubbling that might cause hangs
+                                    e.stopPropagation();
+                                    setAdminResponse(e.target.value);
+                                  }}
+                                  onKeyDown={(e) => {
+                                    // Prevent event bubbling for keyboard events
+                                    e.stopPropagation();
+                                  }}
+                                  onFocus={(e) => {
+                                    // Prevent event bubbling for focus events
+                                    e.stopPropagation();
+                                  }}
                                   className="mt-2"
+                                  rows={4}
                                 />
                               </div>
 
