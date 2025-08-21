@@ -130,6 +130,110 @@ export default function Report() {
     { value: "urgent", label: "Urgent", color: "text-red-600" },
   ] as const;
 
+  // Check geolocation support and setup offline sync
+  useEffect(() => {
+    const initializeFeatures = async () => {
+      // Check geolocation support
+      const geoSupport = await checkGeolocationSupport();
+      setGeolocationSupported(geoSupport.supported);
+
+      // Setup offline sync
+      setupOfflineSync((results) => {
+        if (results.successful > 0) {
+          toast({
+            title: "Reports Synced",
+            description: `${results.successful} report(s) synced successfully`,
+          });
+        }
+        updatePendingCount();
+      });
+
+      // Initial pending count
+      updatePendingCount();
+    };
+
+    initializeFeatures();
+
+    // Listen for online/offline events
+    const handleOnline = () => {
+      setOnline(true);
+      toast({
+        title: "Connection Restored",
+        description: "Reports will be synced automatically",
+      });
+    };
+
+    const handleOffline = () => {
+      setOnline(false);
+      toast({
+        title: "Connection Lost",
+        description: "Reports will be saved offline",
+        variant: "destructive",
+      });
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // AI Moderation effect
+  useEffect(() => {
+    if (message.trim().length > 10) {
+      const result = moderateContent(message);
+      setModerationResult(result);
+      setShowModerationWarning(result.isFlagged);
+    } else {
+      setModerationResult(null);
+      setShowModerationWarning(false);
+    }
+  }, [message]);
+
+  const updatePendingCount = () => {
+    setPendingReports(getPendingReports().length);
+  };
+
+  const getLocation = async () => {
+    if (!geolocationSupported) {
+      setLocationError("Geolocation not supported by this browser");
+      return;
+    }
+
+    setGettingLocation(true);
+    setLocationError("");
+
+    try {
+      const locationData = await getCurrentLocation();
+
+      // Get address if possible
+      try {
+        const address = await reverseGeocode(locationData.latitude, locationData.longitude);
+        locationData.address = address;
+      } catch (e) {
+        console.warn("Could not get address:", e);
+      }
+
+      setLocation(locationData);
+      toast({
+        title: "Location Captured",
+        description: formatLocation(locationData),
+      });
+    } catch (error: any) {
+      setLocationError(error.message || "Failed to get location");
+      toast({
+        title: "Location Error",
+        description: error.message || "Failed to get location",
+        variant: "destructive",
+      });
+    } finally {
+      setGettingLocation(false);
+    }
+  };
+
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
