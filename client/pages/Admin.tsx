@@ -55,6 +55,8 @@ import {
 } from "@shared/api";
 import { decryptReportData } from "@/lib/encryption";
 import { notificationService } from "@/lib/notifications";
+import ReportsMap from "@/components/ReportsMap";
+import { formatLocation } from "@/lib/geolocation";
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
