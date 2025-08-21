@@ -1124,12 +1124,6 @@ export default function Admin() {
           )}
         </div>
       </div>
-
-      {/* Email Setup Dialog */}
-      <EmailSetupDialog
-        open={showEmailSetup}
-        onOpenChange={setShowEmailSetup}
-      />
     </div>
   );
 }
