@@ -8,7 +8,7 @@ const EMAIL_CONFIG = {
   port: 587,
   secure: false,
   auth: {
-    user: process.env.EMAIL_USER, // Your email
+    user: process.env.EMAIL_USER || "whistle.notifications@gmail.com", // Your email
     pass: process.env.EMAIL_APP_PASSWORD, // App-specific password required
   },
 };
