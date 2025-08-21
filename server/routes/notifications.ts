@@ -140,6 +140,8 @@ async function sendEmailAlert(report: Report) {
 
           Please log into the admin dashboard immediately to review and respond.
 
+          Admin Dashboard: ${process.env.ADMIN_DASHBOARD_URL || 'http://localhost:8080/admin'}
+
           - Whistle Security System
         `,
       };
