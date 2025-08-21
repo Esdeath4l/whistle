@@ -58,7 +58,6 @@ import {
 import { decryptReportData } from "@/lib/encryption";
 import { notificationService } from "@/lib/notifications";
 import ReportsMap from "@/components/ReportsMap";
-import EmailSetupDialog from "@/components/EmailSetupDialog";
 import { formatLocation } from "@/lib/geolocation";
 
 export default function Admin() {
