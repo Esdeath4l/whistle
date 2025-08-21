@@ -49,5 +49,10 @@ export function createServer() {
   app.get("/api/notifications/settings", getNotificationSettings);
   app.post("/api/notifications/test-email", testEmailService);
 
+  // Test routes for debugging
+  app.get("/api/test/email-config", testEmailConfiguration);
+  app.post("/api/test/send-email", sendTestEmailNotification);
+  app.post("/api/test/urgent-notification", testUrgentNotification);
+
   return app;
 }
