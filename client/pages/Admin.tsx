@@ -454,6 +454,67 @@ export default function Admin() {
               <Button onClick={fetchReports} variant="outline" size="sm">
                 Refresh
               </Button>
+
+              <Button
+                onClick={async () => {
+                  // Add demo data for testing
+                  const demoReports = [
+                    {
+                      message: "Someone was using offensive language and making threats in the office",
+                      category: "harassment",
+                      severity: "high",
+                      location: {
+                        latitude: 37.7749,
+                        longitude: -122.4194,
+                        accuracy: 10,
+                        timestamp: Date.now(),
+                        address: "123 Market Street, San Francisco, CA"
+                      },
+                      share_location: true
+                    },
+                    {
+                      message: "Emergency medical situation in building lobby",
+                      category: "medical",
+                      severity: "urgent",
+                      location: {
+                        latitude: 37.7849,
+                        longitude: -122.4094,
+                        accuracy: 8,
+                        timestamp: Date.now(),
+                        address: "456 Mission Street, San Francisco, CA"
+                      },
+                      share_location: true
+                    },
+                    {
+                      message: "Great feedback about the new lunch menu options",
+                      category: "feedback",
+                      severity: "low",
+                      location: {
+                        latitude: 37.7649,
+                        longitude: -122.4294,
+                        accuracy: 12,
+                        timestamp: Date.now(),
+                        address: "789 Howard Street, San Francisco, CA"
+                      },
+                      share_location: true
+                    }
+                  ];
+
+                  for (const report of demoReports) {
+                    await fetch('/api/reports', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(report)
+                    });
+                  }
+
+                  fetchReports();
+                }}
+                variant="secondary"
+                size="sm"
+              >
+                Add Demo Data
+              </Button>
             </div>
           </div>
 
