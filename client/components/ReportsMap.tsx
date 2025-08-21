@@ -343,55 +343,6 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
                   </CardContent>
                 </Card>
 
-                {/* Nearby Reports */}
-                {(() => {
-                  const nearbyReports = reportsWithLocation
-                    .filter(r => r.id !== selectedReport.id)
-                    .map(r => ({
-                      ...r,
-                      distance: calculateDistance(
-                        selectedReport.location!.latitude,
-                        selectedReport.location!.longitude,
-                        r.location!.latitude,
-                        r.location!.longitude
-                      )
-                    }))
-                    .filter(r => r.distance < 1) // Within 1km
-                    .sort((a, b) => a.distance - b.distance)
-                    .slice(0, 3);
-
-                  if (nearbyReports.length > 0) {
-                    return (
-                      <Card>
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-sm">Nearby Reports</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                          {nearbyReports.map((report) => (
-                            <div 
-                              key={report.id}
-                              className="p-2 border rounded cursor-pointer hover:bg-muted transition-colors"
-                              onClick={() => setSelectedReport(report)}
-                            >
-                              <div className="flex items-center justify-between mb-1">
-                                <Badge variant="outline" className="text-xs">
-                                  {report.category}
-                                </Badge>
-                                <span className="text-xs text-muted-foreground">
-                                  {report.distance.toFixed(1)}km away
-                                </span>
-                              </div>
-                              <p className="text-xs text-muted-foreground">
-                                {report.message.substring(0, 60)}...
-                              </p>
-                            </div>
-                          ))}
-                        </CardContent>
-                      </Card>
-                    );
-                  }
-                  return null;
-                })()}
               </div>
             ) : (
               <div className="text-center text-muted-foreground">
