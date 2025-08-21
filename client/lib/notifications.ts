@@ -12,6 +12,7 @@ export class NotificationService {
   private eventSource: EventSource | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
+  private notificationsEnabled = true;
 
   static getInstance(): NotificationService {
     if (!NotificationService.instance) {
@@ -176,7 +177,7 @@ export class NotificationService {
 
     // Show toast notification
     this.showToast({
-      title: "🚨 New Report Received",
+      title: "�� New Report Received",
       description: `${category} report (${severity} priority) - ID: ${reportId}`,
       type: "info",
       duration: 8000,
