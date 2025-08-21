@@ -174,6 +174,15 @@ export class NotificationService {
       case "urgent_report":
         this.handleUrgentReportNotification(data);
         break;
+      case "email_sent":
+        this.handleEmailStatusNotification(data, "success");
+        break;
+      case "email_warning":
+        this.handleEmailStatusNotification(data, "warning");
+        break;
+      case "email_error":
+        this.handleEmailStatusNotification(data, "error");
+        break;
       case "test":
         this.handleTestNotification(data);
         break;
@@ -182,7 +191,7 @@ export class NotificationService {
         // Ignore connection/heartbeat messages
         break;
       default:
-        console.log("Unknown notification type:", data.type);
+        console.log("Unknown notification type:", data.type, data);
     }
   }
 
@@ -220,20 +229,21 @@ export class NotificationService {
   }
 
   private handleUrgentReportNotification(data: any) {
-    const { reportId, category } = data;
+    const { reportId, category, severity, status, message } = data;
 
     // Show urgent toast notification
     this.showToast({
       title: "🚨 URGENT REPORT",
-      description: `Emergency ${category} report requires immediate attention - ID: ${reportId}`,
+      description: `${message || 'Emergency report'} - ${category} (${severity}) - ID: ${reportId}`,
       type: "error",
-      duration: 15000,
+      duration: 20000, // Longer duration for urgent reports
     });
 
     // Send urgent browser notification
     this.sendPushNotification(
-      "🚨 URGENT: Harassment Report",
-      `An emergency ${category} report requires immediate attention.`,
+      "🚨 URGENT: Whistle Alert",
+      `Emergency ${category} report (${severity}) requires immediate attention. Click to view dashboard.`,
+      "/favicon.ico"
     );
 
     // Play urgent notification sound (multiple beeps)
@@ -241,6 +251,13 @@ export class NotificationService {
 
     // Flash document title
     this.flashDocumentTitle("🚨 URGENT REPORT");
+
+    console.log(`URGENT notification processed for report ${reportId}:`, {
+      category,
+      severity,
+      status,
+      timestamp: data.timestamp
+    });
   }
 
   private playUrgentSound() {
@@ -248,6 +265,27 @@ export class NotificationService {
     for (let i = 0; i < 3; i++) {
       setTimeout(() => this.playNotificationSound(), i * 400);
     }
+
+    // Additional longer beep after 2 seconds
+    setTimeout(() => {
+      try {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+        gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 1);
+      } catch (error) {
+        console.warn("Could not play urgent sound:", error);
+      }
+    }, 2000);
   }
 
   private updateDocumentTitle(prefix: string) {
