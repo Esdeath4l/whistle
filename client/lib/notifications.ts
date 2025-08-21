@@ -98,6 +98,12 @@ export class NotificationService {
    * Setup real-time notifications via Server-Sent Events
    */
   setupRealtimeNotifications(adminToken: string) {
+    // Skip if notifications are disabled
+    if (!this.notificationsEnabled) {
+      console.log("Notifications are disabled, skipping setup");
+      return;
+    }
+
     // Skip if not in browser environment
     if (typeof window === 'undefined' || typeof EventSource === 'undefined') {
       console.log("SSE not supported in this environment");
@@ -177,7 +183,7 @@ export class NotificationService {
 
     // Show toast notification
     this.showToast({
-      title: "�� New Report Received",
+      title: "🚨 New Report Received",
       description: `${category} report (${severity} priority) - ID: ${reportId}`,
       type: "info",
       duration: 8000,
