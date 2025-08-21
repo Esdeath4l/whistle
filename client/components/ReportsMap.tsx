@@ -289,25 +289,6 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <div>
-                      <div className="text-xs font-medium text-muted-foreground mb-1">Message</div>
-                      <p className="text-sm">
-                        {(() => {
-                          if (selectedReport.is_encrypted && selectedReport.encrypted_data) {
-                            try {
-                              const { decryptReportData } = require("@/lib/encryption");
-                              const decrypted = decryptReportData(selectedReport.encrypted_data);
-                              return decrypted.message.substring(0, 100) + "...";
-                            } catch (error) {
-                              return "[DECRYPTION ERROR - Cannot display encrypted message]";
-                            }
-                          }
-                          return selectedReport.message.substring(0, 100) + "...";
-                        })()}
-                      </p>
-                    </div>
-
-                    <Separator />
 
                     <div>
                       <div className="text-xs font-medium text-muted-foreground mb-2">Location Details</div>
