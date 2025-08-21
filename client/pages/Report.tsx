@@ -388,6 +388,9 @@ export default function Report() {
             severity,
             encrypted_data: encryptedData,
             is_encrypted: true,
+            location: shareLocation && location ? location : undefined,
+            share_location: shareLocation,
+            is_offline_sync: !online,
           };
 
           console.log("Submitting encrypted report data"); // Debug log (no sensitive data)
