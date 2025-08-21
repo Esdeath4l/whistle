@@ -457,6 +457,47 @@ export default function Admin() {
             </div>
           </div>
 
+          {/* Reports Map */}
+          {reports.length > 0 && (
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Map className="w-5 h-5" />
+                  Reports Location Map
+                </CardTitle>
+                <CardDescription>
+                  Interactive map showing report locations with clustering.
+                  Flagged reports are highlighted with special markers.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ReportsMap
+                  reports={reports}
+                  onReportSelect={setSelectedReport}
+                  className="h-96 w-full rounded-lg border"
+                />
+                <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    Normal reports
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                    Flagged reports
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                    AI flagged
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-red-600 rounded-full"></div>
+                    Urgent reports
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Reports List */}
           {loading ? (
             <div className="text-center py-12">
