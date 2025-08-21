@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -33,6 +33,11 @@ import {
   Heart,
   MessageCircle,
   Flag,
+  MapPin,
+  Wifi,
+  WifiOff,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -46,6 +51,22 @@ import { encryptReportData } from "@/lib/encryption";
 import VideoUploadRecorder, {
   VideoFile,
 } from "@/components/VideoUploadRecorder";
+import { moderateContent, getModerationMessage } from "@/lib/ai-moderation";
+import {
+  isOnline,
+  saveOfflineReport,
+  setupOfflineSync,
+  syncPendingReports,
+  getPendingReports
+} from "@/lib/offline-storage";
+import {
+  getCurrentLocation,
+  checkGeolocationSupport,
+  reverseGeocode,
+  formatLocation
+} from "@/lib/geolocation";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "@/hooks/use-toast";
 
 export default function Report() {
   const [message, setMessage] = useState("");
@@ -57,6 +78,17 @@ export default function Report() {
   const [submitted, setSubmitted] = useState(false);
   const [reportId, setReportId] = useState<string>("");
   const [error, setError] = useState<string>("");
+
+  // New feature states
+  const [shareLocation, setShareLocation] = useState(false);
+  const [location, setLocation] = useState<any>(null);
+  const [gettingLocation, setGettingLocation] = useState(false);
+  const [locationError, setLocationError] = useState<string>("");
+  const [geolocationSupported, setGeolocationSupported] = useState(false);
+  const [online, setOnline] = useState(isOnline());
+  const [pendingReports, setPendingReports] = useState(0);
+  const [moderationResult, setModerationResult] = useState<any>(null);
+  const [showModerationWarning, setShowModerationWarning] = useState(false);
 
   const categoryOptions = [
     {
