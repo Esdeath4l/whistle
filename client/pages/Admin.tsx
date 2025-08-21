@@ -276,7 +276,7 @@ export default function Admin() {
         console.error("Failed to decrypt report:", error);
         return {
           message: "[DECRYPTION ERROR]",
-          category: "encrypted",
+          category: "encrypted" as ReportCategory,
           photo_url: undefined,
           video_url: undefined,
           video_metadata: undefined,
