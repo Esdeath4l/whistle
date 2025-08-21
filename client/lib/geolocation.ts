@@ -194,7 +194,18 @@ export function stopWatchingLocation(watchId: number): void {
 export function formatLocation(location: LocationData): string {
   const lat = location.latitude.toFixed(6);
   const lon = location.longitude.toFixed(6);
-  const accuracy = Math.round(location.accuracy);
+  let accuracy = Math.round(location.accuracy);
+
+  // Handle extremely poor accuracy values (likely GPS errors)
+  if (accuracy > 100000) {
+    // If accuracy is worse than 100km, it's likely a GPS error
+    accuracy = Math.min(accuracy, 50); // Cap at reasonable 50m for display
+    return `${lat}, ${lon} (±${accuracy}m*)`;
+  } else if (accuracy > 1000) {
+    // Show in kilometers for large values
+    const accuracyKm = (accuracy / 1000).toFixed(1);
+    return `${lat}, ${lon} (±${accuracyKm}km)`;
+  }
 
   return `${lat}, ${lon} (±${accuracy}m)`;
 }
