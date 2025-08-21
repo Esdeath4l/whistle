@@ -694,6 +694,111 @@ export default function Report() {
                   </div>
                 </div>
 
+                {/* Status indicators */}
+                <div className="flex flex-wrap gap-2 p-3 bg-muted/50 rounded-lg">
+                  <div className={`flex items-center gap-2 text-sm ${online ? 'text-green-600' : 'text-red-600'}`}>
+                    {online ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />}
+                    {online ? 'Online' : 'Offline'}
+                  </div>
+
+                  {pendingReports > 0 && (
+                    <Badge variant="secondary" className="text-xs">
+                      {pendingReports} pending sync
+                    </Badge>
+                  )}
+
+                  {moderationResult?.isFlagged && (
+                    <Badge variant="destructive" className="text-xs">
+                      ⚠️ AI Flagged
+                    </Badge>
+                  )}
+
+                  {location && (
+                    <Badge variant="outline" className="text-xs">
+                      <MapPin className="w-3 h-3 mr-1" />
+                      Location captured
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Location sharing toggle */}
+                {geolocationSupported && (
+                  <div className="space-y-3 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <MapPin className="w-5 h-5 text-blue-600" />
+                        <div>
+                          <Label htmlFor="share-location" className="text-sm font-medium">
+                            Share Location
+                          </Label>
+                          <p className="text-xs text-muted-foreground">
+                            Help authorities locate the incident
+                          </p>
+                        </div>
+                      </div>
+                      <Switch
+                        id="share-location"
+                        checked={shareLocation}
+                        onCheckedChange={setShareLocation}
+                      />
+                    </div>
+
+                    {shareLocation && !location && (
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={getLocation}
+                          disabled={gettingLocation}
+                          className="text-xs"
+                        >
+                          {gettingLocation ? (
+                            <>
+                              <div className="w-3 h-3 border border-blue-600 border-t-transparent rounded-full animate-spin mr-2" />
+                              Getting location...
+                            </>
+                          ) : (
+                            <>
+                              <MapPin className="w-3 h-3 mr-1" />
+                              Capture Location
+                            </>
+                          )}
+                        </Button>
+                        {locationError && (
+                          <span className="text-xs text-red-600">{locationError}</span>
+                        )}
+                      </div>
+                    )}
+
+                    {location && (
+                      <div className="text-xs space-y-1">
+                        <div className="flex items-center gap-1 text-green-600">
+                          <CheckCircle className="w-3 h-3" />
+                          Location captured
+                        </div>
+                        <div className="text-muted-foreground">
+                          📍 {formatLocation(location)}
+                        </div>
+                        {location.address && (
+                          <div className="text-muted-foreground truncate">
+                            {location.address}
+                          </div>
+                        )}
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setLocation(null)}
+                          className="text-xs h-6 px-2"
+                        >
+                          Clear location
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <Label htmlFor="message">Your Report *</Label>
                   <Textarea
