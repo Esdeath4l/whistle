@@ -462,6 +462,31 @@ export default function Admin() {
 
               <Button
                 onClick={async () => {
+                  // Test email service
+                  try {
+                    const response = await fetch('/api/notifications/test-email', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' }
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                      alert('✅ Test email sent successfully! Check your inbox.');
+                    } else {
+                      alert('❌ Email test failed: ' + result.message);
+                    }
+                  } catch (error) {
+                    alert('❌ Email test error: ' + error);
+                  }
+                }}
+                variant="outline"
+                size="sm"
+              >
+                📧 Test Email
+              </Button>
+
+              <Button
+                onClick={async () => {
                   // Add demo data for testing
                   const demoReports = [
                     {
