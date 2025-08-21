@@ -234,7 +234,7 @@ export class NotificationService {
     // Show urgent toast notification
     this.showToast({
       title: "🚨 URGENT REPORT",
-      description: `${message || 'Emergency report'} - ${category} (${severity}) - ID: ${reportId}`,
+      description: `${message || "Emergency report"} - ${category} (${severity}) - ID: ${reportId}`,
       type: "error",
       duration: 20000, // Longer duration for urgent reports
     });
@@ -243,7 +243,7 @@ export class NotificationService {
     this.sendPushNotification(
       "🚨 URGENT: Whistle Alert",
       `Emergency ${category} report (${severity}) requires immediate attention. Click to view dashboard.`,
-      "/favicon.ico"
+      "/favicon.ico",
     );
 
     // Play urgent notification sound (multiple beeps)
@@ -256,7 +256,7 @@ export class NotificationService {
       category,
       severity,
       status,
-      timestamp: data.timestamp
+      timestamp: data.timestamp,
     });
   }
 
@@ -269,7 +269,8 @@ export class NotificationService {
     // Additional longer beep after 2 seconds
     setTimeout(() => {
       try {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const audioContext = new (window.AudioContext ||
+          (window as any).webkitAudioContext)();
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
 
@@ -278,7 +279,10 @@ export class NotificationService {
 
         oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
         gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioContext.currentTime + 1,
+        );
 
         oscillator.start(audioContext.currentTime);
         oscillator.stop(audioContext.currentTime + 1);
@@ -401,7 +405,10 @@ export class NotificationService {
     }
   }
 
-  private handleEmailStatusNotification(data: any, status: "success" | "warning" | "error") {
+  private handleEmailStatusNotification(
+    data: any,
+    status: "success" | "warning" | "error",
+  ) {
     const { reportId, message } = data;
 
     switch (status) {

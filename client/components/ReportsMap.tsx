@@ -43,17 +43,25 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
         typeof report.location.latitude === "number" &&
         typeof report.location.longitude === "number" &&
         (filterStatus === "all" ||
-         (filterStatus === "urgent" && report.severity === "urgent") ||
-         (filterStatus === "flagged" && (report.status === "flagged" || report.moderation?.isFlagged))
-        )
+          (filterStatus === "urgent" && report.severity === "urgent") ||
+          (filterStatus === "flagged" &&
+            (report.status === "flagged" || report.moderation?.isFlagged))),
     );
   }, [reports, filterStatus]);
 
   // Calculate map center based on reports
   useEffect(() => {
     if (reportsWithLocation.length > 0) {
-      const avgLat = reportsWithLocation.reduce((sum, report) => sum + report.location!.latitude, 0) / reportsWithLocation.length;
-      const avgLng = reportsWithLocation.reduce((sum, report) => sum + report.location!.longitude, 0) / reportsWithLocation.length;
+      const avgLat =
+        reportsWithLocation.reduce(
+          (sum, report) => sum + report.location!.latitude,
+          0,
+        ) / reportsWithLocation.length;
+      const avgLng =
+        reportsWithLocation.reduce(
+          (sum, report) => sum + report.location!.longitude,
+          0,
+        ) / reportsWithLocation.length;
       setMapCenter({ lat: avgLat, lng: avgLng });
     }
   }, [reportsWithLocation]);
@@ -92,7 +100,6 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
     });
   };
 
-
   if (reportsWithLocation.length === 0) {
     return (
       <div
@@ -101,7 +108,9 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
         <div className="text-center">
           <MapPin className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
           <p className="text-sm text-muted-foreground">
-            {filterStatus === "all" ? "No reports with location data" : `No ${filterStatus} reports with location data`}
+            {filterStatus === "all"
+              ? "No reports with location data"
+              : `No ${filterStatus} reports with location data`}
           </p>
         </div>
       </div>
@@ -111,7 +120,6 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
   return (
     <div className={className}>
       <div className="h-full bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-lg border overflow-hidden flex">
-        
         {/* Interactive Map View */}
         <div className="flex-1 relative">
           {/* Map Header */}
@@ -120,11 +128,12 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
               <div className="flex items-center gap-2">
                 <Map className="w-5 h-5 text-blue-600" />
                 <h3 className="font-semibold text-sm">
-                  Interactive Location Map ({reportsWithLocation.length} locations)
+                  Interactive Location Map ({reportsWithLocation.length}{" "}
+                  locations)
                 </h3>
               </div>
               <div className="flex items-center gap-2">
-                <select 
+                <select
                   className="text-xs border rounded px-2 py-1"
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
@@ -133,16 +142,16 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
                   <option value="urgent">Urgent Only</option>
                   <option value="flagged">Flagged Only</option>
                 </select>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => setZoom(zoom + 1)}
                   className="h-6 px-2 text-xs"
                 >
                   Zoom In
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => setZoom(Math.max(1, zoom - 1))}
                   className="h-6 px-2 text-xs"
@@ -155,28 +164,28 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
 
           {/* Simulated Map Canvas */}
           <div className="h-full pt-16 pb-12 px-4 relative overflow-auto">
-            <div 
+            <div
               className="relative bg-green-50 dark:bg-green-900/20 rounded-lg border-2 border-green-200 dark:border-green-800 min-h-full"
-              style={{ 
-                minHeight: '400px',
+              style={{
+                minHeight: "400px",
                 backgroundImage: `
                   linear-gradient(90deg, rgba(34,197,94,0.1) 1px, transparent 1px),
                   linear-gradient(rgba(34,197,94,0.1) 1px, transparent 1px)
                 `,
-                backgroundSize: '20px 20px'
+                backgroundSize: "20px 20px",
               }}
             >
               {/* Map Markers - Optimized rendering */}
               {reportsWithLocation.slice(0, 20).map((report, index) => {
-                const x = 50 + (Math.sin(index * 0.8) * 35);
-                const y = 30 + (Math.cos(index * 0.6) * 40);
+                const x = 50 + Math.sin(index * 0.8) * 35;
+                const y = 30 + Math.cos(index * 0.6) * 40;
                 const isSelected = selectedReport?.id === report.id;
 
                 return (
                   <div
                     key={report.id}
                     className={`absolute cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-transform duration-200 hover:scale-110 ${
-                      isSelected ? 'scale-125 z-20' : 'z-10'
+                      isSelected ? "scale-125 z-20" : "z-10"
                     }`}
                     style={{
                       left: `${x}%`,
@@ -190,21 +199,25 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
                   >
                     {/* Simplified Marker */}
                     <div className="relative">
-                      <div className={`w-6 h-6 rounded-full border-2 border-white shadow-lg ${getReportColor(report)} ${isSelected ? 'animate-pulse' : ''}`} />
+                      <div
+                        className={`w-6 h-6 rounded-full border-2 border-white shadow-lg ${getReportColor(report)} ${isSelected ? "animate-pulse" : ""}`}
+                      />
                       {/* Marker Pin */}
-                      <div className={`absolute top-6 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent ${getReportColor(report).replace('bg-', 'border-t-')}`} />
+                      <div
+                        className={`absolute top-6 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent ${getReportColor(report).replace("bg-", "border-t-")}`}
+                      />
                     </div>
                   </div>
                 );
               })}
 
               {/* Map Center Indicator */}
-              <div 
+              <div
                 className="absolute w-2 h-2 bg-red-500 rounded-full border border-white"
-                style={{ 
-                  left: '50%', 
-                  top: '50%',
-                  transform: 'translate(-50%, -50%)'
+                style={{
+                  left: "50%",
+                  top: "50%",
+                  transform: "translate(-50%, -50%)",
                 }}
               />
             </div>
@@ -259,14 +272,20 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center justify-between">
-                      <span>Report #{reportsWithLocation.findIndex(r => r.id === selectedReport.id) + 1}</span>
+                      <span>
+                        Report #
+                        {reportsWithLocation.findIndex(
+                          (r) => r.id === selectedReport.id,
+                        ) + 1}
+                      </span>
                       {getStatusBadge(selectedReport)}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-
                     <div>
-                      <div className="text-xs font-medium text-muted-foreground mb-2">Location Details</div>
+                      <div className="text-xs font-medium text-muted-foreground mb-2">
+                        Location Details
+                      </div>
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
                           <MapPin className="w-3 h-3 text-blue-600" />
@@ -274,7 +293,7 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
                             {formatLocation(selectedReport.location!)}
                           </span>
                         </div>
-                        
+
                         {selectedReport.location?.address && (
                           <div className="text-sm text-muted-foreground">
                             📍 {selectedReport.location.address}
@@ -283,20 +302,29 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
 
                         <div className="grid grid-cols-2 gap-2 text-xs">
                           <div>
-                            <span className="text-muted-foreground">Accuracy:</span>
+                            <span className="text-muted-foreground">
+                              Accuracy:
+                            </span>
                             <span className="font-medium ml-1">
                               {(() => {
-                                const acc = Math.round(selectedReport.location!.accuracy);
+                                const acc = Math.round(
+                                  selectedReport.location!.accuracy,
+                                );
                                 if (acc > 100000) return "±50m*"; // Cap display for GPS errors
-                                if (acc > 1000) return `±${(acc/1000).toFixed(1)}km`;
+                                if (acc > 1000)
+                                  return `±${(acc / 1000).toFixed(1)}km`;
                                 return `±${acc}m`;
                               })()}
                             </span>
                           </div>
                           <div>
-                            <span className="text-muted-foreground">Captured:</span>
+                            <span className="text-muted-foreground">
+                              Captured:
+                            </span>
                             <div className="font-medium">
-                              {new Date(selectedReport.location!.timestamp).toLocaleTimeString()}
+                              {new Date(
+                                selectedReport.location!.timestamp,
+                              ).toLocaleTimeString()}
                             </div>
                           </div>
                         </div>
@@ -312,8 +340,8 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
                       </span>
                     </div>
 
-                    <Button 
-                      size="sm" 
+                    <Button
+                      size="sm"
                       className="w-full"
                       onClick={() => onReportSelect?.(selectedReport)}
                     >
@@ -322,12 +350,13 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
                     </Button>
                   </CardContent>
                 </Card>
-
               </div>
             ) : (
               <div className="text-center text-muted-foreground">
                 <MapPin className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p className="text-sm">Select a marker on the map to view location details</p>
+                <p className="text-sm">
+                  Select a marker on the map to view location details
+                </p>
               </div>
             )}
           </ScrollArea>

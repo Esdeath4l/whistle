@@ -463,12 +463,12 @@ export default function Admin() {
                 Refresh
               </Button>
 
-
               <Button
                 onClick={async () => {
                   // Test urgent notification
                   const urgentReport = {
-                    message: "URGENT TEST: Immediate threat in building - security needed now!",
+                    message:
+                      "URGENT TEST: Immediate threat in building - security needed now!",
                     category: "emergency",
                     severity: "urgent",
                     location: {
@@ -489,7 +489,9 @@ export default function Admin() {
                     });
 
                     if (response.ok) {
-                      alert("🚨 Urgent test report created! You should receive notifications.");
+                      alert(
+                        "🚨 Urgent test report created! You should receive notifications.",
+                      );
                       fetchReports();
                     } else {
                       alert("Failed to create urgent test report");

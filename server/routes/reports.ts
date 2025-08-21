@@ -179,7 +179,9 @@ export const createReport: RequestHandler = (req, res) => {
     // Send real-time notification to admins
     try {
       notifyNewReport(newReport);
-      console.log(`Notification sent for report ${newReport.id} (${newReport.severity} ${newReport.category})`);
+      console.log(
+        `Notification sent for report ${newReport.id} (${newReport.severity} ${newReport.category})`,
+      );
     } catch (notificationError) {
       console.error("Failed to send notification:", notificationError);
       // Don't fail the report creation if notification fails

@@ -100,18 +100,25 @@ export function notifyNewReport(report: Report) {
     severity: report.severity,
     status: report.status,
     timestamp: new Date().toISOString(),
-    message: isUrgent ? "URGENT: Immediate attention required" : "New report received",
+    message: isUrgent
+      ? "URGENT: Immediate attention required"
+      : "New report received",
   };
 
-  console.log(`Creating ${notification.type} notification for report ${report.id}`);
+  console.log(
+    `Creating ${notification.type} notification for report ${report.id}`,
+  );
 
   broadcastNotification(notification);
 
   // Send email notification for urgent reports
   if (isUrgent) {
     console.log(`Sending urgent email alert for report ${report.id}`);
-    sendEmailAlert(report).catch(error => {
-      console.error(`Failed to send email alert for report ${report.id}:`, error);
+    sendEmailAlert(report).catch((error) => {
+      console.error(
+        `Failed to send email alert for report ${report.id}:`,
+        error,
+      );
     });
   }
 }
@@ -157,9 +164,9 @@ async function sendEmailAlert(report: Report) {
           Severity: ${report.severity}
           Status: ${report.status}
           Submitted: ${report.created_at}
-          ${report.location ? `Location: ${report.location.latitude}, ${report.location.longitude}` : ''}
+          ${report.location ? `Location: ${report.location.latitude}, ${report.location.longitude}` : ""}
 
-          ${report.moderation?.isFlagged ? `⚠️ AI Flagged: ${report.moderation.reason}` : ''}
+          ${report.moderation?.isFlagged ? `⚠️ AI Flagged: ${report.moderation.reason}` : ""}
 
           Please log into the admin dashboard immediately to review and respond.
 
