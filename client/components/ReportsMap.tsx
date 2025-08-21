@@ -75,18 +75,35 @@ const moderatedIcon = new Icon({
   popupAnchor: [0, -26]
 });
 
-// Custom cluster icon
-const createClusterIcon = (cluster: any) => {
-  const count = cluster.getChildCount();
-  const hasFlagged = cluster.getAllChildMarkers().some((marker: any) => 
-    marker.options.report?.status === 'flagged' || marker.options.report?.moderation?.isFlagged
-  );
-  
-  return divIcon({
-    html: `<div class="cluster-icon ${hasFlagged ? 'cluster-flagged' : ''}">${count}</div>`,
-    className: 'custom-cluster-icon',
-    iconSize: [40, 40]
+// Simple grouping logic for nearby reports (manual clustering)
+const groupNearbyReports = (reports: Report[], maxDistance = 0.01) => {
+  const groups: Report[][] = [];
+  const processed = new Set<string>();
+
+  reports.forEach(report => {
+    if (processed.has(report.id) || !report.location) return;
+
+    const group = [report];
+    processed.add(report.id);
+
+    reports.forEach(otherReport => {
+      if (processed.has(otherReport.id) || !otherReport.location || otherReport.id === report.id) return;
+
+      const distance = Math.sqrt(
+        Math.pow(report.location!.latitude - otherReport.location!.latitude, 2) +
+        Math.pow(report.location!.longitude - otherReport.location!.longitude, 2)
+      );
+
+      if (distance < maxDistance) {
+        group.push(otherReport);
+        processed.add(otherReport.id);
+      }
+    });
+
+    groups.push(group);
   });
+
+  return groups;
 };
 
 const ReportsMap: React.FC<ReportsMapProps> = ({ 
