@@ -162,8 +162,8 @@ export const createReport: RequestHandler = (req, res) => {
       is_offline_sync: is_offline_sync || false,
     };
 
-    // Auto-flag urgent reports (check severity since category might be encrypted)
-    if (severity === "urgent") {
+    // Auto-flag urgent reports or AI-flagged content
+    if (severity === "urgent" || (moderation && moderation.isFlagged && moderation.confidence > 0.7)) {
       newReport.status = "flagged";
     }
 
