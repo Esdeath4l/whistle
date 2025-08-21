@@ -254,22 +254,25 @@ export class NotificationService {
   private attemptReconnect(adminToken: string) {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
-      const delay = Math.pow(2, this.reconnectAttempts) * 1000; // Exponential backoff
+      const delay = Math.min(Math.pow(2, this.reconnectAttempts) * 1000, 30000); // Cap at 30 seconds
 
       console.log(
-        `Attempting to reconnect notifications in ${delay}ms (attempt ${this.reconnectAttempts})`,
+        `Attempting to reconnect notifications in ${delay/1000}s (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
       );
 
       setTimeout(() => {
-        this.setupRealtimeNotifications(adminToken);
+        if (this.reconnectAttempts <= this.maxReconnectAttempts) {
+          this.setupRealtimeNotifications(adminToken);
+        }
       }, delay);
     } else {
+      console.log("Max reconnection attempts reached, giving up");
       this.showToast({
         title: "❌ Notifications Disconnected",
         description:
-          "Unable to connect to real-time notifications. Please refresh the page.",
+          "Real-time notifications are unavailable. The app will still function normally.",
         type: "error",
-        duration: 10000,
+        duration: 8000,
       });
     }
   }
