@@ -17,6 +17,25 @@ export interface Report {
   // Encrypted data fields
   encrypted_data?: EncryptedReportData;
   is_encrypted?: boolean;
+  // New features
+  location?: LocationData;
+  moderation?: ModerationResult;
+  is_offline_sync?: boolean;
+}
+
+export interface LocationData {
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  timestamp: number;
+  address?: string;
+}
+
+export interface ModerationResult {
+  isFlagged: boolean;
+  reason?: string;
+  confidence: number;
+  detectedTerms: string[];
 }
 
 export interface VideoMetadata {
