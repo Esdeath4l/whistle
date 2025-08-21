@@ -173,9 +173,25 @@ export class NotificationService {
       case "urgent_report":
         this.handleUrgentReportNotification(data);
         break;
+      case "test":
+        this.handleTestNotification(data);
+        break;
+      case "connected":
+      case "heartbeat":
+        // Ignore connection/heartbeat messages
+        break;
       default:
         console.log("Unknown notification type:", data.type);
     }
+  }
+
+  private handleTestNotification(data: any) {
+    this.showToast({
+      title: "🧪 Test Notification",
+      description: data.message || "Test notification received successfully",
+      type: "info",
+      duration: 3000,
+    });
   }
 
   private handleNewReportNotification(data: any) {
