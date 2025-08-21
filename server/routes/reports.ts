@@ -19,9 +19,32 @@ let reportIdCounter = 1;
 const ADMIN_USERNAME = "ritika";
 const ADMIN_PASSWORD = "satoru 2624";
 
+// Simple AI moderation (server-side backup)
+function moderateContent(text: string): ModerationResult {
+  const offensiveTerms = ['fuck', 'shit', 'kill', 'die', 'hate', 'threat'];
+  const lowercaseText = text.toLowerCase();
+  const detectedTerms: string[] = [];
+
+  offensiveTerms.forEach(term => {
+    if (lowercaseText.includes(term)) {
+      detectedTerms.push(term);
+    }
+  });
+
+  const isFlagged = detectedTerms.length > 0;
+  const confidence = Math.min(detectedTerms.length * 0.3, 1);
+
+  return {
+    isFlagged,
+    reason: isFlagged ? 'Potentially inappropriate content detected' : undefined,
+    confidence,
+    detectedTerms
+  };
+}
+
 export const createReport: RequestHandler = (req, res) => {
   try {
-    console.log("Received report submission with media"); // Debug log (no sensitive data)
+    console.log("Received report submission with enhanced features"); // Debug log (no sensitive data)
     const {
       message,
       category,
@@ -31,6 +54,9 @@ export const createReport: RequestHandler = (req, res) => {
       video_metadata,
       encrypted_data,
       is_encrypted,
+      location,
+      share_location,
+      is_offline_sync,
     }: CreateReportRequest = req.body;
 
     // Validate video metadata if video is provided
