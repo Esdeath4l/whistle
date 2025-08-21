@@ -195,6 +195,11 @@ export default function Admin() {
         icon: MessageCircle,
         text: "Feedback",
       },
+      encrypted: {
+        variant: "secondary" as const,
+        icon: Lock,
+        text: "Encrypted",
+      },
     };
 
     const config =
