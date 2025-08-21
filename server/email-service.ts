@@ -38,7 +38,7 @@ export async function sendEmailAlert(report: Report): Promise<boolean> {
         name: "Whistle Security System",
         address: EMAIL_CONFIG.auth.user,
       },
-      to: process.env.EMAIL_TO,
+      to: process.env.EMAIL_TO || "admin@whistle.app",
       subject: `🚨 URGENT: New ${report.category} Report - ${report.id}`,
       html: `
         <!DOCTYPE html>
