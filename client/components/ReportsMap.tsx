@@ -35,17 +35,19 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
   const [zoom, setZoom] = useState(10);
   const [filterStatus, setFilterStatus] = useState<string>("all");
 
-  // Filter reports with location data
-  const reportsWithLocation = reports.filter(
-    (report) =>
-      report.location &&
-      typeof report.location.latitude === "number" &&
-      typeof report.location.longitude === "number" &&
-      (filterStatus === "all" || 
-       (filterStatus === "urgent" && report.severity === "urgent") ||
-       (filterStatus === "flagged" && (report.status === "flagged" || report.moderation?.isFlagged))
-      )
-  );
+  // Filter reports with location data - memoized for performance
+  const reportsWithLocation = React.useMemo(() => {
+    return reports.filter(
+      (report) =>
+        report.location &&
+        typeof report.location.latitude === "number" &&
+        typeof report.location.longitude === "number" &&
+        (filterStatus === "all" ||
+         (filterStatus === "urgent" && report.severity === "urgent") ||
+         (filterStatus === "flagged" && (report.status === "flagged" || report.moderation?.isFlagged))
+        )
+    );
+  }, [reports, filterStatus]);
 
   // Calculate map center based on reports
   useEffect(() => {
