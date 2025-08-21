@@ -3,7 +3,7 @@
  * Handles offline report storage and synchronization
  */
 
-import { CreateReportRequest, CreateReportResponse } from '@shared/api';
+import { CreateReportRequest, CreateReportResponse } from "@shared/api";
 
 export interface OfflineReport extends CreateReportRequest {
   id: string;
@@ -11,8 +11,8 @@ export interface OfflineReport extends CreateReportRequest {
   synced: boolean;
 }
 
-const OFFLINE_REPORTS_KEY = 'whistle_offline_reports';
-const SYNC_STATUS_KEY = 'whistle_sync_status';
+const OFFLINE_REPORTS_KEY = "whistle_offline_reports";
+const SYNC_STATUS_KEY = "whistle_sync_status";
 
 /**
  * Check if the browser is online
@@ -29,14 +29,14 @@ export function saveOfflineReport(reportData: CreateReportRequest): string {
     ...reportData,
     id: `offline_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     timestamp: Date.now(),
-    synced: false
+    synced: false,
   };
 
   const existingReports = getOfflineReports();
   existingReports.push(offlineReport);
-  
+
   localStorage.setItem(OFFLINE_REPORTS_KEY, JSON.stringify(existingReports));
-  
+
   return offlineReport.id;
 }
 
@@ -48,7 +48,7 @@ export function getOfflineReports(): OfflineReport[] {
     const stored = localStorage.getItem(OFFLINE_REPORTS_KEY);
     return stored ? JSON.parse(stored) : [];
   } catch (error) {
-    console.error('Error reading offline reports:', error);
+    console.error("Error reading offline reports:", error);
     return [];
   }
 }
@@ -57,16 +57,19 @@ export function getOfflineReports(): OfflineReport[] {
  * Get pending (unsynced) offline reports
  */
 export function getPendingReports(): OfflineReport[] {
-  return getOfflineReports().filter(report => !report.synced);
+  return getOfflineReports().filter((report) => !report.synced);
 }
 
 /**
  * Mark a report as synced
  */
-export function markReportAsSynced(offlineId: string, serverResponse?: CreateReportResponse): void {
+export function markReportAsSynced(
+  offlineId: string,
+  serverResponse?: CreateReportResponse,
+): void {
   const reports = getOfflineReports();
-  const reportIndex = reports.findIndex(report => report.id === offlineId);
-  
+  const reportIndex = reports.findIndex((report) => report.id === offlineId);
+
   if (reportIndex !== -1) {
     reports[reportIndex].synced = true;
     if (serverResponse) {
@@ -81,12 +84,12 @@ export function markReportAsSynced(offlineId: string, serverResponse?: CreateRep
  * Remove old synced reports to free up storage
  */
 export function cleanupOldReports(daysOld: number = 7): void {
-  const cutoffTime = Date.now() - (daysOld * 24 * 60 * 60 * 1000);
+  const cutoffTime = Date.now() - daysOld * 24 * 60 * 60 * 1000;
   const reports = getOfflineReports();
-  const filteredReports = reports.filter(report => 
-    !report.synced || report.timestamp > cutoffTime
+  const filteredReports = reports.filter(
+    (report) => !report.synced || report.timestamp > cutoffTime,
   );
-  
+
   localStorage.setItem(OFFLINE_REPORTS_KEY, JSON.stringify(filteredReports));
 }
 
@@ -102,7 +105,7 @@ export async function syncPendingReports(): Promise<{
   const results = {
     successful: 0,
     failed: 0,
-    errors: [] as string[]
+    errors: [] as string[],
   };
 
   if (pendingReports.length === 0) {
@@ -111,10 +114,10 @@ export async function syncPendingReports(): Promise<{
 
   for (const report of pendingReports) {
     try {
-      const response = await fetch('/api/reports', {
-        method: 'POST',
+      const response = await fetch("/api/reports", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           message: report.message,
@@ -124,8 +127,8 @@ export async function syncPendingReports(): Promise<{
           video_metadata: report.video_metadata,
           severity: report.severity,
           encrypted_data: report.encrypted_data,
-          is_encrypted: report.is_encrypted
-        })
+          is_encrypted: report.is_encrypted,
+        }),
       });
 
       if (response.ok) {
@@ -133,12 +136,16 @@ export async function syncPendingReports(): Promise<{
         markReportAsSynced(report.id, serverResponse);
         results.successful++;
       } else {
-        const errorData = await response.json().catch(() => ({ error: 'Network error' }));
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Network error" }));
         results.errors.push(`Report ${report.id}: ${errorData.error}`);
         results.failed++;
       }
     } catch (error) {
-      results.errors.push(`Report ${report.id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      results.errors.push(
+        `Report ${report.id}: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
       results.failed++;
     }
   }
@@ -146,7 +153,7 @@ export async function syncPendingReports(): Promise<{
   // Update sync status
   setSyncStatus({
     lastSync: Date.now(),
-    lastSyncResult: results
+    lastSyncResult: results,
   });
 
   return results;
@@ -155,11 +162,13 @@ export async function syncPendingReports(): Promise<{
 /**
  * Set up automatic sync when connection is restored
  */
-export function setupOfflineSync(onSyncComplete?: (results: any) => void): void {
+export function setupOfflineSync(
+  onSyncComplete?: (results: any) => void,
+): void {
   // Listen for online/offline events
-  window.addEventListener('online', async () => {
-    console.log('Connection restored, syncing pending reports...');
-    
+  window.addEventListener("online", async () => {
+    console.log("Connection restored, syncing pending reports...");
+
     // Small delay to ensure connection is stable
     setTimeout(async () => {
       try {
@@ -167,18 +176,20 @@ export function setupOfflineSync(onSyncComplete?: (results: any) => void): void 
         if (onSyncComplete) {
           onSyncComplete(results);
         }
-        
+
         if (results.successful > 0) {
-          showSyncNotification(`${results.successful} report(s) synced successfully`);
+          showSyncNotification(
+            `${results.successful} report(s) synced successfully`,
+          );
         }
       } catch (error) {
-        console.error('Auto-sync failed:', error);
+        console.error("Auto-sync failed:", error);
       }
     }, 1000);
   });
 
-  window.addEventListener('offline', () => {
-    console.log('Connection lost, reports will be saved offline');
+  window.addEventListener("offline", () => {
+    console.log("Connection lost, reports will be saved offline");
   });
 }
 
@@ -195,7 +206,7 @@ export function getSyncStatus(): {
     const status = stored ? JSON.parse(stored) : {};
     return {
       ...status,
-      pendingCount: getPendingReports().length
+      pendingCount: getPendingReports().length,
     };
   } catch (error) {
     return { pendingCount: getPendingReports().length };
@@ -209,7 +220,7 @@ function setSyncStatus(status: any): void {
   try {
     localStorage.setItem(SYNC_STATUS_KEY, JSON.stringify(status));
   } catch (error) {
-    console.error('Error saving sync status:', error);
+    console.error("Error saving sync status:", error);
   }
 }
 
@@ -217,10 +228,10 @@ function setSyncStatus(status: any): void {
  * Show sync notification (browser notification if permitted)
  */
 function showSyncNotification(message: string): void {
-  if ('Notification' in window && Notification.permission === 'granted') {
-    new Notification('Whistle - Sync Complete', {
+  if ("Notification" in window && Notification.permission === "granted") {
+    new Notification("Whistle - Sync Complete", {
       body: message,
-      icon: '/favicon.ico'
+      icon: "/favicon.ico",
     });
   }
 }
@@ -234,15 +245,15 @@ export function getStorageInfo(): {
   pendingCount: number;
 } {
   const reports = getOfflineReports();
-  const pendingCount = reports.filter(r => !r.synced).length;
-  
+  const pendingCount = reports.filter((r) => !r.synced).length;
+
   // Rough estimation of storage size
-  const jsonString = localStorage.getItem(OFFLINE_REPORTS_KEY) || '';
+  const jsonString = localStorage.getItem(OFFLINE_REPORTS_KEY) || "";
   const estimatedSizeMB = new Blob([jsonString]).size / (1024 * 1024);
-  
+
   return {
     reportCount: reports.length,
     estimatedSizeMB: Math.round(estimatedSizeMB * 100) / 100,
-    pendingCount
+    pendingCount,
   };
 }

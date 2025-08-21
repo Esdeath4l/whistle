@@ -57,13 +57,13 @@ import {
   saveOfflineReport,
   setupOfflineSync,
   syncPendingReports,
-  getPendingReports
+  getPendingReports,
 } from "@/lib/offline-storage";
 import {
   getCurrentLocation,
   checkGeolocationSupport,
   reverseGeocode,
-  formatLocation
+  formatLocation,
 } from "@/lib/geolocation";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
@@ -172,12 +172,12 @@ export default function Report() {
       });
     };
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
     };
   }, []);
 
@@ -211,7 +211,10 @@ export default function Report() {
 
       // Get address if possible
       try {
-        const address = await reverseGeocode(locationData.latitude, locationData.longitude);
+        const address = await reverseGeocode(
+          locationData.latitude,
+          locationData.longitude,
+        );
         locationData.address = address;
       } catch (e) {
         console.warn("Could not get address:", e);
@@ -696,9 +699,15 @@ export default function Report() {
 
                 {/* Status indicators */}
                 <div className="flex flex-wrap gap-2 p-3 bg-muted/50 rounded-lg">
-                  <div className={`flex items-center gap-2 text-sm ${online ? 'text-green-600' : 'text-red-600'}`}>
-                    {online ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />}
-                    {online ? 'Online' : 'Offline'}
+                  <div
+                    className={`flex items-center gap-2 text-sm ${online ? "text-green-600" : "text-red-600"}`}
+                  >
+                    {online ? (
+                      <Wifi className="w-4 h-4" />
+                    ) : (
+                      <WifiOff className="w-4 h-4" />
+                    )}
+                    {online ? "Online" : "Offline"}
                   </div>
 
                   {pendingReports > 0 && (
@@ -728,7 +737,10 @@ export default function Report() {
                       <div className="flex items-center gap-3">
                         <MapPin className="w-5 h-5 text-blue-600" />
                         <div>
-                          <Label htmlFor="share-location" className="text-sm font-medium">
+                          <Label
+                            htmlFor="share-location"
+                            className="text-sm font-medium"
+                          >
                             Share Location
                           </Label>
                           <p className="text-xs text-muted-foreground">
@@ -766,7 +778,9 @@ export default function Report() {
                           )}
                         </Button>
                         {locationError && (
-                          <span className="text-xs text-red-600">{locationError}</span>
+                          <span className="text-xs text-red-600">
+                            {locationError}
+                          </span>
                         )}
                       </div>
                     )}
@@ -821,8 +835,12 @@ export default function Report() {
                         {getModerationMessage(moderationResult)}
                         {moderationResult.detectedTerms.length > 0 && (
                           <div className="mt-1 text-xs">
-                            Detected: {moderationResult.detectedTerms.slice(0, 3).join(', ')}
-                            {moderationResult.detectedTerms.length > 3 && ` +${moderationResult.detectedTerms.length - 3} more`}
+                            Detected:{" "}
+                            {moderationResult.detectedTerms
+                              .slice(0, 3)
+                              .join(", ")}
+                            {moderationResult.detectedTerms.length > 3 &&
+                              ` +${moderationResult.detectedTerms.length - 3} more`}
                           </div>
                         )}
                       </AlertDescription>

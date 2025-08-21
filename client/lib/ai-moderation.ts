@@ -13,18 +13,49 @@ export interface ModerationResult {
 // Offensive words list (simplified for demo - in production use more comprehensive list)
 const OFFENSIVE_TERMS = [
   // Explicit content
-  'fuck', 'shit', 'damn', 'bitch', 'ass', 'crap',
+  "fuck",
+  "shit",
+  "damn",
+  "bitch",
+  "ass",
+  "crap",
   // Harassment terms
-  'idiot', 'stupid', 'moron', 'loser', 'pathetic', 'worthless',
+  "idiot",
+  "stupid",
+  "moron",
+  "loser",
+  "pathetic",
+  "worthless",
   // Hate speech (mild examples for demo)
-  'hate', 'kill', 'die', 'murder', 'threat', 'revenge',
+  "hate",
+  "kill",
+  "die",
+  "murder",
+  "threat",
+  "revenge",
   // Spam indicators
-  'click here', 'free money', 'win now', 'call now', 'buy now',
-  'urgent', 'limited time', 'act fast', 'don\'t miss',
+  "click here",
+  "free money",
+  "win now",
+  "call now",
+  "buy now",
+  "urgent",
+  "limited time",
+  "act fast",
+  "don't miss",
   // Inappropriate content
-  'nude', 'naked', 'porn', 'sex', 'xxx',
+  "nude",
+  "naked",
+  "porn",
+  "sex",
+  "xxx",
   // Bullying terms
-  'ugly', 'fat', 'gross', 'disgusting', 'freak', 'weirdo'
+  "ugly",
+  "fat",
+  "gross",
+  "disgusting",
+  "freak",
+  "weirdo",
 ];
 
 // Spam patterns
@@ -45,7 +76,7 @@ export function moderateContent(text: string): ModerationResult {
     return {
       isFlagged: false,
       confidence: 0,
-      detectedTerms: []
+      detectedTerms: [],
     };
   }
 
@@ -55,8 +86,11 @@ export function moderateContent(text: string): ModerationResult {
   let maxScore = 0;
 
   // Check for offensive terms
-  OFFENSIVE_TERMS.forEach(term => {
-    const regex = new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
+  OFFENSIVE_TERMS.forEach((term) => {
+    const regex = new RegExp(
+      `\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+      "gi",
+    );
     const matches = text.match(regex);
     if (matches) {
       detectedTerms.push(term);
@@ -68,16 +102,16 @@ export function moderateContent(text: string): ModerationResult {
 
   // Check for spam patterns
   let spamScore = 0;
-  SPAM_PATTERNS.forEach(pattern => {
+  SPAM_PATTERNS.forEach((pattern) => {
     const matches = text.match(pattern);
     if (matches) {
       spamScore += matches.length * 10;
-      if (pattern.source.includes('https?')) {
-        detectedTerms.push('suspicious_link');
-      } else if (pattern.source.includes('\\$')) {
-        detectedTerms.push('money_reference');
-      } else if (pattern.source.includes('[A-Z]')) {
-        detectedTerms.push('excessive_caps');
+      if (pattern.source.includes("https?")) {
+        detectedTerms.push("suspicious_link");
+      } else if (pattern.source.includes("\\$")) {
+        detectedTerms.push("money_reference");
+      } else if (pattern.source.includes("[A-Z]")) {
+        detectedTerms.push("excessive_caps");
       }
     }
   });
@@ -85,23 +119,29 @@ export function moderateContent(text: string): ModerationResult {
   // Calculate confidence based on various factors
   const textLength = text.length;
   const wordCount = text.split(/\s+/).length;
-  
+
   // Normalize scores
-  const normalizedOffensiveScore = Math.min(totalScore / Math.max(wordCount, 1), 100);
-  const normalizedSpamScore = Math.min(spamScore / Math.max(textLength, 1) * 100, 100);
-  
+  const normalizedOffensiveScore = Math.min(
+    totalScore / Math.max(wordCount, 1),
+    100,
+  );
+  const normalizedSpamScore = Math.min(
+    (spamScore / Math.max(textLength, 1)) * 100,
+    100,
+  );
+
   const finalScore = Math.max(normalizedOffensiveScore, normalizedSpamScore);
   const confidence = Math.min(finalScore / 100, 1);
 
   // Determine if content should be flagged
   const isFlagged = finalScore > 20 || maxScore > 50; // Adjustable thresholds
 
-  let reason = '';
+  let reason = "";
   if (isFlagged) {
     if (normalizedOffensiveScore > normalizedSpamScore) {
-      reason = 'Potentially offensive or inappropriate language detected';
+      reason = "Potentially offensive or inappropriate language detected";
     } else {
-      reason = 'Potential spam or promotional content detected';
+      reason = "Potential spam or promotional content detected";
     }
   }
 
@@ -109,7 +149,7 @@ export function moderateContent(text: string): ModerationResult {
     isFlagged,
     reason,
     confidence,
-    detectedTerms
+    detectedTerms,
   };
 }
 
@@ -117,9 +157,9 @@ export function moderateContent(text: string): ModerationResult {
  * Returns threat score for specific terms
  */
 function getThreatScore(term: string): number {
-  const highThreat = ['kill', 'die', 'murder', 'threat', 'revenge', 'hate'];
-  const mediumThreat = ['fuck', 'bitch', 'worthless', 'pathetic'];
-  const lowThreat = ['damn', 'crap', 'stupid', 'idiot'];
+  const highThreat = ["kill", "die", "murder", "threat", "revenge", "hate"];
+  const mediumThreat = ["fuck", "bitch", "worthless", "pathetic"];
+  const lowThreat = ["damn", "crap", "stupid", "idiot"];
 
   if (highThreat.includes(term.toLowerCase())) return 80;
   if (mediumThreat.includes(term.toLowerCase())) return 50;
@@ -138,25 +178,25 @@ export function analyzeContentPatterns(text: string): {
   suspiciousPatterns: string[];
 } {
   const patterns: string[] = [];
-  
+
   const hasRepeatedChars = /(.)\1{4,}/.test(text);
-  if (hasRepeatedChars) patterns.push('repeated_characters');
-  
+  if (hasRepeatedChars) patterns.push("repeated_characters");
+
   const hasExcessiveCaps = /[A-Z]{5,}/.test(text);
-  if (hasExcessiveCaps) patterns.push('excessive_capitals');
-  
+  if (hasExcessiveCaps) patterns.push("excessive_capitals");
+
   const hasUrls = /(https?:\/\/[^\s]+)/.test(text);
-  if (hasUrls) patterns.push('contains_urls');
-  
+  if (hasUrls) patterns.push("contains_urls");
+
   const hasSuspiciousNumbers = /\b\d{10,}\b/.test(text);
-  if (hasSuspiciousNumbers) patterns.push('long_numbers');
+  if (hasSuspiciousNumbers) patterns.push("long_numbers");
 
   return {
     hasRepeatedChars,
     hasExcessiveCaps,
     hasUrls,
     hasSuspiciousNumbers,
-    suspiciousPatterns: patterns
+    suspiciousPatterns: patterns,
   };
 }
 
@@ -164,8 +204,8 @@ export function analyzeContentPatterns(text: string): {
  * Get user-friendly moderation message
  */
 export function getModerationMessage(result: ModerationResult): string {
-  if (!result.isFlagged) return '';
-  
+  if (!result.isFlagged) return "";
+
   const confidence = Math.round(result.confidence * 100);
   return `⚠️ Content flagged for review (${confidence}% confidence): ${result.reason}`;
 }

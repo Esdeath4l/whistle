@@ -107,7 +107,10 @@ export default function Admin() {
           notificationService.setupRealtimeNotifications(authToken);
 
           // Request notification permission
-          if ("Notification" in window && Notification.permission === "default") {
+          if (
+            "Notification" in window &&
+            Notification.permission === "default"
+          ) {
             await Notification.requestPermission();
           }
         } catch (notificationError) {
@@ -464,30 +467,47 @@ export default function Admin() {
                 onClick={async () => {
                   // Test email service
                   try {
-                    const response = await fetch('/api/notifications/test-email', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' }
-                    });
+                    const response = await fetch(
+                      "/api/notifications/test-email",
+                      {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                      },
+                    );
 
                     let result;
                     try {
                       result = await response.json();
                     } catch (jsonError) {
-                      result = { error: 'Invalid response format', message: response.statusText };
+                      result = {
+                        error: "Invalid response format",
+                        message: response.statusText,
+                      };
                     }
 
                     if (response.ok && result.success) {
-                      alert('✅ Test email sent successfully! Check your inbox.');
+                      alert(
+                        "✅ Test email sent successfully! Check your inbox.",
+                      );
                     } else {
-                      const errorMsg = result.message || result.error || 'Unknown error';
+                      const errorMsg =
+                        result.message || result.error || "Unknown error";
                       if (response.status === 503) {
-                        alert('⚠️ Email not configured yet.\n\nTo enable email notifications:\n1. Get Gmail App Password from https://myaccount.google.com/apppasswords\n2. Set EMAIL_APP_PASSWORD environment variable\n\nError: ' + errorMsg);
+                        alert(
+                          "⚠️ Email not configured yet.\n\nTo enable email notifications:\n1. Get Gmail App Password from https://myaccount.google.com/apppasswords\n2. Set EMAIL_APP_PASSWORD environment variable\n\nError: " +
+                            errorMsg,
+                        );
                       } else {
-                        alert('❌ Email test failed: ' + errorMsg);
+                        alert("❌ Email test failed: " + errorMsg);
                       }
                     }
                   } catch (error) {
-                    alert('❌ Network error: ' + (error instanceof Error ? error.message : 'Connection failed'));
+                    alert(
+                      "❌ Network error: " +
+                        (error instanceof Error
+                          ? error.message
+                          : "Connection failed"),
+                    );
                   }
                 }}
                 variant="outline"
@@ -501,7 +521,8 @@ export default function Admin() {
                   // Add demo data for testing
                   const demoReports = [
                     {
-                      message: "Someone was using offensive language and making threats in the office",
+                      message:
+                        "Someone was using offensive language and making threats in the office",
                       category: "harassment",
                       severity: "high",
                       location: {
@@ -509,9 +530,9 @@ export default function Admin() {
                         longitude: -122.4194,
                         accuracy: 10,
                         timestamp: Date.now(),
-                        address: "123 Market Street, San Francisco, CA"
+                        address: "123 Market Street, San Francisco, CA",
                       },
-                      share_location: true
+                      share_location: true,
                     },
                     {
                       message: "Emergency medical situation in building lobby",
@@ -522,12 +543,13 @@ export default function Admin() {
                         longitude: -122.4094,
                         accuracy: 8,
                         timestamp: Date.now(),
-                        address: "456 Mission Street, San Francisco, CA"
+                        address: "456 Mission Street, San Francisco, CA",
                       },
-                      share_location: true
+                      share_location: true,
                     },
                     {
-                      message: "Great feedback about the new lunch menu options",
+                      message:
+                        "Great feedback about the new lunch menu options",
                       category: "feedback",
                       severity: "low",
                       location: {
@@ -535,17 +557,17 @@ export default function Admin() {
                         longitude: -122.4294,
                         accuracy: 12,
                         timestamp: Date.now(),
-                        address: "789 Howard Street, San Francisco, CA"
+                        address: "789 Howard Street, San Francisco, CA",
                       },
-                      share_location: true
-                    }
+                      share_location: true,
+                    },
                   ];
 
                   for (const report of demoReports) {
-                    await fetch('/api/reports', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(report)
+                    await fetch("/api/reports", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify(report),
                     });
                   }
 
@@ -922,7 +944,9 @@ export default function Admin() {
                                     <div className="flex items-center gap-2 mb-2">
                                       <MapPin className="w-4 h-4 text-blue-600" />
                                       <span className="font-medium text-sm">
-                                        {formatLocation(selectedReport.location)}
+                                        {formatLocation(
+                                          selectedReport.location,
+                                        )}
                                       </span>
                                     </div>
                                     {selectedReport.location.address && (
@@ -931,8 +955,14 @@ export default function Admin() {
                                       </p>
                                     )}
                                     <p className="text-xs text-muted-foreground mt-1">
-                                      Accuracy: ±{Math.round(selectedReport.location.accuracy)}m •
-                                      Captured: {new Date(selectedReport.location.timestamp).toLocaleString()}
+                                      Accuracy: ±
+                                      {Math.round(
+                                        selectedReport.location.accuracy,
+                                      )}
+                                      m • Captured:{" "}
+                                      {new Date(
+                                        selectedReport.location.timestamp,
+                                      ).toLocaleString()}
                                     </p>
                                   </div>
                                 </div>
@@ -944,24 +974,39 @@ export default function Admin() {
                                   <Label className="text-sm font-medium">
                                     AI Moderation Analysis
                                   </Label>
-                                  <div className={`mt-2 p-4 rounded-lg border ${
-                                    selectedReport.moderation.isFlagged
-                                      ? 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800'
-                                      : 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800'
-                                  }`}>
+                                  <div
+                                    className={`mt-2 p-4 rounded-lg border ${
+                                      selectedReport.moderation.isFlagged
+                                        ? "bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800"
+                                        : "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800"
+                                    }`}
+                                  >
                                     <div className="flex items-center gap-2 mb-2">
                                       {selectedReport.moderation.isFlagged ? (
                                         <AlertTriangle className="w-4 h-4 text-yellow-600" />
                                       ) : (
                                         <CheckCircle className="w-4 h-4 text-green-600" />
                                       )}
-                                      <span className={`font-medium text-sm ${
-                                        selectedReport.moderation.isFlagged ? 'text-yellow-800' : 'text-green-800'
-                                      }`}>
-                                        {selectedReport.moderation.isFlagged ? 'Content Flagged' : 'Content Cleared'}
+                                      <span
+                                        className={`font-medium text-sm ${
+                                          selectedReport.moderation.isFlagged
+                                            ? "text-yellow-800"
+                                            : "text-green-800"
+                                        }`}
+                                      >
+                                        {selectedReport.moderation.isFlagged
+                                          ? "Content Flagged"
+                                          : "Content Cleared"}
                                       </span>
-                                      <Badge variant="outline" className="text-xs">
-                                        {Math.round(selectedReport.moderation.confidence * 100)}% confidence
+                                      <Badge
+                                        variant="outline"
+                                        className="text-xs"
+                                      >
+                                        {Math.round(
+                                          selectedReport.moderation.confidence *
+                                            100,
+                                        )}
+                                        % confidence
                                       </Badge>
                                     </div>
                                     {selectedReport.moderation.reason && (
@@ -969,14 +1014,19 @@ export default function Admin() {
                                         {selectedReport.moderation.reason}
                                       </p>
                                     )}
-                                    {selectedReport.moderation.detectedTerms.length > 0 && (
+                                    {selectedReport.moderation.detectedTerms
+                                      .length > 0 && (
                                       <div className="text-xs">
-                                        <span className="text-muted-foreground">Detected terms: </span>
+                                        <span className="text-muted-foreground">
+                                          Detected terms:{" "}
+                                        </span>
                                         <span className="font-mono">
-                                          {selectedReport.moderation.detectedTerms.slice(0, 5).join(', ')}
-                                          {selectedReport.moderation.detectedTerms.length > 5 &&
-                                            ` +${selectedReport.moderation.detectedTerms.length - 5} more`
-                                          }
+                                          {selectedReport.moderation.detectedTerms
+                                            .slice(0, 5)
+                                            .join(", ")}
+                                          {selectedReport.moderation
+                                            .detectedTerms.length > 5 &&
+                                            ` +${selectedReport.moderation.detectedTerms.length - 5} more`}
                                         </span>
                                       </div>
                                     )}

@@ -105,7 +105,7 @@ export class NotificationService {
     }
 
     // Skip if not in browser environment
-    if (typeof window === 'undefined' || typeof EventSource === 'undefined') {
+    if (typeof window === "undefined" || typeof EventSource === "undefined") {
       console.log("SSE not supported in this environment");
       return;
     }
@@ -158,7 +158,8 @@ export class NotificationService {
       console.error("Failed to setup real-time notifications:", error);
       this.showToast({
         title: "❌ Notification Setup Failed",
-        description: "Could not establish notification connection. Some features may be limited.",
+        description:
+          "Could not establish notification connection. Some features may be limited.",
         type: "error",
         duration: 5000,
       });
@@ -280,7 +281,7 @@ export class NotificationService {
       const delay = Math.min(Math.pow(2, this.reconnectAttempts) * 1000, 30000); // Cap at 30 seconds
 
       console.log(
-        `Attempting to reconnect notifications in ${delay/1000}s (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
+        `Attempting to reconnect notifications in ${delay / 1000}s (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
       );
 
       setTimeout(() => {

@@ -21,11 +21,11 @@ const ADMIN_PASSWORD = "satoru 2624";
 
 // Simple AI moderation (server-side backup)
 function moderateContent(text: string): ModerationResult {
-  const offensiveTerms = ['fuck', 'shit', 'kill', 'die', 'hate', 'threat'];
+  const offensiveTerms = ["fuck", "shit", "kill", "die", "hate", "threat"];
   const lowercaseText = text.toLowerCase();
   const detectedTerms: string[] = [];
 
-  offensiveTerms.forEach(term => {
+  offensiveTerms.forEach((term) => {
     if (lowercaseText.includes(term)) {
       detectedTerms.push(term);
     }
@@ -36,9 +36,11 @@ function moderateContent(text: string): ModerationResult {
 
   return {
     isFlagged,
-    reason: isFlagged ? 'Potentially inappropriate content detected' : undefined,
+    reason: isFlagged
+      ? "Potentially inappropriate content detected"
+      : undefined,
     confidence,
-    detectedTerms
+    detectedTerms,
   };
 }
 
@@ -163,7 +165,10 @@ export const createReport: RequestHandler = (req, res) => {
     };
 
     // Auto-flag urgent reports or AI-flagged content
-    if (severity === "urgent" || (moderation && moderation.isFlagged && moderation.confidence > 0.7)) {
+    if (
+      severity === "urgent" ||
+      (moderation && moderation.isFlagged && moderation.confidence > 0.7)
+    ) {
       newReport.status = "flagged";
     }
 
