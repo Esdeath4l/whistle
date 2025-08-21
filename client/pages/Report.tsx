@@ -357,6 +357,9 @@ export default function Report() {
               }
             : undefined,
           is_encrypted: false,
+          location: shareLocation && location ? location : undefined,
+          share_location: shareLocation,
+          is_offline_sync: !online,
         };
         console.log("Submitting plain text report (mobile device detected)");
       } else {
