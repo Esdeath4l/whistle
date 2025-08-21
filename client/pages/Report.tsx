@@ -427,6 +427,23 @@ export default function Report() {
         }
       }
 
+      // Handle offline submission
+      if (!online) {
+        const offlineId = saveOfflineReport(reportData);
+        console.log("Report saved offline:", offlineId);
+
+        toast({
+          title: "Report Saved Offline",
+          description: "Your report will be synced when connection is restored",
+        });
+
+        setReportId(offlineId);
+        setSubmitted(true);
+        updatePendingCount();
+        return;
+      }
+
+      // Online submission
       const response = await fetch("/api/reports", {
         method: "POST",
         headers: {
@@ -453,6 +470,20 @@ export default function Report() {
       console.log("Success:", result); // Debug log
       setReportId(result.id);
       setSubmitted(true);
+
+      // Show success message with moderation info if flagged
+      if (moderationResult?.isFlagged) {
+        toast({
+          title: "Report Submitted",
+          description: "⚠️ Report flagged for review by AI moderation",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Report Submitted",
+          description: "Your report has been submitted successfully",
+        });
+      }
     } catch (err) {
       console.error("Error submitting report:", err);
       setError(
