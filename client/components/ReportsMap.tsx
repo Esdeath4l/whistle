@@ -14,6 +14,7 @@ import {
   Eye
 } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
+import 'react-leaflet-markercluster/dist/styles.min.css';
 
 // Import leaflet images explicitly
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
