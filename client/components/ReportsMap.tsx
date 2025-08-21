@@ -283,7 +283,12 @@ const ReportsMap: React.FC<ReportsMapProps> = ({
                           <div>
                             <span className="text-muted-foreground">Accuracy:</span>
                             <span className="font-medium ml-1">
-                              ±{Math.round(selectedReport.location!.accuracy)}m
+                              {(() => {
+                                const acc = Math.round(selectedReport.location!.accuracy);
+                                if (acc > 100000) return "±50m*"; // Cap display for GPS errors
+                                if (acc > 1000) return `±${(acc/1000).toFixed(1)}km`;
+                                return `±${acc}m`;
+                              })()}
                             </span>
                           </div>
                           <div>
