@@ -102,12 +102,17 @@ export default function Admin() {
         setIsAuthenticated(true);
         fetchReports();
 
-        // Setup real-time notifications
-        notificationService.setupRealtimeNotifications(authToken);
+        // Setup real-time notifications with error handling
+        try {
+          notificationService.setupRealtimeNotifications(authToken);
 
-        // Request notification permission
-        if ("Notification" in window && Notification.permission === "default") {
-          await Notification.requestPermission();
+          // Request notification permission
+          if ("Notification" in window && Notification.permission === "default") {
+            await Notification.requestPermission();
+          }
+        } catch (notificationError) {
+          console.warn("Failed to setup notifications:", notificationError);
+          // Don't block login if notifications fail
         }
       } else {
         setLoginError(data.error || "Invalid username or password");
