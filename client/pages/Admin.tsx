@@ -810,6 +810,78 @@ export default function Admin() {
                                 </div>
                               )}
 
+                              {/* Location Information */}
+                              {selectedReport.location && (
+                                <div>
+                                  <Label className="text-sm font-medium">
+                                    Location Information
+                                  </Label>
+                                  <div className="mt-2 p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <MapPin className="w-4 h-4 text-blue-600" />
+                                      <span className="font-medium text-sm">
+                                        {formatLocation(selectedReport.location)}
+                                      </span>
+                                    </div>
+                                    {selectedReport.location.address && (
+                                      <p className="text-sm text-muted-foreground">
+                                        📍 {selectedReport.location.address}
+                                      </p>
+                                    )}
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      Accuracy: ±{Math.round(selectedReport.location.accuracy)}m •
+                                      Captured: {new Date(selectedReport.location.timestamp).toLocaleString()}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* AI Moderation Results */}
+                              {selectedReport.moderation && (
+                                <div>
+                                  <Label className="text-sm font-medium">
+                                    AI Moderation Analysis
+                                  </Label>
+                                  <div className={`mt-2 p-4 rounded-lg border ${
+                                    selectedReport.moderation.isFlagged
+                                      ? 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800'
+                                      : 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800'
+                                  }`}>
+                                    <div className="flex items-center gap-2 mb-2">
+                                      {selectedReport.moderation.isFlagged ? (
+                                        <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                                      ) : (
+                                        <CheckCircle className="w-4 h-4 text-green-600" />
+                                      )}
+                                      <span className={`font-medium text-sm ${
+                                        selectedReport.moderation.isFlagged ? 'text-yellow-800' : 'text-green-800'
+                                      }`}>
+                                        {selectedReport.moderation.isFlagged ? 'Content Flagged' : 'Content Cleared'}
+                                      </span>
+                                      <Badge variant="outline" className="text-xs">
+                                        {Math.round(selectedReport.moderation.confidence * 100)}% confidence
+                                      </Badge>
+                                    </div>
+                                    {selectedReport.moderation.reason && (
+                                      <p className="text-sm text-muted-foreground mb-2">
+                                        {selectedReport.moderation.reason}
+                                      </p>
+                                    )}
+                                    {selectedReport.moderation.detectedTerms.length > 0 && (
+                                      <div className="text-xs">
+                                        <span className="text-muted-foreground">Detected terms: </span>
+                                        <span className="font-mono">
+                                          {selectedReport.moderation.detectedTerms.slice(0, 5).join(', ')}
+                                          {selectedReport.moderation.detectedTerms.length > 5 &&
+                                            ` +${selectedReport.moderation.detectedTerms.length - 5} more`
+                                          }
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
                               {selectedReport.admin_response && (
                                 <div>
                                   <Label className="text-sm font-medium">
