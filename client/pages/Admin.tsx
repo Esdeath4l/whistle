@@ -50,6 +50,7 @@ import { Link } from "react-router-dom";
 import {
   Report,
   ReportStatus,
+  ReportCategory,
   GetReportsResponse,
   UpdateReportRequest,
 } from "@shared/api";
