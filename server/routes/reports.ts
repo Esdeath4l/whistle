@@ -137,6 +137,12 @@ export const createReport: RequestHandler = (req, res) => {
       return res.status(400).json({ error: "Invalid severity level" });
     }
 
+    // Apply AI moderation if not encrypted
+    let moderation: ModerationResult | undefined;
+    if (!is_encrypted && message) {
+      moderation = moderateContent(message);
+    }
+
     const newReport: Report = {
       id: `report_${reportIdCounter++}`,
       message: is_encrypted ? "[ENCRYPTED]" : (message || "").trim(),
@@ -151,6 +157,9 @@ export const createReport: RequestHandler = (req, res) => {
       status: "pending" as ReportStatus,
       encrypted_data: encrypted_data,
       is_encrypted: is_encrypted || false,
+      location: share_location && location ? location : undefined,
+      moderation: moderation,
+      is_offline_sync: is_offline_sync || false,
     };
 
     // Auto-flag urgent reports (check severity since category might be encrypted)
