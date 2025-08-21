@@ -78,6 +78,10 @@ export interface CreateReportRequest {
   // For encrypted submissions
   encrypted_data?: EncryptedReportData;
   is_encrypted?: boolean;
+  // New features
+  location?: LocationData;
+  share_location?: boolean;
+  is_offline_sync?: boolean;
 }
 
 export interface CreateReportResponse {
