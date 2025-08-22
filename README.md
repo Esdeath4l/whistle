@@ -4,12 +4,15 @@ A secure, anonymous reporting platform built for hackathons, workspaces, and eve
 
 ## 🏆 Award-Winning Features
 
-- **🔐 End-to-End Encryption** - Military-grade AES-256 encryption
+- **🔐 Client Side Encryption** -  Encrypted data handled in local storage
 - **📱 QR Code Access** - Zero-friction reporting via QR codes
 - **⚡ Real-time Alerts** - Instant admin notifications
+- **⚡Email Alerts** - Instant email notifications
 - **🛡️ 100% Anonymous** - No personal data collection
 - **🎯 Smart Categorization** - AI-powered severity detection
 - **📊 Admin Dashboard** - Professional report management
+- **Maps / Geo-tagging**- Leaflet.js + OpenStreetMap for interactive maps
+
 
 ## 🚀 Quick Start
 
@@ -39,8 +42,7 @@ npm start
 - Anonymous session management
 - Encrypted data storage
 - No IP or device tracking
-- GDPR/CCPA compliant
-
+  
 ## 📱 Usage
 
 ### For Users:
@@ -66,27 +68,25 @@ npm start
 - **In-app notifications** for new reports
 - **Browser push notifications**
 - **Email alerts** for urgent reports
-- **SMS notifications** for emergencies
 - **Sound alerts** with severity-based tones
 
 ### Alert Prioritization:
 
 - 🟢 **Standard Reports** → In-app + browser notification
-- 🟡 **High Priority** → Above + email alert
-- 🔴 **Urgent/Emergency** → All channels + SMS + escalation
+- 🟡 **High Priority** → In-app + browser notification
+- 🔴 **Urgent/Emergency** → Above + email alert
 
 ## 🛡️ Security Architecture
 
 ### Client-Side:
 
-- **AES-256 encryption** before transmission
 - **Anonymous sessions** with no tracking
 - **Secure form validation**
 - **Photo metadata removal**
 
 ### Server-Side:
 
-- **Encrypted data storage**
+- **Encrypted local storage**
 - **Admin authentication required**
 - **Audit trail logging**
 - **Rate limiting protection**
@@ -110,14 +110,6 @@ npm start
 
 ## 🌍 Production Considerations
 
-### Database Integration:
-
-Replace in-memory storage with PostgreSQL:
-
-```bash
-npm install pg @types/pg
-# Update server/routes/reports.ts to use database
-```
 
 ### Email Service:
 
@@ -126,18 +118,12 @@ npm install @sendgrid/mail
 # Configure in server/routes/notifications.ts
 ```
 
-### SMS Service:
-
-```bash
-npm install twilio
-# Configure in server/routes/notifications.ts
-```
 
 ## 🏆 Hackathon Ready
 
 **Whistle** is built to win with:
 
-- **Innovation:** E2E encryption + QR access + AI categorization
+- **Innovation:** Client side encryption + QR access + AI categorization
 - **Impact:** Real-world harassment prevention
 - **Technical Excellence:** Production-ready architecture
 - **User Experience:** Zero-friction anonymous reporting
